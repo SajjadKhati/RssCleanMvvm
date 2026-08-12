@@ -289,7 +289,8 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
         private IUnitOfWorkFactory BuildIUnitOfWorkFactory()
         {
-            string connectionString = @"Server=.;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+            //string connectionString = @"Server=.;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+            string connectionString = @"Server=(localdb)\MSSQLLocalDB;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
             return new UnitOfWorkFactory(connectionString);
         }
 
