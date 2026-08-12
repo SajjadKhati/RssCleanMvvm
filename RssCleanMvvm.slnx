@@ -1,0 +1,33 @@
+<Solution>
+  <Folder Name="/1 View/">
+    <Project Path="View.MigrationConsolApp/View.MigrationConsolApp.csproj" Id="5556f581-7b31-4154-88d1-b1e2f7ab7ff6" />
+    <Project Path="View.RssCleanMvvm/View.RssCleanMvvm.csproj" />
+  </Folder>
+  <Folder Name="/2 ViewModel/">
+    <Project Path="ViewModel/ViewModel.csproj" Id="8eea66b5-2f20-4fdd-9c2f-4147fab34825" />
+  </Folder>
+  <Folder Name="/3 Application/">
+    <Project Path="Application/Application.csproj" Id="993636bb-eb3a-437b-95dd-f0ef2fa07f95" />
+  </Folder>
+  <Folder Name="/4_0 Domain/">
+    <Project Path="Domain/Domain.csproj" Id="29c71446-f47a-46f9-95df-3279b6f8ba83" />
+  </Folder>
+  <Folder Name="/4_00 Core/">
+    <Project Path="Core/Core.csproj" Id="044760fe-8423-4145-843e-1e631ab457b5" />
+  </Folder>
+  <Folder Name="/5 Share/">
+    <Project Path="Shared/Shared.csproj" Id="dccf8c76-34a6-4dcf-9008-a2635f440325" />
+  </Folder>
+  <Folder Name="/Infrastructure/" />
+  <Folder Name="/Infrastructure/Services/">
+    <Project Path="Infra.CacheService/Infra.CacheService.csproj" Id="57f6fcaa-8120-4a29-b601-85f44adc76fd" />
+    <Project Path="Infra.DataAccess/Infra.DataAccess.csproj" Id="6f50c08a-dc79-4f3b-ae37-1e731b1ae62f" />
+    <Project Path="Infra.HttpService/Infra.HttpService.csproj" Id="26646bf3-3361-48db-950d-da788b546e2f" />
+    <Project Path="Infra.ImageService/Infra.ImageService.csproj" Id="59e308f9-34e8-4a85-9171-346a0cd3e7f4" />
+    <Project Path="Infra.SharedService/Infra.SharedService.csproj" Id="21a80961-192b-4f97-bb6a-c272f55e7d3d" />
+    <Project Path="Infra.XmlService/Infra.XmlService.csproj" Id="ef73238e-a5ca-4c27-b36f-e76c8cf1b0b9" />
+  </Folder>
+  <Folder Name="/UnitTest/">
+    <Project Path="xUnitTest/xUnitTest.Infrastructure.csproj" Id="95d9e76d-e88b-4ca7-9209-fd7940f88cfc" />
+  </Folder>
+</Solution>
