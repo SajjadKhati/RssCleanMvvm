@@ -1,7 +1,9 @@
 ﻿using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
+using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
-using Infra.SharedService.FilePathMakerService.Class;
+using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
+using Infra.SharedService.ImageSettingsMapperService.Class;
 
 namespace Infra.ImageService.ImageFileSaverService.Class
 {
@@ -15,33 +17,36 @@ namespace Infra.ImageService.ImageFileSaverService.Class
 
         private IImageFileSaver imageFileSaver;
 
-        private FilePathMaker filePathMaker;
+        private IFilePathMaker filePathMaker;
+
+        private ImageSettingsMapper imageSettingsMapper;
 
 
         /////////////////////////////////////////////////////////////////////////////
 
 
-        public ImageFileSaverCoordinator(IImageFileSaver imageFileSaver, FilePathMaker filePathMaker)
+        public ImageFileSaverCoordinator(IImageFileSaver imageFileSaver, IFilePathMaker filePathMaker, ImageSettingsMapper imageSettingsMapper)
         {
             this.imageFileSaver = imageFileSaver;
             this.filePathMaker = filePathMaker;
+            this.imageSettingsMapper = imageSettingsMapper;
         }
 
 
         /////////////////////////////////////////////////////////////////////////////
 
 
-        public DestinationPath Save8BitImageToFile(ImageFileSettings imageFileSettings, FilePath filePath)
+        public DestinationPath Save8BitImageToFile(byte[,,] image, ImageSettings<ImageInfo> imageInfoSettings, FilePath filePath)
         {
-            DestinationPath destinationPath = this.filePathMaker.CreateFullImageFilePath(filePath, imageFileSettings.Format);
+            DestinationPath destinationPath = this.filePathMaker.CreateFullImageFilePathWithSafeFileName(filePath, imageInfoSettings.Format);
             try
             {
-                var imageFileSpecification = new ImageFileSpecification
+                var imageFileSaveSettings = new ImageFileSaveSettings
                 {
-                    ImageFileSettings = imageFileSettings,
+                    ImageFileSettings = this.imageSettingsMapper.MappToImageDataSettings(imageInfoSettings, image),
                     FullFilePath = destinationPath.FullFilePath
                 };
-                this.imageFileSaver.Save8BitImageToFile(imageFileSpecification);
+                this.imageFileSaver.Save8BitImageToFile(imageFileSaveSettings);
                 return destinationPath;
             }
             catch (Exception exception)

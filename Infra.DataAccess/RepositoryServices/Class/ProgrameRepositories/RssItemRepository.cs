@@ -1,14 +1,16 @@
-﻿using Domain.DomainEntities.RssEntity.Class;
-using Infra.DataAccess.DbContextService.Class;
-using Infra.DataAccess.EfEntityMapperService.Class;
-using Infra.DataAccess.EfEntities.Class;
-using Infra.DataAccess.RepositoryServices.Class.RepositoryBases;
-using Application.InfrastructureContracts.CacheProject.Cache.Interfaces;
+﻿using Application.InfrastructureContracts.CacheProject.Cache.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.DataModels;
 using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.Interfaces;
 using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
+using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
+using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
+using Domain.DomainEntities.RssEntity.Class;
+using Infra.DataAccess.DbContextService.Class;
+using Infra.DataAccess.EfEntities.Class;
+using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.RepositoryServices.Class.RepositoryBases;
 
 namespace Infra.DataAccess.RepositoryServices.Class.ProgrameRepositories
 {
@@ -40,9 +42,9 @@ namespace Infra.DataAccess.RepositoryServices.Class.ProgrameRepositories
         ///////////////////////////////////////////////////////////////
 
 
-        public void Add(RssItem rssItem, string imageFolderPath, ImageFileSettings imageFileSettings)
+        public void Add(RssItem rssItem, ImageSaveOptions imageSaveOptions)
         {
-            DestinationPath imageDestinationPath = this.SaveImageToFile(imageFolderPath, rssItem.Id.AbsoluteUri, imageFileSettings);
+            DestinationPath imageDestinationPath = this.SaveImageToFile(rssItem.Argb8BitImage, imageSaveOptions.FolderPath, rssItem.Id.AbsoluteUri, imageSaveOptions.ImageInfoSettings);
             RssItemEfEntity rssItemEfEntity = this.efEntityMapper.ToRssItemEfEntity(rssItem, imageDestinationPath.FullFilePath);
             this.AddEntity(rssItemEfEntity);
         }
@@ -55,9 +57,9 @@ namespace Infra.DataAccess.RepositoryServices.Class.ProgrameRepositories
         }
 
 
-        public void Update(RssItem rssItem, string imageFolderPath, ImageFileSettings imageFileSettings)
+        public void Update(RssItem rssItem, ImageSaveOptions imageSaveOptions)
         {
-            DestinationPath imageDestinationPath = this.SaveImageToFile(imageFolderPath, rssItem.Id.AbsoluteUri, imageFileSettings);
+            DestinationPath imageDestinationPath = this.SaveImageToFile(rssItem.Argb8BitImage, imageSaveOptions.FolderPath, rssItem.Id.AbsoluteUri, imageSaveOptions.ImageInfoSettings);
             RssItemEfEntity oldRssItemEfEntity = this.FindRssItemEfEntityByKey(rssItem.Id.AbsoluteUri);
             this.AttachEntityToDbContext(oldRssItemEfEntity);
             /// به روزرسانی
@@ -91,10 +93,10 @@ namespace Infra.DataAccess.RepositoryServices.Class.ProgrameRepositories
         }
 
 
-        private DestinationPath SaveImageToFile(string imageFolderPath, string imageFileName, ImageFileSettings imageFileSettings)
+        private DestinationPath SaveImageToFile(byte[,,] image, string imageFolderPath, string imageFileName, ImageSettings<ImageInfo> imageInfoSettings)
         {
             var imageFilePath = new FilePath(imageFolderPath, imageFileName);
-            DestinationPath imageDestinationPath = this.imageFileSaverCoordinator.Save8BitImageToFile(imageFileSettings, imageFilePath);
+            DestinationPath imageDestinationPath = this.imageFileSaverCoordinator.Save8BitImageToFile(image, imageInfoSettings, imageFilePath);
             return imageDestinationPath;
         }
 

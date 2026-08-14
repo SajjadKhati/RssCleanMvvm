@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="InfrastructureContracts\SharedProject\FilePathMaker\Interfaces\" />
-  </ItemGroup>
-
 </Project>

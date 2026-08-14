@@ -5,7 +5,7 @@ namespace Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interf
     public interface IImageFileSaver
     {
 
-        void Save8BitImageToFile(ImageFileSpecification imageFileSpecification);
+        void Save8BitImageToFile(ImageFileSaveSettings imageFileSaveSettings);
 
     }
 }

@@ -1,19 +1,42 @@
-﻿using Application.Interfaces.InfrastructureServices.HttpRequestInterface;
-using Application.Interfaces.InfrastructureServices.ImageDataExtractorInterface;
-using Application.OverallDataModels.OverallPoco.ImageData;
+﻿using Application.InfrastructureContracts.CacheProject.Cache.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.DataModels;
+using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.Factory.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.Repository.RepositoryBases.Factory.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.Repository.RepositoryBases.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.UnitOfWork.Factory.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.UnitOfWork.Interfaces;
+using Application.InfrastructureContracts.HttpProject.HttpRequest.Factory.Interfaces;
+using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
+using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
+using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Enum;
+using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
+using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
+using Application.InfrastructureContracts.ImageProject.SharedDataModels.Enum;
+using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
+using Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces;
 using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Class;
 using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Interface;
 using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
 using Application.UseCases.LoadUseCaseModule.Class;
-using Infra.HttpService.Class;
-using Infra.HttpService.Factory.Class;
+using Core.ImageServices.ImageCreatorService.Class;
+using Domain.DomainEntities.RssEntity.Class;
+using Infra.CacheService.CacheServices.Class;
+using Infra.DataAccess.EfEntities.Class;
+using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.RepositoryServices.Factory.Class;
+using Infra.DataAccess.UnitOfWorkService.Factory.Class;
+using Infra.HttpService.HttpRequestService.Factory.Class;
 using Infra.ImageService.ImageDataExtractorService.Class;
+using Infra.ImageService.ImageFileReaderService.Class;
 using Infra.ImageService.ImageFileSaverService.Class;
 using Infra.ImageService.InfraImageCreatorService.Class;
 using Infra.ImageService.MappingService.Class;
-using Infra.XmlParserService.Class;
+using Infra.SharedService.FilePathMakerService.Class;
+using Infra.SharedService.ImageSettingsMapperService.Class;
+using Infra.XmlParserService.XamlParserService.Class;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -23,26 +46,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Infra.DataAccess.RepositoryServices.Factory.Class;
-using Infra.DataAccess.EfEntityMapperService.Class;
-using Infra.ImageService.ImageFileReaderService.Class;
-using Infra.DataAccess.UnitOfWorkService.Factory.Class;
-using Domain.DomainEntities.RssEntity.Class;
-using Infra.SharedService.FilePathMakerService.Class;
-using Application.InfrastructureContracts.DataAccessProject.Repository.RepositoryBases.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.Repository.RepositoryBases.Factory.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.Factory.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.UnitOfWork.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.UnitOfWork.Factory.Interfaces;
-using Application.InfrastructureContracts.HttpProject.HttpRequest.Factory.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
-using Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Enum;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
-using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
-using Application.InfrastructureContracts.ImageProject.SharedDataModels.Enum;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
 {
@@ -51,8 +55,6 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         [Fact]
         public async Task LoadUseCaseTest()
         {
-            Uri tst = new Uri("سلام");
-
             IHttpRequestFactory httpRequestFactory = new HttpRequestFactory();
             IXmlParser xmlParser = new XmlParser();
             LoadUseCase loadUseCase = new LoadUseCase(xmlParser, httpRequestFactory);
@@ -97,9 +99,9 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
             /////
 
-            ImageFileSaver imageSaver = new ImageFileSaver(new ImageFileSettingsMemberMapper(imageInfoMemberMapper));
-            imageSaver.Save8BitImageToFile(imageData.Data, "F:\\Laptop\\ConvertedImageData.png",
-                this.CreateArgb8BitImageSaverSettings());
+            ImageUtility imageUtility = new ImageUtility();
+            ImageFileSaver imageSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(imageInfoMemberMapper));
+            imageSaver.Save8BitImageToFile(this.CreateArgb8BitImageSaverSettings(imageData.Data, "F:\\Laptop\\ConvertedImageData.png"));
         }
 
 
@@ -140,9 +142,9 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
             ///
             var imageInfoMemberMapper = new ImageInfoMemberMapper();
-            ImageFileSaver imageSaver = new ImageFileSaver(new ImageFileSettingsMemberMapper(imageInfoMemberMapper));
-            imageSaver.Save8BitImageToFile(normalizedImageData.Data, "F:\\Laptop\\ConvertedImageData.png",
-                this.CreateArgb8BitImageSaverSettings());
+            ImageUtility imageUtility = new ImageUtility();
+            ImageFileSaver imageSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(imageInfoMemberMapper));
+            imageSaver.Save8BitImageToFile(this.CreateArgb8BitImageSaverSettings(normalizedImageData.Data, "F:\\Laptop\\ConvertedImageData.png"));
         }
 
 
@@ -184,9 +186,9 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             ///
 
             var imageInfoMemberMapper = new ImageInfoMemberMapper();
-            ImageFileSaver imageSaver = new ImageFileSaver(new ImageFileSettingsMemberMapper(imageInfoMemberMapper));
-            imageSaver.Save8BitImageToFile(normalizedImageData.Data, "F:\\Laptop\\ConvertedImageData.png",
-                this.CreateArgb8BitImageSaverSettings());
+            ImageUtility imageUtility = new ImageUtility();
+            ImageFileSaver imageSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(imageInfoMemberMapper));
+            imageSaver.Save8BitImageToFile(this.CreateArgb8BitImageSaverSettings(normalizedImageData.Data, "F:\\Laptop\\ConvertedImageData.png"));
         }
 
 
@@ -211,9 +213,9 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
             ///
 
-            ImageFileSaver imageSaver = new ImageFileSaver(new ImageFileSettingsMemberMapper(imageInfoMemberMapper));
-            imageSaver.Save8BitImageToFile(normalizedImageData.Data, "F:\\Laptop\\ConvertedImageData.png", 
-                this.CreateArgb8BitImageSaverSettings());
+            ImageUtility imageUtility = new ImageUtility();
+            ImageFileSaver imageSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(imageInfoMemberMapper));
+            imageSaver.Save8BitImageToFile(this.CreateArgb8BitImageSaverSettings(normalizedImageData.Data, "F:\\Laptop\\ConvertedImageData.png"));
         }
 
 
@@ -224,7 +226,7 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             IRssItemRepository rssItemRepository = database.rssItemRepository;
             using IUnitOfWork unitOfWork = database.unitOfWork;
 
-            rssItemRepository.Add(this.GetRssItem(), this.CreateArgb8BitImageSaverSettings());
+            rssItemRepository.Add(this.GetRssItem(), this.GetImageSaveOptions(@"D:\Tasavir\Test"));
             unitOfWork.SaveChanges();
         }
 
@@ -279,11 +281,14 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         private IRssItemRepositoryFactory BuildIRssItemRepositoryFactory()
         {
             RssItemEfEntityMapper efEntityMapper = new RssItemEfEntityMapper();
-            IImageFileSaver imageFileSaver = new ImageFileSaver(new ImageFileSettingsMemberMapper(new ImageInfoMemberMapper()));
+            ImageUtility imageUtility = new ImageUtility();
+            IImageFileSaver imageFileSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(new ImageInfoMemberMapper()));
+            IFilePathMaker filePathMaker = new FilePathMaker();
+            ImageSettingsMapper imageSettingsMapper = new ImageSettingsMapper();
+            IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, filePathMaker, imageSettingsMapper);
             IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
-            FilePathMaker filePathMaker = new FilePathMaker();
-            string imageFolderPath = "F:\\Laptop\\Tasavir\\Test";
-            return new RssItemRepositoryFactory(efEntityMapper, imageFileSaver, imageFileReader, filePathMaker, imageFolderPath);
+            ICache<Uri, RssItemEfEntity> persistanceCache = new Cache<Uri, RssItemEfEntity>();
+            return new RssItemRepositoryFactory(efEntityMapper, persistanceCache, imageFileSaverCoordinator, imageFileReader);
         }
 
 
@@ -303,7 +308,8 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
         private RssItem GetRssItem()
         {
-            string id = "farsnews";
+            Uri id = new Uri("https://tasnimnews.ir/3660402");
+            Uri rssFeedId = new Uri("https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar");
             Uri link = new Uri("https://downloadly.ir/software/audio-video-editors/powerdirector-1/");
             string category = "دسته بندی خبر";
             string title = "عنوان خبر";
@@ -313,35 +319,80 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             {
                 //y =0 قرمز و سبز و آبی
                 {
-                    {255, 255, 0, 0},
-                    { 255, 0, 255, 0},
-                    { 255, 0, 0, 255}
+                    {255, 255, 0, 0}, // x = 0
+                    { 255, 0, 255, 0}, // x = 1
+                    { 255, 0, 0, 255} // x = 2
                 },
                 // y = 1  سیاه و خاکستری و سفید
                 {
-                    { 255, 0, 0, 0},
-                    { 255, 128, 128, 128},
-                    { 255, 255, 255, 255}
+                    { 255, 0, 0, 0}, // x = 0
+                    { 255, 128, 128, 128}, // x = 1
+                    { 255, 255, 255, 255} // x = 2
                 }
             };
 
-            return new RssItem(id, link, argb8bitImageData, category, title, description, publishDate);
+            return new RssItem(id, rssFeedId, link, argb8bitImageData, category, title, description, publishDate);
         }
 
 
-        private ImageFileSpecification CreateArgb8BitImageSaverSettings()
+        //////////
+
+
+        private ImageFileSaveSettings CreateArgb8BitImageSaverSettings(byte[,,] image, string fullFilePath)
         {
-            return new ImageFileSpecification
+            return new ImageFileSaveSettings
             {
-                StorageType     = StorageType.Byte,
-                Mapping         = PixelMapping.ARGB,
+                FullFilePath = fullFilePath,
+                ImageFileSettings = this.GetImageDataSettings(image)
+            };
+        }
+
+
+        private ImageSaveOptions GetImageSaveOptions(string folderPath)
+        {
+            return new ImageSaveOptions
+            {
+                ImageInfoSettings = this.GetImageInfoSettings(),
+                FolderPath = folderPath
+            };
+        }
+
+
+        private ImageSettings<ImageData<byte>> GetImageDataSettings(byte[,,] image)
+        {
+            return new ImageSettings<ImageData<byte>>(this.GetImageSettingsBase(), this.GetImageData(image));
+        }
+
+
+        private ImageSettings<ImageInfo> GetImageInfoSettings()
+        {
+            return new ImageSettings<ImageInfo>(this.GetImageSettingsBase(), this.GetImageInfo());
+        }
+
+
+        private ImageSettingsBase GetImageSettingsBase()
+        {
+            return new ImageSettingsBase
+            {
+                StorageType = StorageType.Byte,
+                Mapping = PixelMapping.ARGB,
                 HaveAlphaChannel = AlphaOption.On,
-                Format          =  MagickFormat.Png32,
-                ImageInfo       =  new ImageInfo
-                {
-                    ColorSpace = ColorSpace.sRGB,
-                    ColorDepth = 8
-                }
+                Format = MagickFormat.Png32
+            };
+        }
+
+        private ImageData<byte> GetImageData(byte[,,] image)
+        {
+            return new ImageData<byte>(this.GetImageInfo(), image);
+        }
+
+
+        private ImageInfo GetImageInfo()
+        {
+            return new ImageInfo
+            {
+                ColorSpace = ColorSpace.sRGB,
+                ColorDepth = 8
             };
         }
 

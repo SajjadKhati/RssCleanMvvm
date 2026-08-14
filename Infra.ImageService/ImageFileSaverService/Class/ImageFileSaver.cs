@@ -1,5 +1,7 @@
 ﻿using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
+using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
+using Core.ImageServices.ImageCreatorService.Class;
 using ImageMagick;
 using Infra.ImageService.MappingService.Class;
 
@@ -8,14 +10,17 @@ namespace Infra.ImageService.ImageFileSaverService.Class
     public class ImageFileSaver : IImageFileSaver
     {
 
+        private ImageUtility imageUtility;
+
         private ImageFileSettingsMemberMapper imageSaverSettingsMemberMapper;
 
 
         /////////////////////////////////////////////////////////
         
 
-        public ImageFileSaver(ImageFileSettingsMemberMapper imageSaverSettingsMemberMapper)
+        public ImageFileSaver(ImageUtility imageUtility, ImageFileSettingsMemberMapper imageSaverSettingsMemberMapper)
         {
+            this.imageUtility = imageUtility;
             this.imageSaverSettingsMemberMapper = imageSaverSettingsMemberMapper;
         }
 
@@ -45,59 +50,47 @@ namespace Infra.ImageService.ImageFileSaverService.Class
         /// <param name="settings"></param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public void Save8BitImageToFile(ImageFileSpecification imageFileSpecification)
+        public void Save8BitImageToFile(ImageFileSaveSettings imageFileSaveSettings)
         {
-            if (imageFileSpecification == null || imageFileSpecification.ImageFileSettings == null || 
-                imageFileSpecification.ImageFileSettings.ImageData == null || imageFileSpecification.ImageFileSettings.ImageData.Data == null) 
-                throw new ArgumentNullException(nameof(imageFileSpecification.ImageFileSettings.ImageData.Data));
-            if (string.IsNullOrEmpty(imageFileSpecification.FullFilePath)) 
-                throw new ArgumentException("File path is required.", nameof(imageFileSpecification.FullFilePath));
+            if (imageFileSaveSettings == null || imageFileSaveSettings.ImageFileSettings == null ||
+                imageFileSaveSettings.ImageFileSettings.ImageDetails == null || imageFileSaveSettings.ImageFileSettings.ImageDetails.Data == null) 
+                throw new ArgumentNullException(nameof(imageFileSaveSettings.ImageFileSettings.ImageDetails.Data));
+            if (string.IsNullOrEmpty(imageFileSaveSettings.FullFilePath)) 
+                throw new ArgumentException("File path is required.", nameof(imageFileSaveSettings.FullFilePath));
 
-            var imageData = imageFileSpecification.ImageFileSettings.ImageData.Data;
+            var imageData = imageFileSaveSettings.ImageFileSettings.ImageDetails.Data;
             // ۱. استخراج ابعاد و اطلاعات از آرایه
             int height = imageData.GetLength(0);
             int width = imageData.GetLength(1);
             int channels = imageData.GetLength(2);
 
             // ۳. تخت کردن داده‌ها
-            byte[] flatData = FlattenImageData(imageData, height, width, channels);
+            byte[] flatData = this.imageUtility.FlattenImageData(imageData, height, width, channels);
 
             // ۴. ایجاد MagickImage و اعمال تنظیمات
-            using var image = CreateMagickImage(flatData, width, height, imageFileSpecification.ImageFileSettings);
+            using var magickImage = this.CreateMagickImage(flatData, width, height, imageFileSaveSettings.ImageFileSettings);
 
             // ۵. ذخیره
-            image.Write(imageFileSpecification.FullFilePath);
-        }
-
-
-        /// <summary> تخت کردن آرایه سه‌بعدی به آرایه یک‌ بعدی </summary>
-        private byte[] FlattenImageData(byte[,,] imageData, int height, int width, int channels)
-        {
-            var flat = new byte[width * height * channels];
-            int index = 0;
-            for (int y = 0; y < height; y++)
-                for (int x = 0; x < width; x++)
-                    for (int c = 0; c < channels; c++)
-                        flat[index++] = imageData[y, x, c];
-            return flat;
+            magickImage.Write(imageFileSaveSettings.FullFilePath);
         }
 
 
         /// <summary> ساخت MagickImage بر اساس داده‌ها و تنظیمات </summary>
-        private MagickImage CreateMagickImage(byte[] flatData, int width, int height, ImageFileSettings settings)
+        private MagickImage CreateMagickImage<TImageInfo>(byte[] flatData, int width, int height, ImageSettings<TImageInfo> imageSettings)
+            where TImageInfo : ImageInfo
         {
             var pixelSettings = new PixelReadSettings((uint)width, (uint)height,
-                this.imageSaverSettingsMemberMapper.ToMagickStorageType(settings.StorageType), 
-                this.imageSaverSettingsMemberMapper.ToMagickPixelMapping(settings.Mapping));
+                this.imageSaverSettingsMemberMapper.ToMagickStorageType(imageSettings.StorageType), 
+                this.imageSaverSettingsMemberMapper.ToMagickPixelMapping(imageSettings.Mapping));
 
-            var image = new MagickImage(flatData, pixelSettings);
-            var imageData = settings.ImageData;
-            image.Depth = (uint)imageData.ColorDepth;
-            image.ColorSpace = this.imageSaverSettingsMemberMapper.ImageInfoMemberMapper.ToMagicColorSpace(imageData.ColorSpace);
-            image.Alpha(this.imageSaverSettingsMemberMapper.ToMagickAlphaOption(settings.HaveAlphaChannel));
-            image.Format = this.imageSaverSettingsMemberMapper.ToMagickMagickFormat(settings.Format);
+            var magickImage = new MagickImage(flatData, pixelSettings);
+            var imageData = imageSettings.ImageDetails;
+            magickImage.Depth = (uint)imageData.ColorDepth;
+            magickImage.ColorSpace = this.imageSaverSettingsMemberMapper.ImageInfoMemberMapper.ToMagicColorSpace(imageData.ColorSpace);
+            magickImage.Alpha(this.imageSaverSettingsMemberMapper.ToMagickAlphaOption(imageSettings.HaveAlphaChannel));
+            magickImage.Format = this.imageSaverSettingsMemberMapper.ToMagickMagickFormat(imageSettings.Format);
 
-            return image;
+            return magickImage;
         }
 
     }

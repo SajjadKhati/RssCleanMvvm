@@ -1,4 +1,4 @@
-﻿using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
+﻿using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.DataModels;
 using Domain.DomainEntities.RssEntity.Class;
 
 namespace Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.Interfaces
@@ -6,11 +6,11 @@ namespace Application.InfrastructureContracts.DataAccessProject.Repository.Progr
     public interface IRssItemRepository
     {
 
-        void Add(RssItem rssItem, string imageFolderPath, ImageFileSettings imageFileSettings);
+        void Add(RssItem rssItem, ImageSaveOptions imageSaveOptions);
 
         void Delete(RssItem rssItem);
 
-        void Update(RssItem rssItem, string imageFolderPath, ImageFileSettings imageFileSettings);
+        void Update(RssItem rssItem, ImageSaveOptions imageSaveOptions);
 
         RssItem FindByKey(string rssItemKey);
 

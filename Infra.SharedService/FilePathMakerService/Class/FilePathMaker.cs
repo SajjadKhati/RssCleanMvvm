@@ -1,27 +1,42 @@
 ﻿using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Enum;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
+using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
 
 namespace Infra.SharedService.FilePathMakerService.Class
 {
-    public class FilePathMaker
+    public class FilePathMaker : IFilePathMaker
     {
+
+        public DestinationPath CreateFullImageFilePathWithSafeFileName(FilePath filePath, MagickFormat magickFormat)
+        {
+            string fileExtension = this.GetFileExtension(magickFormat);
+            string safeFileName = this.EncodeFileName(filePath.FileName);
+            return this.GetDestinationPath(filePath.FolderPath, safeFileName, fileExtension);
+        }
+
 
         public DestinationPath CreateFullImageFilePath(FilePath filePath, MagickFormat magickFormat)
         {
-            string fileExtention = this.GetFileExtention(magickFormat);
-            DestinationPath fileDestinationPath = new DestinationPath
-            {
-                FolderPath = filePath.FolderPath,
-                FileName = filePath.FileName,
-                Extension = fileExtention,
-                FullFilePath = $"{filePath.FolderPath}\\{filePath.FileName}.{fileExtention}"
-            };
-            return fileDestinationPath;
+            string fileExtension = this.GetFileExtension(magickFormat);
+            return this.GetDestinationPath(filePath.FolderPath, filePath.FileName, fileExtension);
         }
+
+
+        public string EncodeFileName(string uri)
+        {
+            return Uri.EscapeDataString(uri);
+        }
+
+
+        public string DecodeFileName(string uri)
+        {
+            return Uri.UnescapeDataString(uri);
+        }
+
 
         ////////////////////////////////
 
-        private string GetFileExtention(MagickFormat magickFormat)
+        private string GetFileExtension(MagickFormat magickFormat)
         {
             return magickFormat switch
             {
@@ -31,6 +46,18 @@ namespace Infra.SharedService.FilePathMakerService.Class
                 MagickFormat.Bmp => "bmp",
                 MagickFormat.Tif or MagickFormat.Tiff or MagickFormat.Tiff64 => "tiff",
                 _ => throw new FormatException("فرمت نباید در حالت ناشناخته باشد .")
+            };
+        }
+
+
+        private DestinationPath GetDestinationPath(string folderPath, string fileName, string fileExtension)
+        {
+            return new DestinationPath
+            {
+                FolderPath = folderPath,
+                FileName = fileName,
+                Extension = fileExtension,
+                FullFilePath = Path.Combine(folderPath, $"{fileName}.{fileExtension}")
             };
         }
 
