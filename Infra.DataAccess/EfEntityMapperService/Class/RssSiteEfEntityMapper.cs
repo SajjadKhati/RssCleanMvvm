@@ -1,4 +1,5 @@
-﻿using Domain.DomainEntities.RssEntity.Class;
+﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using Domain.DomainEntities.RssEntity.Class;
 using Infra.DataAccess.EfEntities.Class;
 
 namespace Infra.DataAccess.EfEntityMapperService.Class
@@ -41,17 +42,34 @@ namespace Infra.DataAccess.EfEntityMapperService.Class
         }
 
 
+        public RssSiteDto ToRssSiteDto(RssSiteEfEntity rssSiteEfEntity)
+        {
+            return new RssSiteDto
+            {
+                Id = rssSiteEfEntity.Id,
+                RssFeedDtos = this.ToRssFeedDtos(rssSiteEfEntity.RssFeedEfEntities),
+                SiteName = rssSiteEfEntity.SiteName
+            };
+        }
+
+
         ///////////////////////////////////////////////////////////
-        
+
         private ICollection<RssFeedEfEntity> ToRssFeedEfEntities(IList<RssFeed> rssFeeds)
         {
-            return rssFeeds?.Select((RssFeed rssFeed) => this.rssFeedEfEntityMapper.ToRssFeedEfEntity(rssFeed))?.ToList();
+            return rssFeeds?.Select(rssFeed => this.rssFeedEfEntityMapper.ToRssFeedEfEntity(rssFeed))?.ToList();
         }
 
 
         private IList<RssFeed> ToRssFeeds(ICollection<RssFeedEfEntity> rssFeedEfEntities)
         {
-            return rssFeedEfEntities?.Select((RssFeedEfEntity rssFeedEfEntity) => this.rssFeedEfEntityMapper.ToRssFeed(rssFeedEfEntity))?.ToList();
+            return rssFeedEfEntities?.Select(rssFeedEfEntity => this.rssFeedEfEntityMapper.ToRssFeed(rssFeedEfEntity))?.ToList();
+        }
+
+
+        private IList<RssFeedDto> ToRssFeedDtos(ICollection<RssFeedEfEntity> rssFeedEfEntities)
+        {
+            return rssFeedEfEntities?.Select(rssFeedEfEntity => this.rssFeedEfEntityMapper.ToRssFeedDto(rssFeedEfEntity))?.ToList();
         }
 
     }

@@ -23,13 +23,13 @@ namespace Infra.DataAccess.DbContextService.Class
         }
 
 
-        public RssDbContext()
-        {
-            this.connectionString = @"Server=(localdb)\MSSQLLocalDB;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
-            //      this.connectionString = @"Server=.;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
-            //    this.connectionString = @"Server=.;Database=RssDb;Trusted_Connection=True;Encrypt=False;";
-            this.shouldUseLazyLoading = false;
-        }
+        //public RssDbContext()
+        //{
+        //    this.connectionString = @"Server=(localdb)\MSSQLLocalDB;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+        //    //      this.connectionString = @"Server=.;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+        //    //    this.connectionString = @"Server=.;Database=RssDb;Trusted_Connection=True;Encrypt=False;";
+        //    this.shouldUseLazyLoading = false;
+        //}
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

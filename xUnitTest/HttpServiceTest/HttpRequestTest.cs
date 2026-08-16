@@ -1,11 +1,13 @@
 ﻿using Application.InfrastructureContracts.CacheProject.Cache.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.DataModels;
-using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.Factory.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.Repository.ProgrameRepositories.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.Repository.RepositoryBases.Factory.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.Repository.RepositoryBases.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.UnitOfWork.Factory.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.UnitOfWork.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.Factory.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppRepository.DataModels;
+using Application.InfrastructureContracts.DataAccessProject.AppRepository.Factory.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.AppRepository.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Factory.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Interface;
+using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.UnitOfWork.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.UnitOfWorkFactory.Interfaces;
 using Application.InfrastructureContracts.HttpProject.HttpRequest.Factory.Interfaces;
 using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
@@ -15,19 +17,24 @@ using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Enum;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
 using Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces;
+using Application.OverallDataModels.OverallDto.EntityDto;
 using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Class;
 using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Interface;
 using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
-using Application.UseCases.LoadUseCaseModule.Class;
+using Application.UseCases.RssItemLoadUseCase.Class;
 using Core.ImageServices.ImageCreatorService.Class;
 using Domain.DomainEntities.RssEntity.Class;
 using Infra.CacheService.CacheServices.Class;
+using Infra.DataAccess.AppQueryService.Class;
+using Infra.DataAccess.AppQueryService.Class.Factory.Class;
+using Infra.DataAccess.AppRepositoryService.Factory.Class;
+using Infra.DataAccess.DataAccessBaseServices.DatabaseInitializationService.Factory.Class;
+using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
-using Infra.DataAccess.RepositoryServices.Factory.Class;
-using Infra.DataAccess.UnitOfWorkService.Factory.Class;
+using Infra.DataAccess.UnitOfWorkFactoryService.Class;
 using Infra.HttpService.HttpRequestService.Factory.Class;
 using Infra.ImageService.ImageDataExtractorService.Class;
 using Infra.ImageService.ImageFileReaderService.Class;
@@ -57,7 +64,7 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         {
             IHttpRequestFactory httpRequestFactory = new HttpRequestFactory();
             IXmlParser xmlParser = new XmlParser();
-            LoadUseCase loadUseCase = new LoadUseCase(xmlParser, httpRequestFactory);
+            RssItemLoadUseCase loadUseCase = new RssItemLoadUseCase(xmlParser, httpRequestFactory);
 
             Uri tasnimRssFeedLink = new Uri("https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories");
             string tasnimXmlParentElementName = "item";
@@ -238,6 +245,15 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         }
 
 
+        [Fact]
+        public void DatabaseTest_6()
+        {
+            IRssSiteQueryFactory rssSiteQueryFactory = this.GetRssSiteQueryFactory();
+            using IRssSiteQuery rssSiteQuery = rssSiteQueryFactory.Create();
+            IList<RssSiteDto> rssSiteDtos = rssSiteQuery.FindAllEagerLoading();
+        }
+
+
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -261,6 +277,12 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             }
 
             return DateTime.MinValue; // یا هر مقدار پیش‌فرض/لاگ خطا
+        }
+
+
+        private IRssSiteQueryFactory GetRssSiteQueryFactory()
+        {
+            return new RssSiteQueryFactory(this.GetConnectionString(), new RssSiteEfEntityMapper(new RssFeedEfEntityMapper()));
         }
 
 
@@ -294,9 +316,14 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
         private IUnitOfWorkFactory BuildIUnitOfWorkFactory()
         {
-            //string connectionString = @"Server=.;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
-            string connectionString = @"Server=(localdb)\MSSQLLocalDB;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+            string connectionString = this.GetConnectionString();
             return new UnitOfWorkFactory(connectionString);
+        }
+
+
+        private string GetConnectionString()
+        {
+            return @"Server=(localdb)\MSSQLLocalDB;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
         }
 
 

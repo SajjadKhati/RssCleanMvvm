@@ -1,4 +1,5 @@
-﻿using Domain.DomainEntities.RssEntity.Class;
+﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using Domain.DomainEntities.RssEntity.Class;
 using Infra.DataAccess.EfEntities.Class;
 
 namespace Infra.DataAccess.EfEntityMapperService.Class
@@ -23,6 +24,16 @@ namespace Infra.DataAccess.EfEntityMapperService.Class
                 new Uri(rssFeedEfEntity.Id),
                  new Uri(rssFeedEfEntity.RssSiteEfEntityId),
                 rssFeedEfEntity.Title);
+        }
+
+
+        public RssFeedDto ToRssFeedDto(RssFeedEfEntity rssFeedEfEntity)
+        {
+            return new RssFeedDto
+            {
+                Id = rssFeedEfEntity.Id,
+                Title = rssFeedEfEntity.Title
+            };
         }
 
     }
