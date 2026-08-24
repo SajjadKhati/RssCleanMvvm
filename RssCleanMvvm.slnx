@@ -1,7 +1,9 @@
 <Solution>
+  <Folder Name="/0 Composition Root/">
+    <Project Path="CompositionRoot.WpfApp/CompositionRoot.WpfApp.csproj" Id="0f92d4af-a93a-4f11-8de3-273610de0b40" />
+  </Folder>
   <Folder Name="/1 View/">
-    <Project Path="View.MigrationConsolApp/View.MigrationConsolApp.csproj" Id="5556f581-7b31-4154-88d1-b1e2f7ab7ff6" />
-    <Project Path="View.RssCleanMvvm/View.RssCleanMvvm.csproj" />
+    <Project Path="View.WpfLibrary.RssCleanMvvm/View.WpfLibrary.RssCleanMvvm.csproj" Id="79d109bf-5524-43dd-8714-351ce40db9ca" />
   </Folder>
   <Folder Name="/2 ViewModel/">
     <Project Path="ViewModel/ViewModel.csproj" Id="8eea66b5-2f20-4fdd-9c2f-4147fab34825" />
@@ -24,6 +26,7 @@
     <Project Path="Infra.DataAccess/Infra.DataAccess.csproj" Id="6f50c08a-dc79-4f3b-ae37-1e731b1ae62f" />
     <Project Path="Infra.HttpService/Infra.HttpService.csproj" Id="26646bf3-3361-48db-950d-da788b546e2f" />
     <Project Path="Infra.ImageService/Infra.ImageService.csproj" Id="59e308f9-34e8-4a85-9171-346a0cd3e7f4" />
+    <Project Path="Infra.JsonService/Infra.JsonService.csproj" Id="fbc20362-8433-44cd-b3a7-44a35c73874c" />
     <Project Path="Infra.SharedService/Infra.SharedService.csproj" Id="21a80961-192b-4f97-bb6a-c272f55e7d3d" />
     <Project Path="Infra.XmlService/Infra.XmlService.csproj" Id="ef73238e-a5ca-4c27-b36f-e76c8cf1b0b9" />
   </Folder>

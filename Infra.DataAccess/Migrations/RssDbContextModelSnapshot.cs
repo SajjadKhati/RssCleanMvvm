@@ -42,7 +42,7 @@ namespace Infra.DataAccess.Migrations
 
                     b.HasIndex("RssSiteEfEntityId");
 
-                    b.ToTable("RssFeedTable");
+                    b.ToTable("RssFeedTable", (string)null);
 
                     b.HasData(
                         new
@@ -127,7 +127,7 @@ namespace Infra.DataAccess.Migrations
 
                     b.HasIndex("RssFeedEfEntityId");
 
-                    b.ToTable("RssItemTable");
+                    b.ToTable("RssItemTable", (string)null);
                 });
 
             modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssSiteEfEntity", b =>
@@ -143,7 +143,7 @@ namespace Infra.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RssSiteTable");
+                    b.ToTable("RssSiteTable", (string)null);
 
                     b.HasData(
                         new

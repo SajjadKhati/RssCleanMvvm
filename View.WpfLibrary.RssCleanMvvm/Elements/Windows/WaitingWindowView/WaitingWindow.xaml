@@ -1,0 +1,38 @@
+﻿<Window x:Class="View.WpfLibrary.RssCleanMvvm.Elements.Windows.WaitingWindowView.WaitingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.Windows.WaitingWindowView"
+        mc:Ignorable="d"
+        Title="WaitingWindow" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ShowInTaskbar="False">
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever">
+                    <DoubleAnimation Storyboard.TargetName="SpinTransform"
+                             Storyboard.TargetProperty="Angle" From="0" To="360" Duration="0:0:4">
+                        <DoubleAnimation.EasingFunction>
+                            <QuadraticEase EasingMode="EaseInOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <Border Background="White" CornerRadius="10" Padding="30">
+        <StackPanel>
+            <Ellipse Width="100" Height="100" Stroke="Blue" StrokeThickness="6" StrokeDashArray="2 2" RenderTransformOrigin="0.5,0.5">
+                <Ellipse.RenderTransform>
+                    <RotateTransform x:Name="SpinTransform"/>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+
+            <TextBlock Margin="0,15,0,0" HorizontalAlignment="Center" Text="در حال بارگذاری..." FontSize="18"/>
+        </StackPanel>
+    </Border>
+
+</Window>

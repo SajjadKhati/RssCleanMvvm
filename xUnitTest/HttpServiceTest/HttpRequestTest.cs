@@ -4,7 +4,6 @@ using Application.InfrastructureContracts.DataAccessProject.AppQuery.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.DataModels;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.Factory.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Factory.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Interface;
 using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.UnitOfWork.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.UnitOfWorkFactory.Interfaces;
@@ -23,14 +22,13 @@ using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Int
 using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
-using Application.UseCases.RssItemLoadUseCase.Class;
+using Application.UseCases.LoadRssItemsUseCaseModule.Class;
 using Core.ImageServices.ImageCreatorService.Class;
 using Domain.DomainEntities.RssEntity.Class;
 using Infra.CacheService.CacheServices.Class;
 using Infra.DataAccess.AppQueryService.Class;
 using Infra.DataAccess.AppQueryService.Class.Factory.Class;
 using Infra.DataAccess.AppRepositoryService.Factory.Class;
-using Infra.DataAccess.DataAccessBaseServices.DatabaseInitializationService.Factory.Class;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
@@ -64,7 +62,7 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         {
             IHttpRequestFactory httpRequestFactory = new HttpRequestFactory();
             IXmlParser xmlParser = new XmlParser();
-            RssItemLoadUseCase loadUseCase = new RssItemLoadUseCase(xmlParser, httpRequestFactory);
+            LoadRssItemsUseCase loadUseCase = new LoadRssItemsUseCase(xmlParser, httpRequestFactory);
 
             Uri tasnimRssFeedLink = new Uri("https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories");
             string tasnimXmlParentElementName = "item";
@@ -290,11 +288,10 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         {
             IRssItemRepositoryFactory rssItemRepositoryFactory = this.BuildIRssItemRepositoryFactory();
             IUnitOfWorkFactory unitOfWorkFactory = this.BuildIUnitOfWorkFactory();
-            IInitializeDatabaseFactory initializeDatabaseFactory = this.BuildIInitializeDatabaseFactory();
 
             IUnitOfWork unitOfWork = unitOfWorkFactory.Create(false);
-            IInitializeDatabase initializeDatabase = initializeDatabaseFactory.Create(unitOfWork);
-            bool isCreated = initializeDatabase.EnsureDatabaseCreated();
+            //IInitializeDatabase initializeDatabase = initializeDatabaseFactory.Create(unitOfWork);
+            //bool isCreated = initializeDatabase.EnsureDatabaseCreated();
 
             return (rssItemRepositoryFactory.Create(unitOfWork), unitOfWork);
         }
@@ -324,12 +321,6 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         private string GetConnectionString()
         {
             return @"Server=(localdb)\MSSQLLocalDB;Database=RssDb;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
-        }
-
-
-        private IInitializeDatabaseFactory BuildIInitializeDatabaseFactory()
-        {
-            return new InitializeDatabaseFactory();
         }
 
 

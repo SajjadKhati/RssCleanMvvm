@@ -30,5 +30,11 @@ namespace Infra.DataAccess.DataAccessBaseServices.DatabaseInitializationService.
             return isDatabaseExist;
         }
 
+
+        public void Dispose()
+        {
+            this.dbContext.Dispose();
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Interface
 {
-    public interface IInitializeDatabase
+    public interface IInitializeDatabase : IDisposable
     {
 
         bool EnsureDatabaseCreated();
