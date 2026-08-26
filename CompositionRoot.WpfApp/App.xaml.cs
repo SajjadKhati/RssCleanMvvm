@@ -1,8 +1,9 @@
-﻿using System.IO;
+﻿using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
+using CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModule.Class;
+using CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositionRootModule.Class;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
-using CompositionRoot.WpfApp.StartupModules.AppCompositionRootModule.Class;
-using CompositionRoot.WpfApp.StartupModules.AppInitializerModule.Class;
 using View.WpfLibrary.RssCleanMvvm.Elements.Windows.WaitingWindowView;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using MainWindowView = View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView;
@@ -43,6 +44,9 @@ namespace CompositionRoot.WpfApp
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             this.ShowErrorInMainThread(e.Exception);
+
+            // جلوی کرش شدن برنامه را توسط خطای مدیریت نشده ، میگیره :
+            e.Handled = true;
         }
 
 
@@ -53,11 +57,12 @@ namespace CompositionRoot.WpfApp
             {
                 string connectionStringJsonFullFilePath = this.GetConnectionStringJsonFullFilePath();
                 string connectionString = await this.appInitializer.GetConnectionStringAsync(connectionStringJsonFullFilePath);
-                Task initializeAppTask = this.appInitializer.InitializeAppAsync(connectionString);
+                bool isInitialized = await this.appInitializer.InitializeAppAsync(connectionString);
+                IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> rssFeedXmlParsingConfigDictionary = 
+                    await this.appInitializer.FinAllRssFeedXmlParsingConfigAsync(connectionString);
                 ///
-                AppCompositionRoot appCompositionRoot = new AppCompositionRoot(connectionString);
-                MainWindowViewModel mainWindowViewModel = appCompositionRoot.CreateMainWindowViewModel();
-                await initializeAppTask;
+                ViewModelCompositionRoot viewModelCompositionRoot = new ViewModelCompositionRoot(connectionString, rssFeedXmlParsingConfigDictionary);
+                MainWindowViewModel mainWindowViewModel = viewModelCompositionRoot.CreateMainWindowViewModel();
                 this.ShowMainWindow(mainWindowViewModel);
             }
             catch (Exception exception)

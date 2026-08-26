@@ -19,9 +19,9 @@ namespace Infra.XmlParserService.XamlParserService.Class
         /// </summary>
         /// <param name="xmlParsingConfig"></param>
         /// <returns></returns>
-        public IList<IDictionary<string, string>> GetXmlData(XmlParsingConfig xmlParsingConfig)
+        public IList<IDictionary<string, string>> GetXmlData(XmlParsingData xmlParsingConfig)
         {
-            XDocument xmlDocument = XDocument.Parse(xmlParsingConfig.xmlData);
+            XDocument xmlDocument = XDocument.Parse(xmlParsingConfig.XmlData);
             IEnumerable<XElement> parentElements = xmlDocument?.Descendants(xmlParsingConfig.ParentElementName);
             if (parentElements == null)
                 return null;

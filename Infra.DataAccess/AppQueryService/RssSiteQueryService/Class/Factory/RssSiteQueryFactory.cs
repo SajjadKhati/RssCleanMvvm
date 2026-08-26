@@ -1,9 +1,9 @@
-﻿using Application.InfrastructureContracts.DataAccessProject.AppQuery.Factory.Interface;
-using Application.InfrastructureContracts.DataAccessProject.AppQuery.Interface;
+﻿using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Factory.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Interface;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
 
-namespace Infra.DataAccess.AppQueryService.Class.Factory.Class
+namespace Infra.DataAccess.AppQueryService.RssSiteQueryService.Class.Factory
 {
     /// دقت کنید که این کلاس چون شی جدیدی از RssDbContext میسازه ، حتما لازم نیست که مسئول Dispose اش ، خودش باشه .
     /// در شرایط خاص مثل UnitOfWork و Query ، ما میتونیم مالکیتِ Disposable کردن را به این سرویس ها تغییر بدیم .

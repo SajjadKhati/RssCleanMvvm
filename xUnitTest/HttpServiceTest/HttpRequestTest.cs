@@ -1,6 +1,6 @@
 ﻿using Application.InfrastructureContracts.CacheProject.Cache.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.AppQuery.Factory.Interface;
-using Application.InfrastructureContracts.DataAccessProject.AppQuery.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Factory.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.DataModels;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.Factory.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.Interfaces;
@@ -23,11 +23,8 @@ using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalize
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
 using Application.UseCases.LoadRssItemsUseCaseModule.Class;
-using Core.ImageServices.ImageCreatorService.Class;
 using Domain.DomainEntities.RssEntity.Class;
 using Infra.CacheService.CacheServices.Class;
-using Infra.DataAccess.AppQueryService.Class;
-using Infra.DataAccess.AppQueryService.Class.Factory.Class;
 using Infra.DataAccess.AppRepositoryService.Factory.Class;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
@@ -51,38 +48,40 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Infra.DataAccess.AppQueryService.RssSiteQueryService.Class.Factory;
 using static System.Net.Mime.MediaTypeNames;
+using Shared.ImageServices.ImageUtilityService.Class;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
 {
     public class HttpRequestTest
     {
-        [Fact]
-        public async Task LoadUseCaseTest()
-        {
-            IHttpRequestFactory httpRequestFactory = new HttpRequestFactory();
-            IXmlParser xmlParser = new XmlParser();
-            LoadRssItemsUseCase loadUseCase = new LoadRssItemsUseCase(xmlParser, httpRequestFactory);
+        //[Fact]
+        //public async Task LoadUseCaseTest()
+        //{
+        //    IHttpRequestFactory httpRequestFactory = new HttpRequestFactory();
+        //    IXmlParser xmlParser = new XmlParser();
+        //    LoadRssItemsUseCase loadUseCase = new LoadRssItemsUseCase(xmlParser, httpRequestFactory);
 
-            Uri tasnimRssFeedLink = new Uri("https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories");
-            string tasnimXmlParentElementName = "item";
-            var tasnimXmlChildElementNames = new List<string>()
-            {
-                "guid",
-                "link",
-                "category",
-                "title",
-                "description",
-                "pubDate",
-                "{http://search.yahoo.com/mrss/}content"
-            };
-            string tasnimImageUrl = "url";
-            var tasnimXmlAttributeNames = new List<string>() { tasnimImageUrl };
+        //    Uri tasnimRssFeedLink = new Uri("https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories");
+        //    string tasnimXmlParentElementName = "item";
+        //    var tasnimXmlChildElementNames = new List<string>()
+        //    {
+        //        "guid",
+        //        "link",
+        //        "category",
+        //        "title",
+        //        "description",
+        //        "pubDate",
+        //        "{http://search.yahoo.com/mrss/}content"
+        //    };
+        //    string tasnimImageUrl = "url";
+        //    var tasnimXmlAttributeNames = new List<string>() { tasnimImageUrl };
 
-            var test = await loadUseCase.ExecuteAsync(tasnimRssFeedLink, tasnimXmlParentElementName, 
-                tasnimXmlChildElementNames, tasnimXmlAttributeNames);
+        //    var test = await loadUseCase.ExecuteAsync(tasnimRssFeedLink, tasnimXmlParentElementName, 
+        //        tasnimXmlChildElementNames, tasnimXmlAttributeNames);
 
-        }
+        //}
 
 
         [Fact]

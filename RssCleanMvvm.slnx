@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/0 Composition Root/">
+    <Project Path="CompositionRoot.Shared.ClassLibrary/CompositionRoot.Shared.ClassLibrary.csproj" Id="3a539b35-bb45-4bad-b7d0-017ddc0a80c8" />
     <Project Path="CompositionRoot.WpfApp/CompositionRoot.WpfApp.csproj" Id="0f92d4af-a93a-4f11-8de3-273610de0b40" />
   </Folder>
   <Folder Name="/1 View/">

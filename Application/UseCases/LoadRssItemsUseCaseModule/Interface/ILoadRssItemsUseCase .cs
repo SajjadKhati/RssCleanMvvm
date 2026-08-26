@@ -10,8 +10,6 @@ namespace Application.UseCases.LoadRssItemsUseCaseModule.Interface
     public interface ILoadRssItemsUseCase
     {
 
-        Task<RssItemDto> ExecuteAsync(Uri rssFeedLink, string xmlParentElementName,
-            IList<string> xmlChildElementNames, IList<string> xmlAttributeNames);
 
     }
 }

@@ -3,8 +3,6 @@
     public class XmlParsingConfig
     {
 
-        public string xmlData {  get; set; }
-
         public string ParentElementName { get; set; }
 
         public IList<string> ChildElementNames { get; set; }
@@ -13,7 +11,7 @@
 
 
         ////////////////////////////////////////////////////////////////
-        
+
 
         public XmlParsingConfig()
         {
@@ -21,12 +19,19 @@
         }
 
 
-        public XmlParsingConfig(string xmlData, string parentElementName, IList<string> childElementNames, IList<string> attributeNames = null)
+        public XmlParsingConfig(string parentElementName, IList<string> childElementNames, IList<string> attributeNames = null)
         {
-            this.xmlData = xmlData;
             this.ParentElementName = parentElementName;
             this.ChildElementNames = childElementNames;
             this.AttributeNames = attributeNames;
+        }
+
+
+        public XmlParsingConfig(XmlParsingConfig xmlParsingConfig)
+        {
+            this.ParentElementName = xmlParsingConfig.ParentElementName;
+            this.ChildElementNames = xmlParsingConfig.ChildElementNames;
+            this.AttributeNames = xmlParsingConfig.AttributeNames;
         }
 
     }

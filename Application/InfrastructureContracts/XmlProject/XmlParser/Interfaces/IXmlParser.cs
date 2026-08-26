@@ -5,7 +5,7 @@ namespace Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces
     public interface IXmlParser
     {
 
-        IList<IDictionary<string, string>> GetXmlData(XmlParsingConfig xmlParsingConfig);
+        IList<IDictionary<string, string>> GetXmlData(XmlParsingData xmlParsingConfig);
 
     }
 }

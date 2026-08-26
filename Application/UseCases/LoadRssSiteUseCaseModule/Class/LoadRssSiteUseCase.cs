@@ -1,7 +1,7 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
-using Application.InfrastructureContracts.DataAccessProject.AppQuery.Factory.Interface;
-using Application.InfrastructureContracts.DataAccessProject.AppQuery.Interface;
 using Application.UseCases.LoadRssSiteUseCaseModule.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Factory.Interface;
 
 namespace Application.UseCases.LoadRssSiteUseCaseModule.Class
 {

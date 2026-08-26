@@ -1,38 +1,30 @@
-﻿using Application.InfrastructureContracts.DataAccessProject.AppQuery.Factory.Interface;
-using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Interface;
-using Application.InfrastructureContracts.JsonProject.Json.Interface;
+﻿using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Factory.Interface;
+using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
 using Application.UseCases.LoadRssSiteUseCaseModule.Class;
 using Application.UseCases.LoadRssSiteUseCaseModule.Interface;
-using CompositionRoot.WpfApp.StartupModules.AppInitializerModule.Class;
-using Infra.DataAccess.AppQueryService.Class.Factory.Class;
-using Infra.DataAccess.DataAccessBaseServices.DatabaseInitializationService.Class;
-using Infra.DataAccess.DbContextService.Class;
+using Infra.DataAccess.AppQueryService.RssSiteQueryService.Class.Factory;
 using Infra.DataAccess.EfEntityMapperService.Class;
-using Infra.JsonService.JsonServices.Class;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
 
-namespace CompositionRoot.WpfApp.StartupModules.AppCompositionRootModule.Class
+namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositionRootModule.Class
 {
-    public class AppCompositionRoot
+    public class ViewModelCompositionRoot
     {
 
         private string connectionString;
+
+        private IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> rssFeedXmlParsingConfigDictionary;
 
 
         ///////////////////////////////////////////////////////////////////////
 
 
-        public AppCompositionRoot(string connectionString)
+        public ViewModelCompositionRoot(string connectionString, IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> rssFeedXmlParsingConfigDictionary)
         {
             this.connectionString = connectionString;
+            this.rssFeedXmlParsingConfigDictionary = rssFeedXmlParsingConfigDictionary;
         }
 
 

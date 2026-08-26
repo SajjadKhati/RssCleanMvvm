@@ -1,4 +1,4 @@
-﻿using Application.InfrastructureContracts.DataAccessProject.AppQuery.Interface;
+﻿using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Interface;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Class;
 using Infra.DataAccess.DbContextService.Class;
@@ -6,7 +6,7 @@ using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infra.DataAccess.AppQueryService.Class
+namespace Infra.DataAccess.AppQueryService.RssSiteQueryService.Class
 {
     public class RssSiteQuery : DbContextOwningQueryBase, IRssSiteQuery
     {

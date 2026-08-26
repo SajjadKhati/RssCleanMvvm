@@ -26,6 +26,7 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\CompositionRoot.Shared.ClassLibrary\CompositionRoot.Shared.ClassLibrary.csproj" />
 		<ProjectReference Include="..\Infra.DataAccess\Infra.DataAccess.csproj" />
 		<ProjectReference Include="..\Infra.JsonService\Infra.JsonService.csproj" />
 		<ProjectReference Include="..\View.WpfLibrary.RssCleanMvvm\View.WpfLibrary.RssCleanMvvm.csproj" />

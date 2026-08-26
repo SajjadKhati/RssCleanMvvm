@@ -1,16 +1,16 @@
 ﻿using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
-using Core.ImageServices.ImageCreatorService.Class;
 using ImageMagick;
 using Infra.ImageService.MappingService.Class;
+using Shared.ImageServices.ImageUtilityService.Interface;
 
 namespace Infra.ImageService.ImageFileSaverService.Class
 {
     public class ImageFileSaver : IImageFileSaver
     {
 
-        private ImageUtility imageUtility;
+        private IImageUtility imageUtility;
 
         private ImageFileSettingsMemberMapper imageSaverSettingsMemberMapper;
 
@@ -18,7 +18,7 @@ namespace Infra.ImageService.ImageFileSaverService.Class
         /////////////////////////////////////////////////////////
         
 
-        public ImageFileSaver(ImageUtility imageUtility, ImageFileSettingsMemberMapper imageSaverSettingsMemberMapper)
+        public ImageFileSaver(IImageUtility imageUtility, ImageFileSettingsMemberMapper imageSaverSettingsMemberMapper)
         {
             this.imageUtility = imageUtility;
             this.imageSaverSettingsMemberMapper = imageSaverSettingsMemberMapper;

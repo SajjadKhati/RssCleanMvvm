@@ -42,7 +42,7 @@ namespace Infra.DataAccess.Migrations
 
                     b.HasIndex("RssSiteEfEntityId");
 
-                    b.ToTable("RssFeedTable", (string)null);
+                    b.ToTable("RssFeedTable");
 
                     b.HasData(
                         new
@@ -80,6 +80,73 @@ namespace Infra.DataAccess.Migrations
                             Id = "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0",
                             RssSiteEfEntityId = "http://www.tasnimnews.ir/",
                             Title = "فرهنگی"
+                        });
+                });
+
+            modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssFeedXmlParsingConfigEfEntity", b =>
+                {
+                    b.Property<string>("RssFeedEfEntityId")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.PrimitiveCollection<string>("AttributeNames")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.PrimitiveCollection<string>("ChildElementNames")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParentElementName")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.HasKey("RssFeedEfEntityId");
+
+                    b.ToTable("RssFeedXmlParsingConfigTable");
+
+                    b.HasData(
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ParentElementName = "item"
                         });
                 });
 
@@ -127,7 +194,7 @@ namespace Infra.DataAccess.Migrations
 
                     b.HasIndex("RssFeedEfEntityId");
 
-                    b.ToTable("RssItemTable", (string)null);
+                    b.ToTable("RssItemTable");
                 });
 
             modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssSiteEfEntity", b =>
@@ -143,7 +210,7 @@ namespace Infra.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RssSiteTable", (string)null);
+                    b.ToTable("RssSiteTable");
 
                     b.HasData(
                         new
@@ -164,6 +231,17 @@ namespace Infra.DataAccess.Migrations
                     b.Navigation("RssSiteEfEntity");
                 });
 
+            modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssFeedXmlParsingConfigEfEntity", b =>
+                {
+                    b.HasOne("Infra.DataAccess.EfEntities.Class.RssFeedEfEntity", "RssFeedEfEntity")
+                        .WithOne("RssFeedXmlParsingConfigEfEntity")
+                        .HasForeignKey("Infra.DataAccess.EfEntities.Class.RssFeedXmlParsingConfigEfEntity", "RssFeedEfEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RssFeedEfEntity");
+                });
+
             modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssItemEfEntity", b =>
                 {
                     b.HasOne("Infra.DataAccess.EfEntities.Class.RssFeedEfEntity", "RssFeedEfEntity")
@@ -177,6 +255,9 @@ namespace Infra.DataAccess.Migrations
 
             modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssFeedEfEntity", b =>
                 {
+                    b.Navigation("RssFeedXmlParsingConfigEfEntity")
+                        .IsRequired();
+
                     b.Navigation("RssItemEfEntities");
                 });
 

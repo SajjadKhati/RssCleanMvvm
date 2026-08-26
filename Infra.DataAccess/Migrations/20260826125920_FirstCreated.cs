@@ -45,6 +45,26 @@ namespace Infra.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RssFeedXmlParsingConfigTable",
+                columns: table => new
+                {
+                    RssFeedEfEntityId = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
+                    ParentElementName = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: false),
+                    ChildElementNames = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AttributeNames = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RssFeedXmlParsingConfigTable", x => x.RssFeedEfEntityId);
+                    table.ForeignKey(
+                        name: "FK_RssFeedXmlParsingConfigTable_RssFeedTable_RssFeedEfEntityId",
+                        column: x => x.RssFeedEfEntityId,
+                        principalTable: "RssFeedTable",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RssItemTable",
                 columns: table => new
                 {
@@ -86,6 +106,19 @@ namespace Infra.DataAccess.Migrations
                     { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "http://www.tasnimnews.ir/", "بین الملل" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "RssFeedXmlParsingConfigTable",
+                columns: new[] { "RssFeedEfEntityId", "AttributeNames", "ChildElementNames", "ParentElementName" },
+                values: new object[,]
+                {
+                    { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_RssFeedTable_RssSiteEfEntityId",
                 table: "RssFeedTable",
@@ -105,6 +138,9 @@ namespace Infra.DataAccess.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "RssFeedXmlParsingConfigTable");
+
             migrationBuilder.DropTable(
                 name: "RssItemTable");
 
