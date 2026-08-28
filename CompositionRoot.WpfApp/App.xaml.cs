@@ -4,9 +4,8 @@ using CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositionRoo
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
-using View.WpfLibrary.RssCleanMvvm.Elements.Windows.WaitingWindowView;
+using CompositionRoot.WpfApp.ViewModules;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
-using MainWindowView = View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView;
 
 
 namespace CompositionRoot.WpfApp
@@ -19,6 +18,8 @@ namespace CompositionRoot.WpfApp
 
         private AppInitializer appInitializer;
 
+        private ViewDisplayer viewDisplayer;
+
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -26,6 +27,7 @@ namespace CompositionRoot.WpfApp
         public App()
         {
             this.appInitializer = new AppInitializer();
+            this.viewDisplayer = new ViewDisplayer(this.Dispatcher);
         }
 
 
@@ -43,7 +45,7 @@ namespace CompositionRoot.WpfApp
 
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            this.ShowErrorInMainThread(e.Exception);
+            this.viewDisplayer.ShowErrorInMainThread(e.Exception);
 
             // جلوی کرش شدن برنامه را توسط خطای مدیریت نشده ، میگیره :
             e.Handled = true;
@@ -52,22 +54,22 @@ namespace CompositionRoot.WpfApp
 
         private async Task StartAsync()
         {
-            Window waitingWindow = this.ShowWaitingWindow();
+            Window waitingWindow = this.viewDisplayer.ShowWaitingWindow();
             try
             {
                 string connectionStringJsonFullFilePath = this.GetConnectionStringJsonFullFilePath();
                 string connectionString = await this.appInitializer.GetConnectionStringAsync(connectionStringJsonFullFilePath);
                 bool isInitialized = await this.appInitializer.InitializeAppAsync(connectionString);
                 IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> rssFeedXmlParsingConfigDictionary = 
-                    await this.appInitializer.FinAllRssFeedXmlParsingConfigAsync(connectionString);
+                    await this.appInitializer.GetRssFeedXmlParsingConfigAsync(connectionString);
                 ///
                 ViewModelCompositionRoot viewModelCompositionRoot = new ViewModelCompositionRoot(connectionString, rssFeedXmlParsingConfigDictionary);
                 MainWindowViewModel mainWindowViewModel = viewModelCompositionRoot.CreateMainWindowViewModel();
-                this.ShowMainWindow(mainWindowViewModel);
+                this.viewDisplayer.ShowMainWindow(mainWindowViewModel);
             }
             catch (Exception exception)
             {
-                this.ShowErrorInMainThread(exception);
+                this.viewDisplayer.ShowErrorInMainThread(exception);
             }
             finally
             {
@@ -79,34 +81,9 @@ namespace CompositionRoot.WpfApp
         ////////////////////////////////////////////////////////////////////////////
 
 
-        private void ShowErrorInMainThread(Exception exception)
-        {
-            this.Dispatcher.Invoke(() =>
-            {
-                MessageBox.Show(exception.ToString());
-            });
-        }
-
-
         private string GetConnectionStringJsonFullFilePath()
         {
             return Path.Combine(AppContext.BaseDirectory, "Resource", "Config", "ConnectionString.json");
-        }
-
-
-        private WaitingWindow ShowWaitingWindow()
-        {
-            WaitingWindow waitingWindow = new WaitingWindow();
-            waitingWindow.Show();
-            return waitingWindow;
-        }
-
-
-        private void ShowMainWindow(MainWindowViewModel mainWindowViewModel)
-        {
-            MainWindowView.MainWindow mainWindow = new MainWindowView.MainWindow();
-            mainWindow.DataContext = mainWindowViewModel;
-            mainWindow.Show();
         }
 
     }

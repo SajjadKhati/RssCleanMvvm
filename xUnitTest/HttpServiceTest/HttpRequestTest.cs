@@ -1,9 +1,11 @@
-﻿using Application.InfrastructureContracts.CacheProject.Cache.Interfaces;
+﻿using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemDtoQuery.Factory.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemDtoQuery.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Factory.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Interface;
-using Application.InfrastructureContracts.DataAccessProject.AppRepository.DataModels;
-using Application.InfrastructureContracts.DataAccessProject.AppRepository.Factory.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.AppRepository.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.DataModels;
+using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Factory.Interfaces;
+using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Interface;
 using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.UnitOfWork.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.UnitOfWorkFactory.Interfaces;
@@ -24,8 +26,9 @@ using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormal
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
 using Application.UseCases.LoadRssItemsUseCaseModule.Class;
 using Domain.DomainEntities.RssEntity.Class;
-using Infra.CacheService.CacheServices.Class;
-using Infra.DataAccess.AppRepositoryService.Factory.Class;
+using Infra.CacheService.CacheBaseServices.CacheServices.Class;
+using Infra.DataAccess.AppQueryService.RssSiteQueryService.Class.Factory;
+using Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory.Class;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
@@ -37,8 +40,9 @@ using Infra.ImageService.ImageFileSaverService.Class;
 using Infra.ImageService.InfraImageCreatorService.Class;
 using Infra.ImageService.MappingService.Class;
 using Infra.SharedService.FilePathMakerService.Class;
-using Infra.SharedService.ImageSettingsMapperService.Class;
+using Infra.SharedService.MapperService.ImageSettingsMapperService.Class;
 using Infra.XmlParserService.XamlParserService.Class;
+using Shared.ImageServices.ImageUtilityService.Class;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -48,14 +52,36 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Infra.DataAccess.AppQueryService.RssSiteQueryService.Class.Factory;
+using Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class;
 using static System.Net.Mime.MediaTypeNames;
-using Shared.ImageServices.ImageUtilityService.Class;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
 {
     public class HttpRequestTest
     {
+
+        private ICache<Uri, RssItemEfEntity> _persistenceCache;
+
+
+        private ICache<Uri, RssItemEfEntity> PersistenceCache
+        {
+            get
+            {
+                if (this._persistenceCache == null)
+                    this._persistenceCache = new Cache<Uri, RssItemEfEntity>();
+                return this._persistenceCache;
+            }
+        }
+
+
+
+
+        /// //////////////////////////////////////////////////////////////
+        
+
+
+
+
         //[Fact]
         //public async Task LoadUseCaseTest()
         //{
@@ -226,7 +252,7 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         [Fact]
         public void DatabaseTest_4()
         {
-            var database = this.BuildIRssItemRepository();
+            var database = this.GetRssItemRepository();
             IRssItemRepository rssItemRepository = database.rssItemRepository;
             using IUnitOfWork unitOfWork = database.unitOfWork;
 
@@ -251,7 +277,33 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         }
 
 
+        [Fact]
+        public void DatabaseTest_7()
+        {
+            var database = this.GetRssItemRepository();
+            IRssItemRepository rssItemRepository = database.rssItemRepository;
+            using (IUnitOfWork unitOfWork = database.unitOfWork)
+            {
+                rssItemRepository.Add(this.GetRssItem(), this.GetImageSaveOptions(@"D:\Tasavir\Test"));
+                unitOfWork.SaveChanges();
+            }
+
+            using (IRssItemDtoQuery rssItemDtoQuery = this.GetRssItemDtoQuery())
+            {
+                IEnumerable<RssItemDto> rssItemDtos = rssItemDtoQuery.FindAll();
+            }
+        }
+
+
         ////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        private IRssItemDtoQuery GetRssItemDtoQuery()
+        {
+            IRssItemDtoQueryFactory rssItemDtoQueryFactory = new RssItemDtoQueryFactory(
+                this.GetConnectionString(), this.PersistenceCache, new RssItemDtoMapper());
+            return rssItemDtoQueryFactory.Create();
+        }
 
 
         private DateTime ParsePublishDate(string dateStr)
@@ -283,20 +335,16 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         }
 
 
-        private (IRssItemRepository rssItemRepository, IUnitOfWork unitOfWork) BuildIRssItemRepository()
+        private (IRssItemRepository rssItemRepository, IUnitOfWork unitOfWork) GetRssItemRepository()
         {
-            IRssItemRepositoryFactory rssItemRepositoryFactory = this.BuildIRssItemRepositoryFactory();
-            IUnitOfWorkFactory unitOfWorkFactory = this.BuildIUnitOfWorkFactory();
-
+            IRssItemRepositoryFactory rssItemRepositoryFactory = this.GetRssItemRepositoryFactory();
+            IUnitOfWorkFactory unitOfWorkFactory = this.GetUnitOfWorkFactory();
             IUnitOfWork unitOfWork = unitOfWorkFactory.Create(false);
-            //IInitializeDatabase initializeDatabase = initializeDatabaseFactory.Create(unitOfWork);
-            //bool isCreated = initializeDatabase.EnsureDatabaseCreated();
-
             return (rssItemRepositoryFactory.Create(unitOfWork), unitOfWork);
         }
 
 
-        private IRssItemRepositoryFactory BuildIRssItemRepositoryFactory()
+        private IRssItemRepositoryFactory GetRssItemRepositoryFactory()
         {
             RssItemEfEntityMapper efEntityMapper = new RssItemEfEntityMapper();
             ImageUtility imageUtility = new ImageUtility();
@@ -305,12 +353,11 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             ImageSettingsMapper imageSettingsMapper = new ImageSettingsMapper();
             IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, filePathMaker, imageSettingsMapper);
             IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
-            ICache<Uri, RssItemEfEntity> persistanceCache = new Cache<Uri, RssItemEfEntity>();
-            return new RssItemRepositoryFactory(efEntityMapper, persistanceCache, imageFileSaverCoordinator, imageFileReader);
+            return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, imageFileSaverCoordinator, imageFileReader);
         }
 
 
-        private IUnitOfWorkFactory BuildIUnitOfWorkFactory()
+        private IUnitOfWorkFactory GetUnitOfWorkFactory()
         {
             string connectionString = this.GetConnectionString();
             return new UnitOfWorkFactory(connectionString);

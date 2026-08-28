@@ -3,7 +3,7 @@ using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
-using Infra.SharedService.ImageSettingsMapperService.Class;
+using Infra.SharedService.MapperService.ImageSettingsMapperService.Class;
 
 namespace Infra.ImageService.ImageFileSaverService.Class
 {

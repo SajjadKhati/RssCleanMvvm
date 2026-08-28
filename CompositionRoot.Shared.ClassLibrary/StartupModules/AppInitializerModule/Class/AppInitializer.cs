@@ -41,9 +41,9 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModul
         }
 
 
-        public async Task<IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig>> FinAllRssFeedXmlParsingConfigAsync(string connectionString)
+        public async Task<IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig>> GetRssFeedXmlParsingConfigAsync(string connectionString)
         {
-            return await Task.Run(() => this.FinAllRssFeedXmlParsingConfig(connectionString));
+            return await Task.Run(() => this.GetRssFeedXmlParsingConfig(connectionString));
         }
 
 
@@ -64,7 +64,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModul
         }
 
 
-        private IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> FinAllRssFeedXmlParsingConfig(string connectionString)
+        private IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> GetRssFeedXmlParsingConfig(string connectionString)
         {
             RssDbContext rssDbContext = new RssDbContext(connectionString);
             RssFeedXmlParsingConfigEfEntityMapper configEfEntityMapper = new RssFeedXmlParsingConfigEfEntityMapper();

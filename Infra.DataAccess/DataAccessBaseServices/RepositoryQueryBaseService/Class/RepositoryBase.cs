@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Class
 {
@@ -19,20 +18,6 @@ namespace Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Cla
 
 
         ///////////////////////////////////////////////////////////////
-
-
-        public bool AttachEntityToDbContext<TEntity>(TEntity entity, EntityState entityState = EntityState.Unchanged)
-            where TEntity : class
-        {
-            EntityEntry<TEntity> entityEntry = this.dbContext.Entry(entity);
-            if (entityEntry.State == EntityState.Detached)
-            {
-                entityEntry = this.dbContext.Attach(entity);
-                entityEntry.State = entityState;
-                return true;
-            }
-            return false;
-        }
 
 
         public TNonQueryEntity AddEntity<TNonQueryEntity>(TNonQueryEntity entity) where TNonQueryEntity : class

@@ -15,7 +15,7 @@ namespace Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Cla
     /// در شرایط خاص مثل UnitOfWork و Query ، ما میتونیم مالکیتِ Disposable کردن را به این سرویس ها تغییر بدیم .
     /// یعنی سرویس Factory شون ، فقط شی DbContext را بسازه اما این سرویس ها ، مسئول Dispose کردنش باشند .
     /// </summary>
-    public abstract class QueryBase
+    public abstract class QueryBase : DbContextBase
     {
 
         private DbContext dbContext;
@@ -24,7 +24,7 @@ namespace Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Cla
         ///////////////////////////////////////////////////////////////
 
 
-        public QueryBase(DbContext dbContext)
+        public QueryBase(DbContext dbContext) : base(dbContext)
         {
             this.dbContext = dbContext;
         }
