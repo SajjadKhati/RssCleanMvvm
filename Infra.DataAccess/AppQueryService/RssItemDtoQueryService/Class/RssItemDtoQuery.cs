@@ -5,7 +5,6 @@ using Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Class;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
-using System.Linq;
 
 namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
 {

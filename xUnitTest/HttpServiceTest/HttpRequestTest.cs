@@ -26,7 +26,9 @@ using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormal
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
 using Application.UseCases.LoadRssItemsUseCaseModule.Class;
 using Domain.DomainEntities.RssEntity.Class;
+using Infra.CacheService.AppDraftCacheManagerService.DraftCacheWriterService.Class;
 using Infra.CacheService.CacheBaseServices.CacheServices.Class;
+using Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class;
 using Infra.DataAccess.AppQueryService.RssSiteQueryService.Class.Factory;
 using Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory.Class;
 using Infra.DataAccess.DbContextService.Class;
@@ -52,7 +54,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class;
+using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.DraftCacheWriter.Interface;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
@@ -347,13 +349,15 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         private IRssItemRepositoryFactory GetRssItemRepositoryFactory()
         {
             RssItemEfEntityMapper efEntityMapper = new RssItemEfEntityMapper();
+            IDraftCacheWriter draftCacheWriter = new DraftCacheWriter();
             ImageUtility imageUtility = new ImageUtility();
             IImageFileSaver imageFileSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(new ImageInfoMemberMapper()));
             IFilePathMaker filePathMaker = new FilePathMaker();
             ImageSettingsMapper imageSettingsMapper = new ImageSettingsMapper();
             IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, filePathMaker, imageSettingsMapper);
             IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
-            return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, imageFileSaverCoordinator, imageFileReader);
+            return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, draftCacheWriter, 
+                imageFileSaverCoordinator, imageFileReader);
         }
 
 

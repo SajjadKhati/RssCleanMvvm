@@ -2,6 +2,9 @@
 {
     public interface ICache<TKey, TItem> where TKey : notnull
     {
+
+        int Count();
+
         bool ContainsKey(TKey key);
 
         ICollection<TKey> GetKeys();
@@ -9,6 +12,8 @@
         TItem Get(TKey key);
 
         IReadOnlyList<TItem> GetAll();
+
+        IReadOnlyDictionary<TKey, TItem> GetAllKeyValuesSnapshot();
 
         TItem GetOrAdd(TKey key, TItem value);
 

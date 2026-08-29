@@ -1,12 +1,19 @@
-﻿using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
+﻿using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.DraftCacheWriter.Interface;
+using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.DataModels;
 using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.Interfaces;
 using Infra.CacheService.CacheBaseServices.DraftCacheServices.Class;
+using Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordinatorService.InternalInterface;
 using Infra.DataAccess.EfEntities.Class;
 
-namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
+namespace Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordinatorService.InternalClass
 {
-    internal class RssItemRepositoryCacheCoordinator
+    /// <summary>
+    /// جای اصلی این کلاس ، در پروژه ی Infra.CacheService هست .
+    /// منتها چون این کلاس ، مستقیما توسط کلاس RssItemRepository شی اش ساخته میشه (و رابط IRssItemRepositoryCacheCoordinator ، در سازنده ی RssItemRepository تزریق نمیشه) ، 
+    /// بنابراین اگر این سرویس را در پروژه ی Infra.CacheService تعریف کنیم ، چرخه ی وابستگی به پروژه ها بوجود میاد و نمیشه .
+    /// </summary>
+    internal class RssItemRepositoryCacheCoordinator : IRssItemRepositoryCacheCoordinator
     {
 
         /// <summary>
@@ -26,39 +33,42 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
         /// </summary>
         private IDraftCache<Uri, RssItemEfEntity> draftCache;
 
+        private IDraftCacheWriter draftCacheWriter;
+
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        internal RssItemRepositoryCacheCoordinator(ICache<Uri, RssItemEfEntity> persistenceCache)
+        internal RssItemRepositoryCacheCoordinator(ICache<Uri, RssItemEfEntity> persistenceCache, IDraftCacheWriter draftCacheWriter)
         {
             this.persistenceCache = persistenceCache;
             this.draftCache = new DraftCache<Uri, RssItemEfEntity>();
+            this.draftCacheWriter = draftCacheWriter;
         }
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        internal void MarkAsAddedInDraftCache(Uri key, RssItemEfEntity rssItemEfEntity)
+        public void MarkAsAddedInDraftCache(Uri key, RssItemEfEntity rssItemEfEntity)
         {
-            this.AddOrUpdateToDraftCache(key, rssItemEfEntity, DraftState.Added);
+            this.draftCacheWriter.AddOrUpdateToDraftCache(this.draftCache, key, rssItemEfEntity, DraftState.Added);
         }
 
 
-        internal void MarkAsModifiedInDraftCache(Uri key, RssItemEfEntity rssItemEfEntity)
+        public void MarkAsModifiedInDraftCache(Uri key, RssItemEfEntity rssItemEfEntity)
         {
-            this.AddOrUpdateToDraftCache(key, rssItemEfEntity, DraftState.Modified);
+            this.draftCacheWriter.AddOrUpdateToDraftCache(this.draftCache, key, rssItemEfEntity, DraftState.Modified);
         }
 
 
-        internal void MarkAsDeletedInDraftCache(Uri key, RssItemEfEntity rssItemEfEntity)
+        public void MarkAsDeletedInDraftCache(Uri key, RssItemEfEntity rssItemEfEntity)
         {
-            this.AddOrUpdateToDraftCache(key, rssItemEfEntity, DraftState.Deleted);
+            this.draftCacheWriter.AddOrUpdateToDraftCache(this.draftCache, key, rssItemEfEntity, DraftState.Deleted);
         }
 
 
-        internal void CommitDraftCacheToPersistenceCache()
+        public void CommitDraftCacheToPersistenceCache()
         {
             foreach (DraftEntry<RssItemEfEntity> draftEntry in this.draftCache.GetAll())
             {
@@ -70,13 +80,6 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        private void AddOrUpdateToDraftCache(Uri key, RssItemEfEntity rssItemEfEntity, DraftState draftState)
-        {
-            DraftEntry<RssItemEfEntity> updateDraftEntry = new DraftEntry<RssItemEfEntity>(rssItemEfEntity, draftState, key);
-            this.draftCache.AddOrUpdate(key, updateDraftEntry);
-        }
 
 
         private void MoveDraftCacheToPersistenceCache(Uri key, DraftEntry<RssItemEfEntity> draftEntry)

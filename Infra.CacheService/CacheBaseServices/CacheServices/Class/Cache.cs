@@ -1,5 +1,7 @@
 ﻿using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Infra.CacheService.CacheBaseServices.CacheServices.Class
 {
@@ -23,6 +25,12 @@ namespace Infra.CacheService.CacheBaseServices.CacheServices.Class
         ////////////////////////////////////////////////
 
 
+        public int Count()
+        {
+            return this.itemsDictionary.Count;
+        }
+
+
         public bool ContainsKey(TKey key)
         {
             return this.itemsDictionary.ContainsKey(key);
@@ -44,6 +52,12 @@ namespace Infra.CacheService.CacheBaseServices.CacheServices.Class
         public IReadOnlyList<TItem> GetAll()
         {
             return this.itemsDictionary.Values.ToList().AsReadOnly();
+        }
+
+
+        public IReadOnlyDictionary<TKey, TItem> GetAllKeyValuesSnapshot()
+        {
+            return new ReadOnlyDictionary<TKey, TItem>(this.itemsDictionary);
         }
 
 

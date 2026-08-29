@@ -1,4 +1,5 @@
-﻿using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
+﻿using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.DraftCacheWriter.Interface;
+using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Factory.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.UnitOfWork.Interfaces;
@@ -17,6 +18,8 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
 
         private ICache<Uri, RssItemEfEntity> persistenceCache;
 
+        private IDraftCacheWriter draftCacheWriter;
+
         private RssItemEfEntityMapper efEntityMapper;
 
         private IImageFileSaverCoordinator imageFileSaverCoordinator;
@@ -28,9 +31,10 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
 
 
         public RssItemRepositoryFactory(RssItemEfEntityMapper efEntityMapper, ICache<Uri, RssItemEfEntity> persistenceCache,
-            IImageFileSaverCoordinator imageFileSaverCoordinator, IImageFileReader imageFileReader)
+            IDraftCacheWriter draftCacheWriter, IImageFileSaverCoordinator imageFileSaverCoordinator, IImageFileReader imageFileReader)
         {
             this.persistenceCache = persistenceCache;
+            this.draftCacheWriter = draftCacheWriter;
             this.efEntityMapper = efEntityMapper;
             this.imageFileSaverCoordinator = imageFileSaverCoordinator;
             this.imageFileReader = imageFileReader;
@@ -49,7 +53,8 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
             if(dbContextProvider.DbContext is not RssDbContext rssDbContext)
                 throw new ArgumentException($"نوع {nameof(dbContextProvider.DbContext)} ، باید از نوع RssDbContext باشد .");
 
-            return new RssItemRepository(rssDbContext, this.persistenceCache, this.efEntityMapper, this.imageFileSaverCoordinator, this.imageFileReader);
+            return new RssItemRepository(rssDbContext, this.persistenceCache, this.draftCacheWriter, 
+                this.efEntityMapper, this.imageFileSaverCoordinator, this.imageFileReader);
         }
 
 
