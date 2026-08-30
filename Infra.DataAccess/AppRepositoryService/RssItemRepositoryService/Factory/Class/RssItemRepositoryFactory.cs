@@ -4,12 +4,12 @@ using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssIte
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.UnitOfWork.Interfaces;
 using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
 using Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class;
 using Infra.DataAccess.DataAccessBaseServices.UnitOfWorkService.InternalInterface;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
 
 namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory.Class
 {
@@ -22,22 +22,22 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
 
         private RssItemEfEntityMapper efEntityMapper;
 
-        private IImageFileSaverCoordinator imageFileSaverCoordinator;
-
         private IImageFileReader imageFileReader;
+
+        private IRssItemEfEntityFactory rssItemEfEntityFactory;
 
 
         /////////////////////////////////////////////////////////////////////////
 
 
         public RssItemRepositoryFactory(RssItemEfEntityMapper efEntityMapper, ICache<Uri, RssItemEfEntity> persistenceCache,
-            IDraftCacheWriter draftCacheWriter, IImageFileSaverCoordinator imageFileSaverCoordinator, IImageFileReader imageFileReader)
+            IDraftCacheWriter draftCacheWriter, IImageFileReader imageFileReader, IRssItemEfEntityFactory rssItemEfEntityFactory)
         {
             this.persistenceCache = persistenceCache;
             this.draftCacheWriter = draftCacheWriter;
             this.efEntityMapper = efEntityMapper;
-            this.imageFileSaverCoordinator = imageFileSaverCoordinator;
             this.imageFileReader = imageFileReader;
+            this.rssItemEfEntityFactory = rssItemEfEntityFactory;
         }
 
 
@@ -54,7 +54,7 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
                 throw new ArgumentException($"نوع {nameof(dbContextProvider.DbContext)} ، باید از نوع RssDbContext باشد .");
 
             return new RssItemRepository(rssDbContext, this.persistenceCache, this.draftCacheWriter, 
-                this.efEntityMapper, this.imageFileSaverCoordinator, this.imageFileReader);
+                this.efEntityMapper, this.imageFileReader, this.rssItemEfEntityFactory);
         }
 
 

@@ -1,12 +1,17 @@
 ﻿using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.DataModels;
-using Application.InfrastructureContracts.SharedProject.DraftCacheStateMarker.Interface;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Domain.DomainEntities.RssEntity.Class;
 
 namespace Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.RssItemDraftCacheManager.Interface
 {
-    public interface IRssItemDraftCacheManager : IDraftCacheStateMarker<Uri, RssItem>, IDisposable
+    public interface IRssItemDraftCacheManager : IDisposable
     {
+
+        void MarkAsAddedInDraftCache(Uri key, RssItem rssItem, RssItemDto rssItemDto);
+
+        void MarkAsModifiedInDraftCache(Uri key, RssItem rssItem, RssItemDto rssItemDto);
+
+        void MarkAsDeletedInDraftCache(Uri key, RssItem rssItem, RssItemDto rssItemDto);
 
         void Remove(Uri key);
 

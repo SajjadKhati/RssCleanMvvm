@@ -3,11 +3,7 @@ using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interface
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.DataModels;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Interfaces;
 using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
-using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.SharedProject.Disposed.Interface;
-using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
 using Domain.DomainEntities.RssEntity.Class;
 using Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordinatorService.InternalClass;
 using Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordinatorService.InternalInterface;
@@ -15,6 +11,7 @@ using Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Class;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
@@ -23,27 +20,27 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
     {
 
         private RssItemEfEntityMapper efEntityMapper;
-
-        private IImageFileSaverCoordinator imageFileSaverCoordinator;
         
         private IImageFileReader imageFileReader;
 
         private IRssItemRepositoryCacheCoordinator rssItemCacheCoordinator;
+
+        private IRssItemEfEntityFactory rssItemEfEntityFactory;
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
         public RssItemRepository(RssDbContext rssDbContext, ICache<Uri, RssItemEfEntity> persistenceCache,
-            IDraftCacheWriter draftCacheWriter, RssItemEfEntityMapper efEntityMapper,
-            IImageFileSaverCoordinator imageFileSaverCoordinator, IImageFileReader imageFileReader) : base(rssDbContext)
+            IDraftCacheWriter draftCacheWriter, RssItemEfEntityMapper efEntityMapper, IImageFileReader imageFileReader, 
+            IRssItemEfEntityFactory rssItemEfEntityFactory) : base(rssDbContext)
         {
             /// شی RssItemRepositoryCacheCoordinator ، نیاز به تزریق نداره . چون هم سنگین نیست که خیلی لازم به تست باشه و -
             /// هم برای مدیریت طول عمر draftCache ، که به ازای هر شی RssItemRepository ، باید یک شی draftCache داشته باشه ، نباید تزریق بشه .
             this.rssItemCacheCoordinator = new RssItemRepositoryCacheCoordinator(persistenceCache, draftCacheWriter);
             this.efEntityMapper = efEntityMapper;
-            this.imageFileSaverCoordinator = imageFileSaverCoordinator;
             this.imageFileReader = imageFileReader;
+            this.rssItemEfEntityFactory = rssItemEfEntityFactory;
 
             rssDbContext.SavedChanges += this.DbContext_SavedChanges;
             rssDbContext.Disposed += this.DbContext_Disposed;
@@ -55,8 +52,7 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
 
         public void Add(RssItem rssItem, ImageSaveOptions imageSaveOptions)
         {
-            DestinationPath imageDestinationPath = this.SaveImageToFile(rssItem.Argb8BitImage, imageSaveOptions.FolderPath, rssItem.Id.AbsoluteUri, imageSaveOptions.ImageInfoSettings);
-            RssItemEfEntity rssItemEfEntity = this.efEntityMapper.ToRssItemEfEntity(rssItem, imageDestinationPath.FullFilePath);
+            RssItemEfEntity rssItemEfEntity = this.rssItemEfEntityFactory.CreateRssItemEfEntity(rssItem, imageSaveOptions);
             this.AddEntity(rssItemEfEntity);
             // اضافه یا به روزرسانی در کش موقت
             this.rssItemCacheCoordinator.MarkAsAddedInDraftCache(rssItem.Id, rssItemEfEntity);
@@ -65,11 +61,10 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
 
         public void Update(RssItem rssItem, ImageSaveOptions imageSaveOptions)
         {
-            DestinationPath imageDestinationPath = this.SaveImageToFile(rssItem.Argb8BitImage, imageSaveOptions.FolderPath, rssItem.Id.AbsoluteUri, imageSaveOptions.ImageInfoSettings);
+            RssItemEfEntity updatedRssItemEfEntity = this.rssItemEfEntityFactory.CreateRssItemEfEntity(rssItem, imageSaveOptions);
             RssItemEfEntity oldRssItemEfEntity = this.FindRssItemEfEntityByKey(rssItem.Id.AbsoluteUri);
             this.AttachEntityToDbContext(oldRssItemEfEntity);
             /// به روزرسانی
-            RssItemEfEntity updatedRssItemEfEntity = this.efEntityMapper.ToRssItemEfEntity(rssItem, imageDestinationPath.FullFilePath);
             this.efEntityMapper.UpdateRssItemEfEntity(updatedRssItemEfEntity, oldRssItemEfEntity);
             // اضافه یا به روزرسانی در کش موقت
             this.rssItemCacheCoordinator.MarkAsModifiedInDraftCache(rssItem.Id, updatedRssItemEfEntity);
@@ -129,14 +124,6 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
         private RssItemEfEntity FindRssItemEfEntityByKey(string rssItemKey)
         {
             return this.FindByKeyEntity<string, RssItemEfEntity>(rssItemKey);
-        }
-
-
-        private DestinationPath SaveImageToFile(byte[,,] image, string imageFolderPath, string imageFileName, ImageSettings<ImageInfo> imageInfoSettings)
-        {
-            var imageFilePath = new FilePath(imageFolderPath, imageFileName);
-            DestinationPath imageDestinationPath = this.imageFileSaverCoordinator.Save8BitImageToFile(image, imageInfoSettings, imageFilePath);
-            return imageDestinationPath;
         }
 
 

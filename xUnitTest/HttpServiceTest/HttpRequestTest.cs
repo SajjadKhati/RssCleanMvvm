@@ -1,4 +1,5 @@
-﻿using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
+﻿using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.DraftCacheWriter.Interface;
+using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemDtoQuery.Factory.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemDtoQuery.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Factory.Interface;
@@ -17,6 +18,7 @@ using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Enum;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
+using Application.InfrastructureContracts.SharedProject.SharedMapper.RssItemDtoMapper.Interface;
 using Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Class;
@@ -34,6 +36,8 @@ using Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory.Cla
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Class;
+using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
 using Infra.DataAccess.UnitOfWorkFactoryService.Class;
 using Infra.HttpService.HttpRequestService.Factory.Class;
 using Infra.ImageService.ImageDataExtractorService.Class;
@@ -54,7 +58,6 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.DraftCacheWriter.Interface;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
@@ -356,8 +359,9 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             ImageSettingsMapper imageSettingsMapper = new ImageSettingsMapper();
             IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, filePathMaker, imageSettingsMapper);
             IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
-            return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, draftCacheWriter, 
-                imageFileSaverCoordinator, imageFileReader);
+            IRssItemDtoMapper rssItemDtoMapper = new Application.Services.Mapper.RssItemDtoMapper();
+            IRssItemEfEntityFactory rssItemEfEntityFactory = new RssItemDtoEfEntityFactory(imageFileSaverCoordinator, rssItemDtoMapper, efEntityMapper);
+            return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, draftCacheWriter, imageFileReader, rssItemEfEntityFactory);
         }
 
 

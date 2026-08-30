@@ -2,14 +2,7 @@
 using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.RssItemDraftCacheManager.Interface;
 using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.DataModels;
 using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.Interfaces;
-using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.DataModels;
-using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
-using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
-using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.SharedProject.FileManager.Interface;
-using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
-using Application.InfrastructureContracts.SharedProject.SharedMapper.RssItemDtoMapper.Interface;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Domain.DomainEntities.RssEntity.Class;
 
@@ -26,12 +19,6 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
 
         private IDraftCacheWriter draftCacheWriter;
 
-        private ImageSaveOptions imageSaveOptions;
-
-        private IImageFileSaverCoordinator imageFileSaverCoordinator;
-
-        private IRssItemDtoMapper rssItemDtoMapper;
-
         private IFileManager fileManager;
 
         #endregion
@@ -42,17 +29,12 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
 
         #region متد سازنده
 
-        public RssItemDraftCacheManager(IDraftCache<Uri, RssItem> rssItemDraftCache,
-            IDraftCache<Uri, RssItemDto> rssItemDtoDraftCache, IDraftCacheWriter draftCacheWriter, ImageSaveOptions imageSaveOptions, 
-            IImageFileSaverCoordinator imageFileSaverCoordinator, IRssItemDtoMapper rssItemDtoMapper, 
-            IFileManager fileManager)
+        public RssItemDraftCacheManager(IDraftCache<Uri, RssItem> rssItemDraftCache, 
+            IDraftCache<Uri, RssItemDto> rssItemDtoDraftCache, IDraftCacheWriter draftCacheWriter, IFileManager fileManager)
         {
             this.rssItemDraftCache = rssItemDraftCache;
             this.rssItemDtoDraftCache = rssItemDtoDraftCache;
             this.draftCacheWriter = draftCacheWriter;
-            this.imageSaveOptions = imageSaveOptions;
-            this.imageFileSaverCoordinator = imageFileSaverCoordinator;
-            this.rssItemDtoMapper = rssItemDtoMapper;
             this.fileManager = fileManager;
         }
 
@@ -62,24 +44,19 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
         ////////////////////////////////////////////////////////////////
 
 
-        public void MarkAsAddedInDraftCache(Uri key, RssItem item)
+        public void MarkAsAddedInDraftCache(Uri key, RssItem rssItem, RssItemDto rssItemDto)
         {
-            RssItemDto rssItemDto = this.CreateRssItemDto(item);
-            this.AddOrUpdateToDraftCaches(key, item, rssItemDto, DraftState.Added);
+            this.AddOrUpdateToDraftCaches(key, rssItem, rssItemDto, DraftState.Added);
         }
 
-
-        public void MarkAsModifiedInDraftCache(Uri key, RssItem item)
+        public void MarkAsModifiedInDraftCache(Uri key, RssItem rssItem, RssItemDto rssItemDto)
         {
-            RssItemDto rssItemDto = this.CreateRssItemDto(item);
-            this.AddOrUpdateToDraftCaches(key, item, rssItemDto, DraftState.Modified);
+            this.AddOrUpdateToDraftCaches(key, rssItem, rssItemDto, DraftState.Modified);
         }
 
-
-        public void MarkAsDeletedInDraftCache(Uri key, RssItem item)
+        public void MarkAsDeletedInDraftCache(Uri key, RssItem rssItem, RssItemDto rssItemDto)
         {
-            RssItemDto rssItemDto = this.CreateRssItemDto(item);
-            this.AddOrUpdateToDraftCaches(key, item, rssItemDto, DraftState.Deleted);
+            this.AddOrUpdateToDraftCaches(key, rssItem, rssItemDto, DraftState.Deleted);
         }
 
 
@@ -153,21 +130,6 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
 
 
         ////////////////////////////////////////////////////////////////
-
-
-        private RssItemDto CreateRssItemDto(RssItem rssItem)
-        {
-            DestinationPath draftImageDestinationPath = this.SaveImageToFile(rssItem.Argb8BitImage, this.imageSaveOptions.FolderPath,
-                rssItem.Id.AbsoluteUri, this.imageSaveOptions.ImageInfoSettings);
-            return this.rssItemDtoMapper.ToRssItemDto(rssItem, draftImageDestinationPath.FullFilePath);
-        }
-
-        private DestinationPath SaveImageToFile(byte[,,] image, string imageFolderPath, string imageFileName, ImageSettings<ImageInfo> imageInfoSettings)
-        {
-            var imageFilePath = new FilePath(imageFolderPath, imageFileName);
-            DestinationPath imageDestinationPath = this.imageFileSaverCoordinator.Save8BitImageToFile(image, imageInfoSettings, imageFilePath);
-            return imageDestinationPath;
-        }
 
 
         private void AddOrUpdateToDraftCaches(Uri key, RssItem rssItem, RssItemDto rssItemDto, DraftState draftState)
