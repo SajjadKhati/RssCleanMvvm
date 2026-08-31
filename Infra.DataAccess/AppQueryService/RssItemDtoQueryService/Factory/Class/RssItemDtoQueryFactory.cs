@@ -16,7 +16,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class
 
         private ICache<Uri, RssItemEfEntity> persistenceCache;
 
-        private RssItemDtoMapper rssItemDtoMapper;
+        private RssItemDtoEfEntityMapper rssItemDtoMapper;
 
         private RssItemEfEntityExpressionFactory expressionFactory;
 
@@ -25,7 +25,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class
 
 
         public RssItemDtoQueryFactory(string connectionString, ICache<Uri, RssItemEfEntity> persistenceCache, 
-            RssItemDtoMapper rssItemDtoMapper, RssItemEfEntityExpressionFactory expressionFactory)
+            RssItemDtoEfEntityMapper rssItemDtoMapper, RssItemEfEntityExpressionFactory expressionFactory)
         {
             this.connectionString = connectionString;
             this.persistenceCache = persistenceCache;

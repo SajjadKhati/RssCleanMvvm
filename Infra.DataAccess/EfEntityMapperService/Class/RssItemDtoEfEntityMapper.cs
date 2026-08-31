@@ -3,7 +3,7 @@ using Infra.DataAccess.EfEntities.Class;
 
 namespace Infra.DataAccess.EfEntityMapperService.Class
 {
-    public class RssItemDtoMapper
+    public class RssItemDtoEfEntityMapper
     {
 
 

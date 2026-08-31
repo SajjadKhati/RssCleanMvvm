@@ -14,7 +14,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
 
         private ICache<Uri, RssItemEfEntity> persistenceCache;
 
-        private RssItemDtoMapper rssItemDtoMapper;
+        private RssItemDtoEfEntityMapper rssItemDtoMapper;
 
         private RssItemEfEntityExpressionFactory expressionFactory;
 
@@ -23,7 +23,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
 
 
         public RssItemDtoQuery(RssDbContext dbContext, ICache<Uri, RssItemEfEntity> persistenceCache, 
-            RssItemDtoMapper rssItemDtoMapper, RssItemEfEntityExpressionFactory expressionFactory) : base(dbContext)
+            RssItemDtoEfEntityMapper rssItemDtoMapper, RssItemEfEntityExpressionFactory expressionFactory) : base(dbContext)
         {
             this.persistenceCache = persistenceCache;
             this.rssItemDtoMapper = rssItemDtoMapper;
@@ -34,7 +34,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        public bool IsExist(string rssItemId)
+        public bool IsRssItemExist(string rssItemId)
         {
             // لازم به جستجو در کش نیست .
             return this.FindByKeyEntity<string, RssItemEfEntity>(rssItemId) != null;

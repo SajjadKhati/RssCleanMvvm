@@ -307,7 +307,7 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         private IRssItemDtoQuery GetRssItemDtoQuery()
         {
             IRssItemDtoQueryFactory rssItemDtoQueryFactory = new RssItemDtoQueryFactory(
-                this.GetConnectionString(), this.PersistenceCache, new RssItemDtoMapper(), this.GetExpressionFactory());
+                this.GetConnectionString(), this.PersistenceCache, new RssItemDtoEfEntityMapper(), this.GetExpressionFactory());
             return rssItemDtoQueryFactory.Create();
         }
 

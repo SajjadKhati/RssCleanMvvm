@@ -5,7 +5,7 @@ namespace Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItem
     public interface IRssItemDtoQuery : IDisposable
     {
 
-        bool IsExist(string rssItemId);
+        bool IsRssItemExist(string rssItemId);
 
         RssItemDto FindByKey(string rssItemId);
 
