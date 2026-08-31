@@ -58,6 +58,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Infra.DataAccess.ExpressionFactoryService.Class;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
@@ -295,7 +296,7 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
             using (IRssItemDtoQuery rssItemDtoQuery = this.GetRssItemDtoQuery())
             {
-                IEnumerable<RssItemDto> rssItemDtos = rssItemDtoQuery.FindAll();
+                //IEnumerable<RssItemDto> rssItemDtos = rssItemDtoQuery.FindByFeedId();
             }
         }
 
@@ -306,8 +307,14 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         private IRssItemDtoQuery GetRssItemDtoQuery()
         {
             IRssItemDtoQueryFactory rssItemDtoQueryFactory = new RssItemDtoQueryFactory(
-                this.GetConnectionString(), this.PersistenceCache, new RssItemDtoMapper());
+                this.GetConnectionString(), this.PersistenceCache, new RssItemDtoMapper(), this.GetExpressionFactory());
             return rssItemDtoQueryFactory.Create();
+        }
+
+
+        private RssItemEfEntityExpressionFactory GetExpressionFactory()
+        {
+            return new RssItemEfEntityExpressionFactory();
         }
 
 
@@ -361,7 +368,8 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
             IRssItemDtoMapper rssItemDtoMapper = new Application.Services.Mapper.RssItemDtoMapper();
             IRssItemEfEntityFactory rssItemEfEntityFactory = new RssItemDtoEfEntityFactory(imageFileSaverCoordinator, rssItemDtoMapper, efEntityMapper);
-            return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, draftCacheWriter, imageFileReader, rssItemEfEntityFactory);
+            return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, draftCacheWriter, imageFileReader, 
+                rssItemEfEntityFactory, this.GetExpressionFactory());
         }
 
 

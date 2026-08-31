@@ -5,9 +5,11 @@ namespace Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItem
     public interface IRssItemDtoQuery : IDisposable
     {
 
-        RssItemDto FindByKey(string key);
+        bool IsExist(string rssItemId);
 
-        IEnumerable<RssItemDto> FindAll();
+        RssItemDto FindByKey(string rssItemId);
+
+        IEnumerable<RssItemDto> FindByFeedId(string rssFeedId);
 
     }
 }

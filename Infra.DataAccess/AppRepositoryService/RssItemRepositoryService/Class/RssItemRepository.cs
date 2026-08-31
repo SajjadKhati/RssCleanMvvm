@@ -11,6 +11,7 @@ using Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Class;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.ExpressionFactoryService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,13 +28,15 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
 
         private IRssItemEfEntityFactory rssItemEfEntityFactory;
 
+        private RssItemEfEntityExpressionFactory expressionFactory;
+
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
         public RssItemRepository(RssDbContext rssDbContext, ICache<Uri, RssItemEfEntity> persistenceCache,
             IDraftCacheWriter draftCacheWriter, RssItemEfEntityMapper efEntityMapper, IImageFileReader imageFileReader, 
-            IRssItemEfEntityFactory rssItemEfEntityFactory) : base(rssDbContext)
+            IRssItemEfEntityFactory rssItemEfEntityFactory, RssItemEfEntityExpressionFactory expressionFactory) : base(rssDbContext)
         {
             /// شی RssItemRepositoryCacheCoordinator ، نیاز به تزریق نداره . چون هم سنگین نیست که خیلی لازم به تست باشه و -
             /// هم برای مدیریت طول عمر draftCache ، که به ازای هر شی RssItemRepository ، باید یک شی draftCache داشته باشه ، نباید تزریق بشه .
@@ -41,6 +44,7 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
             this.efEntityMapper = efEntityMapper;
             this.imageFileReader = imageFileReader;
             this.rssItemEfEntityFactory = rssItemEfEntityFactory;
+            this.expressionFactory = expressionFactory;
 
             rssDbContext.SavedChanges += this.DbContext_SavedChanges;
             rssDbContext.Disposed += this.DbContext_Disposed;
@@ -87,12 +91,14 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
         }
 
 
-        public IEnumerable<RssItem> FindAll()
+        public IEnumerable<RssItem> FindByFeedId(string rssFeedId)
         {
-            IQueryable<RssItemEfEntity> rssItemEfEntityQuery = this.FindAllEntity<RssItemEfEntity>();
-            List<RssItemEfEntity> rssItemEfEntities = rssItemEfEntityQuery.ToList();
+            List<RssItemEfEntity> rssItemEfEntities = this.FindByAttributeEntity<RssItemEfEntity>(
+                this.expressionFactory.ExpressionByFeedId(rssFeedId))?.
+                ToList();
+            if (rssItemEfEntities == null || rssItemEfEntities.Count < 1)
+                return null;
             return this.ReconstructionRssItems(rssItemEfEntities);
-
         }
 
 

@@ -5,6 +5,9 @@ using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.Inte
 using Application.InfrastructureContracts.SharedProject.FileManager.Interface;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Domain.DomainEntities.RssEntity.Class;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManagerService.Class
 {
@@ -109,9 +112,12 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
         }
 
 
-        public IReadOnlyList<RssItemDto> GetAllRssItemDto()
+        public IReadOnlyList<RssItemDto> GetRssItemDtosByFeedId(Uri rssFeedId)
         {
-            return this.rssItemDtoDraftCache.GetAllItems();
+            IList<Uri> draftCacheKeysByFeedId = this.GetDraftCacheKeysByFeedId(rssFeedId);
+            if (draftCacheKeysByFeedId == null || draftCacheKeysByFeedId.Count < 1)
+                return null;
+            return this.GetDraftRssItemDtosByKeys(draftCacheKeysByFeedId);
         }
 
 
@@ -145,6 +151,24 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
             {
                 this.fileManager.DeleteFile(draftImageFullFilePath);
             }
+        }
+
+
+        private IList<Uri> GetDraftCacheKeysByFeedId(Uri rssFeedId)
+        {
+            return this.rssItemDraftCache.GetAllKeyValuesSnapshot()?.
+                Where(keyValuePairs => keyValuePairs.Value.Item.RssFeedId == rssFeedId)?.
+                Select(keyValuePairs => keyValuePairs.Key)?.
+                ToList();
+        }
+
+
+        private IReadOnlyList<RssItemDto> GetDraftRssItemDtosByKeys(IList<Uri> draftCacheKeys)
+        {
+            return this.rssItemDtoDraftCache.GetAllKeyValuesSnapshot()?.
+                Where(keyValuePairs => draftCacheKeys.Contains(keyValuePairs.Key))?.
+                Select(keyValuePairs => keyValuePairs.Value.Item)?.
+                ToList();
         }
 
     }

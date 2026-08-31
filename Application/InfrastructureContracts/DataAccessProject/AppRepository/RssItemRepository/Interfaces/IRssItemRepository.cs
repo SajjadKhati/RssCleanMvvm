@@ -14,7 +14,7 @@ namespace Application.InfrastructureContracts.DataAccessProject.AppRepository.Rs
 
         RssItem FindByKey(string rssItemKey);
 
-        IEnumerable<RssItem> FindAll();
+        IEnumerable<RssItem> FindByFeedId(string rssFeedId);
 
     }
 }

@@ -9,6 +9,7 @@ using Infra.DataAccess.DataAccessBaseServices.UnitOfWorkService.InternalInterfac
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.ExpressionFactoryService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
 
 namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory.Class
@@ -26,18 +27,22 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
 
         private IRssItemEfEntityFactory rssItemEfEntityFactory;
 
+        private RssItemEfEntityExpressionFactory expressionFactory;
+
 
         /////////////////////////////////////////////////////////////////////////
 
 
         public RssItemRepositoryFactory(RssItemEfEntityMapper efEntityMapper, ICache<Uri, RssItemEfEntity> persistenceCache,
-            IDraftCacheWriter draftCacheWriter, IImageFileReader imageFileReader, IRssItemEfEntityFactory rssItemEfEntityFactory)
+            IDraftCacheWriter draftCacheWriter, IImageFileReader imageFileReader, IRssItemEfEntityFactory rssItemEfEntityFactory,
+                RssItemEfEntityExpressionFactory expressionFactory)
         {
             this.persistenceCache = persistenceCache;
             this.draftCacheWriter = draftCacheWriter;
             this.efEntityMapper = efEntityMapper;
             this.imageFileReader = imageFileReader;
             this.rssItemEfEntityFactory = rssItemEfEntityFactory;
+            this.expressionFactory = expressionFactory;
         }
 
 
@@ -54,7 +59,7 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
                 throw new ArgumentException($"نوع {nameof(dbContextProvider.DbContext)} ، باید از نوع RssDbContext باشد .");
 
             return new RssItemRepository(rssDbContext, this.persistenceCache, this.draftCacheWriter, 
-                this.efEntityMapper, this.imageFileReader, this.rssItemEfEntityFactory);
+                this.efEntityMapper, this.imageFileReader, this.rssItemEfEntityFactory, this.expressionFactory);
         }
 
 

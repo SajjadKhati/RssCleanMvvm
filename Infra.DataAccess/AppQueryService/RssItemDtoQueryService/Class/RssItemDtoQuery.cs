@@ -5,6 +5,7 @@ using Infra.DataAccess.DataAccessBaseServices.RepositoryQueryBaseService.Class;
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.ExpressionFactoryService.Class;
 
 namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
 {
@@ -15,32 +16,42 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
 
         private RssItemDtoMapper rssItemDtoMapper;
 
+        private RssItemEfEntityExpressionFactory expressionFactory;
+
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemDtoQuery(RssDbContext dbContext, ICache<Uri, RssItemEfEntity> persistenceCache, RssItemDtoMapper rssItemDtoMapper) 
-            : base(dbContext)
+        public RssItemDtoQuery(RssDbContext dbContext, ICache<Uri, RssItemEfEntity> persistenceCache, 
+            RssItemDtoMapper rssItemDtoMapper, RssItemEfEntityExpressionFactory expressionFactory) : base(dbContext)
         {
             this.persistenceCache = persistenceCache;
             this.rssItemDtoMapper = rssItemDtoMapper;
+            this.expressionFactory = expressionFactory;
         }
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemDto FindByKey(string key)
+        public bool IsExist(string rssItemId)
         {
-            RssItemDto rssItemDto = this.GetRssItemDtoFromCache(key);
-            return (rssItemDto != null)? rssItemDto : this.GetRssItemDtoFromDatabase(key);
+            // لازم به جستجو در کش نیست .
+            return this.FindByKeyEntity<string, RssItemEfEntity>(rssItemId) != null;
         }
 
 
-        public IEnumerable<RssItemDto> FindAll()
+        public RssItemDto FindByKey(string rssItemId)
         {
-            IList<RssItemDto> cachedRssItemDtos = this.GetAllRssItemDtoFromCache() ?? new List<RssItemDto>();
-            var databaseRssItemDtos = this.GetUncachedRssItemDtosFromDatabase() ?? new List<RssItemDto>();
+            RssItemDto rssItemDto = this.GetRssItemDtoFromCache(rssItemId);
+            return (rssItemDto != null)? rssItemDto : this.GetRssItemDtoFromDatabase(rssItemId);
+        }
+
+
+        public IEnumerable<RssItemDto> FindByFeedId(string rssFeedId)
+        {
+            IList<RssItemDto> cachedRssItemDtos = this.GetRssItemDtosByFeedIdFromCache(rssFeedId) ?? new List<RssItemDto>();
+            IList<RssItemDto> databaseRssItemDtos = this.GetUncachedRssItemDtosByFeedIdFromDatabase(rssFeedId) ?? new List<RssItemDto>();
             return cachedRssItemDtos.Concat(databaseRssItemDtos)?.ToList();
         }
 
@@ -48,41 +59,60 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        private RssItemDto GetRssItemDtoFromCache(string key)
+        private RssItemDto GetRssItemDtoFromCache(string rssItemId)
         {
-            Uri uriKey = new Uri(key);
-            if (this.persistenceCache.ContainsKey(uriKey) == true)
+            Uri rssItemUriKey = new Uri(rssItemId);
+            if (this.persistenceCache.ContainsKey(rssItemUriKey) == true)
             {
-                RssItemEfEntity rssItemEfEntity = this.persistenceCache.Get(uriKey);
+                RssItemEfEntity rssItemEfEntity = this.persistenceCache.Get(rssItemUriKey);
                 return this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity);
             }
             return null;
         }
 
 
-        private IList<RssItemDto> GetAllRssItemDtoFromCache()
+        private IList<RssItemDto> GetRssItemDtosByFeedIdFromCache(string rssFeedId)
         {
-            return this.persistenceCache.GetAll()?.Select(rssItemEfEntity => this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity))?.ToList();
+            return this.persistenceCache.GetAll()?.
+                Where(this.expressionFactory.FuncByFeedId(rssFeedId))?.
+                Select(rssItemEfEntity => this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity))?.
+                ToList();
         }
 
 
-        private RssItemDto GetRssItemDtoFromDatabase(string key)
+        private RssItemDto GetRssItemDtoFromDatabase(string rssItemId)
         {
-            RssItemEfEntity rssItemEfEntity = this.FindByKeyEntity<string, RssItemEfEntity>(key);
+            RssItemEfEntity rssItemEfEntity = this.FindByKeyEntity<string, RssItemEfEntity>(rssItemId);
             if (rssItemEfEntity == null)
                 return null;
             return this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity);
         }
 
 
-        private IList<RssItemDto> GetUncachedRssItemDtosFromDatabase()
+        private IList<RssItemDto> GetUncachedRssItemDtosByFeedIdFromDatabase(string rssFeedId)
         {
-            IList<string> cacheKeys = this.persistenceCache.GetKeys().Select(uri=>uri.AbsoluteUri).ToList();
+            IList<string> cacheKeys = this.GetCacheKeysByFeedId(rssFeedId);
 
-            return this.FindAllEntity<RssItemEfEntity>()?.
-                Where(rssItemEfEntity => cacheKeys.Contains(rssItemEfEntity.Id) == false)?.
-                ToList()?.
-                Select(rssItemEfEntity => this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity))?.
+            IQueryable<RssItemEfEntity> rssItemEfEntityQuery = this.FindByAttributeEntity<RssItemEfEntity>(
+                this.expressionFactory.ExpressionByFeedId(rssFeedId));
+
+            if (cacheKeys != null && cacheKeys.Count > 0)
+            {
+                rssItemEfEntityQuery = rssItemEfEntityQuery.Where(rssItemEfEntity => cacheKeys.Contains(rssItemEfEntity.Id) == false);
+            }
+
+            return rssItemEfEntityQuery
+                .ToList()
+                .Select(e => this.rssItemDtoMapper.ToRssItemDto(e))
+                .ToList();
+        }
+
+
+        private IList<string> GetCacheKeysByFeedId(string rssFeedId)
+        {
+            return this.persistenceCache.GetAllKeyValuesSnapshot()?.
+                Where(keyValue => keyValue.Value.RssFeedEfEntityId == rssFeedId)?.
+                Select(keyValue => keyValue.Value.Id)?.
                 ToList();
         }
 

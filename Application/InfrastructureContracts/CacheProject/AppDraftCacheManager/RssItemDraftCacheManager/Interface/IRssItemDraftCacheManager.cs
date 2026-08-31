@@ -25,7 +25,7 @@ namespace Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.
 
         RssItemDto GetRssItemDto(Uri key);
 
-        IReadOnlyList<RssItemDto> GetAllRssItemDto();
+        IReadOnlyList<RssItemDto> GetRssItemDtosByFeedId(Uri rssFeedId);
 
     }
 }

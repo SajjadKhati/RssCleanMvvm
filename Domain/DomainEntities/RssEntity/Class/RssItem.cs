@@ -13,6 +13,10 @@ namespace Domain.DomainEntities.RssEntity.Class
 
         private Uri _link;
 
+        private string _category;
+
+        private string _title;
+
         private byte[,,] _argb8BitImage;
 
 
@@ -67,9 +71,37 @@ namespace Domain.DomainEntities.RssEntity.Class
             }
         }
 
-        public string Category { get; set; }
+        public string Category
+        {
+            get
+            {
+                return this._category;
+            }
+            set
+            {
+                if(this._category == value)
+                    return;
 
-        public string Title { get; set; }
+                this.ValidateCategory(value);
+                this._category = value;
+            }
+        }
+
+        public string Title
+        {
+            get
+            {
+                return this._title;
+            }
+            set
+            {
+                if(this._title  == value)
+                    return;
+
+                this.ValidateTitle(value);
+                this._title = value;
+            }
+        }
 
         public string Description { get; set; }
 
@@ -124,6 +156,19 @@ namespace Domain.DomainEntities.RssEntity.Class
 
             if (argb8BitImage.GetLength(2) != 4)
                 throw new ArgumentException("تصویر باید 4 کانال داشته باشد .");
+        }
+
+
+        private void ValidateCategory(string category)
+        {
+            if (category != null && category.Length > 512)
+                throw new ArgumentNullException(nameof(category), $"{nameof(category)} در فیلد دامنه ، نباید اندازه ی رشته اش بیشتر از 512 کاراکتر باشد .");
+        }
+
+        private void ValidateTitle(string title)
+        {
+            if (title != null && title.Length > 2048)
+                throw new ArgumentNullException(nameof(title), $"{nameof(title)} در فیلد دامنه ، نباید اندازه ی رشته اش بیشتر از 2048 کاراکتر باشد .");
         }
 
     }
