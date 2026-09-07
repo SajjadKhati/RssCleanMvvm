@@ -60,10 +60,10 @@ namespace CompositionRoot.WpfApp
                 string connectionStringJsonFullFilePath = this.GetConnectionStringJsonFullFilePath();
                 string connectionString = await this.appInitializer.GetConnectionStringAsync(connectionStringJsonFullFilePath);
                 bool isInitialized = await this.appInitializer.InitializeAppAsync(connectionString);
-                IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> rssFeedXmlParsingConfigDictionary = 
-                    await this.appInitializer.GetRssFeedXmlParsingConfigAsync(connectionString);
+                IReadOnlyDictionary<Uri, RssFeedConfig> rssFeedDictionary = 
+                    await this.appInitializer.GetRssFeedConfigDictionaryAsync(connectionString);
                 ///
-                ViewModelCompositionRoot viewModelCompositionRoot = new ViewModelCompositionRoot(connectionString, rssFeedXmlParsingConfigDictionary);
+                ViewModelCompositionRoot viewModelCompositionRoot = new ViewModelCompositionRoot(connectionString, rssFeedDictionary);
                 MainWindowViewModel mainWindowViewModel = viewModelCompositionRoot.CreateMainWindowViewModel();
                 this.viewDisplayer.ShowMainWindow(mainWindowViewModel);
             }

@@ -65,6 +65,30 @@ namespace Infra.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RssItemFieldKeyConfigTable",
+                columns: table => new
+                {
+                    RssFeedEfEntityId = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
+                    IdKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    LinkKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    CategoryKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    TitleKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    DescriptionKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    PublishDateKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Argb8BitImageKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RssItemFieldKeyConfigTable", x => x.RssFeedEfEntityId);
+                    table.ForeignKey(
+                        name: "FK_RssItemFieldKeyConfigTable_RssFeedTable_RssFeedEfEntityId",
+                        column: x => x.RssFeedEfEntityId,
+                        principalTable: "RssFeedTable",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RssItemTable",
                 columns: table => new
                 {
@@ -119,6 +143,19 @@ namespace Infra.DataAccess.Migrations
                     { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "RssItemFieldKeyConfigTable",
+                columns: new[] { "RssFeedEfEntityId", "Argb8BitImageKey", "CategoryKey", "DescriptionKey", "IdKey", "LinkKey", "PublishDateKey", "TitleKey" },
+                values: new object[,]
+                {
+                    { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "url", "category", "description", "guid", "link", "pubDate", "title" },
+                    { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "url", "category", "description", "guid", "link", "pubDate", "title" },
+                    { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "url", "category", "description", "guid", "link", "pubDate", "title" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0", "url", "category", "description", "guid", "link", "pubDate", "title" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0", "url", "category", "description", "guid", "link", "pubDate", "title" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "url", "category", "description", "guid", "link", "pubDate", "title" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_RssFeedTable_RssSiteEfEntityId",
                 table: "RssFeedTable",
@@ -140,6 +177,9 @@ namespace Infra.DataAccess.Migrations
         {
             migrationBuilder.DropTable(
                 name: "RssFeedXmlParsingConfigTable");
+
+            migrationBuilder.DropTable(
+                name: "RssItemFieldKeyConfigTable");
 
             migrationBuilder.DropTable(
                 name: "RssItemTable");

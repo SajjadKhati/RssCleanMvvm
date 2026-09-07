@@ -26,6 +26,9 @@ namespace Infra.DataAccess.EfEntities.Class
 
         public virtual RssFeedXmlParsingConfigEfEntity RssFeedXmlParsingConfigEfEntity { get; set; }
 
+        public virtual RssItemFieldKeyConfigEfEntity RssItemFieldKeyConfigEfEntity { get; set; }
+
+
         [Required()]
         [MaxLength(256)]
         public string Title { get; set; }

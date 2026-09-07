@@ -2,10 +2,10 @@
 
 namespace Application.InfrastructureContracts.DataAccessProject.AppQuery.RssFeedXmlParsingConfigQuery.Interface
 {
-    public interface IRssFeedXmlParsingConfigQuery : IDisposable
+    public interface IRssFeedConfigQuery : IDisposable
     {
 
-        IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> FindAll();
+        IReadOnlyDictionary<Uri, RssFeedConfig> FindAll();
 
     }
 }

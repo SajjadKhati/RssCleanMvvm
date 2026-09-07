@@ -165,6 +165,7 @@ namespace Domain.DomainEntities.RssEntity.Class
                 throw new ArgumentNullException(nameof(category), $"{nameof(category)} در فیلد دامنه ، نباید اندازه ی رشته اش بیشتر از 512 کاراکتر باشد .");
         }
 
+
         private void ValidateTitle(string title)
         {
             if (title != null && title.Length > 2048)

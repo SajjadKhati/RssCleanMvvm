@@ -152,6 +152,5 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
             return this.efEntityMapper.ToRssItem(rssItemEfEntity, imageData);
         }
 
-
     }
 }

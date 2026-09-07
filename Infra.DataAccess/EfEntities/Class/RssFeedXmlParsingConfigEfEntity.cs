@@ -7,6 +7,10 @@ namespace Infra.DataAccess.EfEntities.Class
     public class RssFeedXmlParsingConfigEfEntity
     {
 
+        /// <summary>
+        /// این پروپرتی ، هم کلید اصلی و هم کلید خارجی هست .
+        /// کلید خارجیِ جدول RssFeedEfEntity هست .
+        /// </summary>
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key()]
         [MaxLength(2048)]

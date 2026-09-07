@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infra.DataAccess.Migrations
 {
     [DbContext(typeof(RssDbContext))]
-    [Migration("20260826125920_FirstCreated")]
+    [Migration("20260907145018_FirstCreated")]
     partial class FirstCreated
     {
         /// <inheritdoc />
@@ -200,6 +200,120 @@ namespace Infra.DataAccess.Migrations
                     b.ToTable("RssItemTable");
                 });
 
+            modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssItemFieldKeyConfigEfEntity", b =>
+                {
+                    b.Property<string>("RssFeedEfEntityId")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<string>("Argb8BitImageKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("CategoryKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("DescriptionKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("IdKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("LinkKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PublishDateKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("TitleKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("RssFeedEfEntityId");
+
+                    b.ToTable("RssItemFieldKeyConfigTable");
+
+                    b.HasData(
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories",
+                            Argb8BitImageKey = "url",
+                            CategoryKey = "category",
+                            DescriptionKey = "description",
+                            IdKey = "guid",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories",
+                            Argb8BitImageKey = "url",
+                            CategoryKey = "category",
+                            DescriptionKey = "description",
+                            IdKey = "guid",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0",
+                            Argb8BitImageKey = "url",
+                            CategoryKey = "category",
+                            DescriptionKey = "description",
+                            IdKey = "guid",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar",
+                            Argb8BitImageKey = "url",
+                            CategoryKey = "category",
+                            DescriptionKey = "description",
+                            IdKey = "guid",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0",
+                            Argb8BitImageKey = "url",
+                            CategoryKey = "category",
+                            DescriptionKey = "description",
+                            IdKey = "guid",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0",
+                            Argb8BitImageKey = "url",
+                            CategoryKey = "category",
+                            DescriptionKey = "description",
+                            IdKey = "guid",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        });
+                });
+
             modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssSiteEfEntity", b =>
                 {
                     b.Property<string>("Id")
@@ -256,12 +370,26 @@ namespace Infra.DataAccess.Migrations
                     b.Navigation("RssFeedEfEntity");
                 });
 
+            modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssItemFieldKeyConfigEfEntity", b =>
+                {
+                    b.HasOne("Infra.DataAccess.EfEntities.Class.RssFeedEfEntity", "RssFeedEfEntity")
+                        .WithOne("RssItemFieldKeyConfigEfEntity")
+                        .HasForeignKey("Infra.DataAccess.EfEntities.Class.RssItemFieldKeyConfigEfEntity", "RssFeedEfEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RssFeedEfEntity");
+                });
+
             modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssFeedEfEntity", b =>
                 {
                     b.Navigation("RssFeedXmlParsingConfigEfEntity")
                         .IsRequired();
 
                     b.Navigation("RssItemEfEntities");
+
+                    b.Navigation("RssItemFieldKeyConfigEfEntity")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Infra.DataAccess.EfEntities.Class.RssSiteEfEntity", b =>

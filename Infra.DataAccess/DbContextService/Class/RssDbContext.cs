@@ -46,6 +46,23 @@ namespace Infra.DataAccess.DbContextService.Class
         ///////////////////////////////////////////////////////////////////////////////////
 
 
+        public override void Dispose()
+        {
+            base.Dispose();
+            this.OnDisposed(this, EventArgs.Empty);
+        }
+
+
+        public override async ValueTask DisposeAsync()
+        {
+            await base.DisposeAsync();
+            this.OnDisposed(this, EventArgs.Empty);
+        }
+
+
+        ///////////////////////////////////////////////////////////////////////////////////
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -62,20 +79,6 @@ namespace Infra.DataAccess.DbContextService.Class
             /// در این کلاس ها که RssFeedEfEntityConfiguration و RssSiteEfEntityConfiguration هستند ، مقدار پیش فرض برای این جدول ها در دیتابیس در نظر گرفتیم .
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(RssDbContext).Assembly);
             base.OnModelCreating(modelBuilder);
-        }
-
-
-        public override void Dispose()
-        {
-            base.Dispose();
-            this.OnDisposed(this, EventArgs.Empty);
-        }
-
-
-        public override async ValueTask DisposeAsync()
-        {
-            await base.DisposeAsync();
-            this.OnDisposed(this, EventArgs.Empty);
         }
 
 

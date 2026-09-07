@@ -15,16 +15,16 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private string connectionString;
 
-        private IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> rssFeedXmlParsingConfigDictionary;
+        private IReadOnlyDictionary<Uri, RssFeedConfig> rssFeedConfigDictionary;
 
 
         ///////////////////////////////////////////////////////////////////////
 
 
-        public ViewModelCompositionRoot(string connectionString, IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> rssFeedXmlParsingConfigDictionary)
+        public ViewModelCompositionRoot(string connectionString, IReadOnlyDictionary<Uri, RssFeedConfig> rssFeedConfigDictionary)
         {
             this.connectionString = connectionString;
-            this.rssFeedXmlParsingConfigDictionary = rssFeedXmlParsingConfigDictionary;
+            this.rssFeedConfigDictionary = rssFeedConfigDictionary;
         }
 
 

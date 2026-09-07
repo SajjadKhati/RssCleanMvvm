@@ -11,14 +11,17 @@ using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.Datab
 using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.UnitOfWork.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.UnitOfWorkFactory.Interfaces;
 using Application.InfrastructureContracts.HttpProject.HttpRequest.Factory.Interfaces;
+using Application.InfrastructureContracts.HttpProject.HttpRequest.Interfaces;
 using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Enum;
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Enum;
+using Application.InfrastructureContracts.SharedProject.DateTimes.DateTimeParser.Interface;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
 using Application.InfrastructureContracts.SharedProject.SharedMapper.RssItemDtoMapper.Interface;
+using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Class;
@@ -36,9 +39,11 @@ using Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory.Cla
 using Infra.DataAccess.DbContextService.Class;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
+using Infra.DataAccess.ExpressionFactoryService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
 using Infra.DataAccess.UnitOfWorkFactoryService.Class;
+using Infra.HttpService.HttpRequestService.Class;
 using Infra.HttpService.HttpRequestService.Factory.Class;
 using Infra.ImageService.ImageDataExtractorService.Class;
 using Infra.ImageService.ImageFileReaderService.Class;
@@ -58,8 +63,10 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Infra.DataAccess.ExpressionFactoryService.Class;
+using Infra.SharedService.DateTimesServices.DateTimeParserService.Class;
 using static System.Net.Mime.MediaTypeNames;
+using Application.InfrastructureContracts.SharedProject.DateTimes.PersianCalenderConvertor.Interface;
+using Infra.SharedService.DateTimesServices.PersianCalenderConvertorService.Class;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
 {
@@ -301,7 +308,56 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         }
 
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
+        [Fact]
+        public async Task RssFactoryTest_8()
+        {
+            IXmlParser xmlParser = new XmlParser();
+            using IHttpRequest httpRequest = new HttpRequest(new HttpClient());
+            string rssFeedXmlData = await httpRequest.GetStringAsync(new Uri("https://www.tasnimnews.ir/fa/rss/feed/1/0/7/0/MostPupolar"));
+
+            string tasnimXmlParentElementName = "item";
+            var tasnimXmlChildElementNames = new List<string>()
+            {
+                "guid",
+                "link",
+                "category",
+                "title",
+                "description",
+                "pubDate",
+                "{http://search.yahoo.com/mrss/}content"
+            };
+            string tasnimImageUrl = "url";
+            var tasnimXmlAttributeNames = new List<string>() { tasnimImageUrl };
+
+            XmlParsingData xmlParsingConfig = new XmlParsingData
+            {
+                XmlData = rssFeedXmlData,
+                ParentElementName = tasnimXmlParentElementName,
+                ChildElementNames = tasnimXmlChildElementNames,
+                AttributeNames = tasnimXmlAttributeNames
+            };
+            IList<IDictionary<string, string>> rssParsedXml = xmlParser.GetXmlData(xmlParsingConfig);
+            //Uri tasnimRssFeedLink = new Uri("https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories");
+        }
+
+
+        [Fact]
+        public async Task DateTimeTest_9()
+        {
+            IDateTimeParser dateTimeParser = new DateTimeParser();
+            var dateTime = dateTimeParser.ParseDateTime("Mon, 31 Aug 2026 15:31:00 +0330");
+            IPersianCalenderConvertor persianCalenderConvertor = new PersianCalenderConvertor();
+            string persianCalenderDate = persianCalenderConvertor.ToPersianDateString(dateTime);
+        }
+
+
+
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 
         private IRssItemDtoQuery GetRssItemDtoQuery()
@@ -413,6 +469,9 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
             return new RssItem(id, rssFeedId, link, argb8bitImageData, category, title, description, publishDate);
         }
+
+
+
 
 
         //////////

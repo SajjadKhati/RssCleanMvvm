@@ -41,9 +41,9 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModul
         }
 
 
-        public async Task<IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig>> GetRssFeedXmlParsingConfigAsync(string connectionString)
+        public async Task<IReadOnlyDictionary<Uri, RssFeedConfig>> GetRssFeedConfigDictionaryAsync(string connectionString)
         {
-            return await Task.Run(() => this.GetRssFeedXmlParsingConfig(connectionString));
+            return await Task.Run(() => this.GetRssFeedConfigDictionary(connectionString));
         }
 
 
@@ -64,11 +64,11 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModul
         }
 
 
-        private IReadOnlyDictionary<Uri, RssFeedXmlParsingConfig> GetRssFeedXmlParsingConfig(string connectionString)
+        private IReadOnlyDictionary<Uri, RssFeedConfig> GetRssFeedConfigDictionary(string connectionString)
         {
             RssDbContext rssDbContext = new RssDbContext(connectionString);
-            RssFeedXmlParsingConfigEfEntityMapper configEfEntityMapper = new RssFeedXmlParsingConfigEfEntityMapper();
-            using IRssFeedXmlParsingConfigQuery rssFeedXmlParsingConfigQuery = new RssFeedXmlParsingConfigQuery(rssDbContext, configEfEntityMapper);
+            RssFeedConfigEfEntityMapper configEfEntityMapper = new RssFeedConfigEfEntityMapper();
+            using IRssFeedConfigQuery rssFeedXmlParsingConfigQuery = new RssFeedConfigQuery(rssDbContext, configEfEntityMapper);
             return rssFeedXmlParsingConfigQuery.FindAll();
         }
 

@@ -3,7 +3,7 @@
     public class RssFeedXmlParsingConfig : XmlParsingConfig
     {
 
-        public Uri RssFeedLink { get; set; }
+        public Uri RssFeedId { get; set; }
 
 
         ////////////////////////////////////////////////////////////////
@@ -15,10 +15,10 @@
         }
 
 
-        public RssFeedXmlParsingConfig(Uri rssFeedLink, string parentElementName, IList<string> childElementNames, IList<string> attributeNames = null) :
+        public RssFeedXmlParsingConfig(Uri rssFeedId, string parentElementName, IList<string> childElementNames, IList<string> attributeNames = null) :
             base(parentElementName, childElementNames, attributeNames)
         {
-            this.RssFeedLink = rssFeedLink;
+            this.RssFeedId = rssFeedId;
         }
 
     }
