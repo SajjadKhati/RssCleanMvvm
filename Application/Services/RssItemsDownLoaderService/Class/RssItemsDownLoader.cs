@@ -1,104 +1,80 @@
 ﻿using Application.InfrastructureContracts.HttpProject.HttpRequest.Factory.Interfaces;
 using Application.InfrastructureContracts.HttpProject.HttpRequest.Interfaces;
-using Application.InfrastructureContracts.JsonProject.Json.Interface;
 using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces;
-using Application.OverallDataModels.OverallDto.EntityDto;
+using Application.Services.RssItemCreationServices.RssItemBuilderService.Interface;
 using Application.Services.RssItemsDownLoaderService.Interface;
+using Application.Services.SharedDataModels.Class;
 using Domain.DomainEntities.RssEntity.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Services.RssItemsDownLoaderService.Class
 {
-    public class RssItemsDownLoader //: IRssItemsDownLoader
+    public class RssItemsDownLoader : IRssItemsDownLoader
     {
-
-        private IJsonFile jsonFile;
-
-        private IXmlParser xmlParser;
 
         private IHttpRequestFactory httpRequestFactory;
 
+        private IXmlParser xmlParser;
 
-        ////////////////////
+        private IRssItemBuilder rssItemBuilder;
 
 
-        public RssItemsDownLoader(IJsonFile jsonFile, IXmlParser xmlParser, IHttpRequestFactory httpRequestFactory)
+        ////////////////////////////////////////////////////////////////////////////
+
+
+        public RssItemsDownLoader(IHttpRequestFactory httpRequestFactory, IXmlParser xmlParser, IRssItemBuilder rssItemBuilder)
         {
-            this.jsonFile = jsonFile;
-            this.xmlParser = xmlParser;
             this.httpRequestFactory = httpRequestFactory;
+            this.xmlParser = xmlParser;
+            this.rssItemBuilder = rssItemBuilder;
         }
 
 
-        ////////////////////
+        ////////////////////////////////////////////////////////////////////////////
 
 
-        //public RssItem DownLoadRssItems(Uri rssFeedLink, XmlParsingConfig xmlParsingConfig)
-        //{
-        //    //this.jsonFile.ReadJson<>
-        //    using IHttpRequest httpRequest = httpRequestFactory.Create();
-        //    string rssFeedXmlData = await httpRequest.GetStringAsync(rssFeedLink);
-
-        //    XmlParsingData xmlParsingConfig = new XmlParsingData
-        //    {
-        //        XmlData = rssFeedXmlData,
-        //        ParentElementName = xmlParentElementName,
-        //        ChildElementNames = xmlChildElementNames,
-        //        AttributeNames = xmlAttributeNames
-        //    };
-        //    IList<IDictionary<string, string>> rssParsedXml = this.xmlParser.GetXmlData(xmlParsingConfig);
-
-        //    /// تصاویر را دانلود و مقدار آرایه ی خام تصویر را درون شی دیکشنری که کلیدش همان guid متد GetXmlDataAsync هست ، برمیگرداند .
-        //    /// "مقدار کلید شناسه ی guid" : تصویر خام
-        //    /// مثال :
-        //    /// "https://tasnimnews.ir/3580074"  :  تصویر خام بصورت byte[]
-        //    //IList<IDictionary<string, byte[]>> rawImages = await this.GetByteDataFromLink(tasnimRssParsedXml, guid, url);
-
-        //    //byte[] imageRawData = await httpRequest.GetByteArrayAsync(new Uri("https://newsmedia.tasnimnews.ir/Tasnim/Uploaded/Image/1405/01/29/1405012916564487036443874.jpg"));
+        public async Task<RssItemsBuildingResult> DownLoadRssItemsAsync(RssFeedConfig rssFeedConfig)
+        {
+            RssFeedXmlParsingConfig rssFeedXmlParsingConfig = rssFeedConfig.RssFeedXmlParsingConfig;
+            RssItemWithFeedIdFieldKeyConfig rssItemFieldKeyConfig = rssFeedConfig.RssItemWithFeedIdFieldKeyConfig;
+            string rssFeedXmlData = await this.DownloadRssFeedXmlData(rssFeedXmlParsingConfig.RssFeedId);
+            XmlParsingData xmlParsingData = new XmlParsingData(rssFeedXmlData, rssFeedXmlParsingConfig);
+            IList<IDictionary<string, string>> rawRssItems = this.xmlParser.GetXmlData(xmlParsingData);
+            RssItemsBuildingResult rssItemsBuildingResult = await this.BuildRssItems(rawRssItems, rssItemFieldKeyConfig);
+            return rssItemsBuildingResult;
+        }
 
 
-
-        //    /////
-        //    return null;
-        //}
+        ////////////////////////////////////////////////////////////////////////////
 
 
-        //public async Task<RssItemDto> ExecuteAsync(Uri rssFeedLink, string xmlParentElementName,
-        //    IList<string> xmlChildElementNames, IList<string> xmlAttributeNames)
-        //{
+        private async Task<string> DownloadRssFeedXmlData(Uri rssFeedId)
+        {
+            using IHttpRequest httpRequest = this.httpRequestFactory.Create();
+            return await httpRequest.GetStringAsync(rssFeedId);
+        }
 
-        //}
 
-        //private async Task<IList<IDictionary<string, byte[]>>> GetByteDataFromLink(
-        //    IList<IDictionary<string, string>> dataLinkContainDictionaries, string guidKey, string dataLinkKey)
-        //{
-        //    IList<IDictionary<string, byte[]>> rawDataList = new List<IDictionary<string, byte[]>>();
+        private async Task<RssItemsBuildingResult> BuildRssItems(IList<IDictionary<string, string>> rawRssItems, 
+            RssItemWithFeedIdFieldKeyConfig rssItemFieldKeyConfig)
+        {
+            List<RssItem> createdRssItems = new List<RssItem>();
+            List<Exception> creationErrors = new List<Exception>();
+            foreach (IDictionary<string, string> rawRssItem in rawRssItems)
+            {
+                try
+                {
+                    RssItem rssItem = await this.rssItemBuilder.CreateRssItemAsync(rawRssItem, rssItemFieldKeyConfig);
+                    createdRssItems.Add(rssItem);
+                }
+                catch (Exception exception)
+                {
+                    creationErrors.Add(exception);
+                }
 
-        //    foreach (var dataLinkContainDictionary in dataLinkContainDictionaries)
-        //    {
-        //        if (dataLinkContainDictionary.ContainsKey(dataLinkKey) == true &&
-        //            dataLinkContainDictionary.ContainsKey(guidKey) == true)
-        //        {
-        //            string dataLink = dataLinkContainDictionary[dataLinkKey];
-        //            string guid = dataLinkContainDictionary[guidKey];
-        //            byte[] rawData = await this.httpRequest.GetByteArrayAsync(new Uri(dataLink));
-
-        //            if (rawData != null)
-        //            {
-        //                IDictionary<string, byte[]> rawDataDictionary = new Dictionary<string, byte[]>();
-        //                rawDataDictionary.Add(guid, rawData);
-        //                rawDataList.Add(rawDataDictionary);
-        //            }
-        //        }
-        //    }
-
-        //    return rawDataList?.Count > 0 ? rawDataList : null;
-        //}
+            }
+            return new RssItemsBuildingResult(createdRssItems, creationErrors);
+        }
 
     }
 }

@@ -63,7 +63,7 @@ namespace Application.Services.RssItemCreationServices.RssItemDataExtractorServi
         ///////////////////////////////////////////////////////////////////
 
 
-        public async Task<byte[,,]> GetArgb8BitImage(string imageLinkData)
+        private async Task<byte[,,]> GetArgb8BitImage(string imageLinkData)
         {
             Uri imageLink = new Uri(imageLinkData);
             byte[] rawImage = await this.DownloadRawImage(imageLink);

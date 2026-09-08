@@ -13,6 +13,10 @@ namespace Infra.CacheService.CacheBaseServices.DraftCacheServices.Class
         }
 
 
+        public DraftCache(IEnumerable<KeyValuePair<TKey, DraftEntry<TItem>>> collection) : base(collection)
+        {
+        }
+
         ////////////////////////////////////////////////
 
 

@@ -1,6 +1,5 @@
 ﻿using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Infra.CacheService.CacheBaseServices.CacheServices.Class
@@ -19,6 +18,12 @@ namespace Infra.CacheService.CacheBaseServices.CacheServices.Class
         {
             collectionCapacity = (collectionCapacity <= 0) ? 31 : collectionCapacity;
             this.itemsDictionary = new ConcurrentDictionary<TKey, TItem>(-1, collectionCapacity);
+        }
+
+
+        public Cache(IEnumerable<KeyValuePair<TKey, TItem>> collection)
+        {
+            this.itemsDictionary = new ConcurrentDictionary<TKey, TItem>(collection);
         }
 
 

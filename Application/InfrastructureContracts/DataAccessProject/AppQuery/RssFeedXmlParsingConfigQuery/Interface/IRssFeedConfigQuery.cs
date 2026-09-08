@@ -4,8 +4,6 @@ namespace Application.InfrastructureContracts.DataAccessProject.AppQuery.RssFeed
 {
     public interface IRssFeedConfigQuery : IDisposable
     {
-
         IReadOnlyDictionary<Uri, RssFeedConfig> FindAll();
-
     }
 }
