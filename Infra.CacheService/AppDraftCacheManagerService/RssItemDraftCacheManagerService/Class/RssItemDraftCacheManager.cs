@@ -5,9 +5,6 @@ using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.Inte
 using Application.InfrastructureContracts.SharedProject.FileManager.Interface;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Domain.DomainEntities.RssEntity.Class;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManagerService.Class
 {

@@ -9,6 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Infra.DataAccess\Infra.DataAccess.csproj" />
+    <ProjectReference Include="..\Infra.HttpService\Infra.HttpService.csproj" />
+    <ProjectReference Include="..\Infra.ImageService\Infra.ImageService.csproj" />
     <ProjectReference Include="..\Infra.JsonService\Infra.JsonService.csproj" />
     <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
   </ItemGroup>

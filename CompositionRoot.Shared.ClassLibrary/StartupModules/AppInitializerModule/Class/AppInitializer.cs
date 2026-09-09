@@ -1,11 +1,7 @@
-﻿using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssFeedXmlParsingConfigQuery.Interface;
-using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Interface;
+﻿using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.DatabaseInitialization.Interface;
 using Application.InfrastructureContracts.JsonProject.Json.Interface;
-using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
-using Infra.DataAccess.AppQueryService.RssFeedXmlParsingConfigQueryService.Class;
 using Infra.DataAccess.DataAccessBaseServices.DatabaseInitializationService.Class;
 using Infra.DataAccess.DbContextService.Class;
-using Infra.DataAccess.EfEntityMapperService.Class;
 using Infra.JsonService.JsonServices.Class;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,12 +37,6 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModul
         }
 
 
-        public async Task<IReadOnlyDictionary<Uri, RssFeedConfig>> GetRssFeedConfigDictionaryAsync(string connectionString)
-        {
-            return await Task.Run(() => this.GetRssFeedConfigDictionary(connectionString));
-        }
-
-
         ///////////////////////////////////////////////////////////////////////
 
 
@@ -61,15 +51,6 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModul
             DbContext dbContext = new RssDbContext(connectionString);
             using IInitializeDatabase initializeDatabase = new InitializeDatabase(dbContext);
             return initializeDatabase.EnsureDatabaseCreated();
-        }
-
-
-        private IReadOnlyDictionary<Uri, RssFeedConfig> GetRssFeedConfigDictionary(string connectionString)
-        {
-            RssDbContext rssDbContext = new RssDbContext(connectionString);
-            RssFeedConfigEfEntityMapper configEfEntityMapper = new RssFeedConfigEfEntityMapper();
-            using IRssFeedConfigQuery rssFeedXmlParsingConfigQuery = new RssFeedConfigQuery(rssDbContext, configEfEntityMapper);
-            return rssFeedXmlParsingConfigQuery.FindAll();
         }
 
     }

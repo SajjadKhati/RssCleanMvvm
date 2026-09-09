@@ -62,6 +62,5 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
                 this.efEntityMapper, this.imageFileReader, this.rssItemEfEntityFactory, this.expressionFactory);
         }
 
-
     }
 }
