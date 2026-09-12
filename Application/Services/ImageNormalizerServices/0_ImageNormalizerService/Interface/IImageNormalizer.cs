@@ -4,8 +4,6 @@ namespace Application.Services.ImageNormalizerServices._0_ImageNormalizerService
 {
     public interface IImageNormalizer<TColorDepth> where TColorDepth : struct, IConvertible
     {
-
         ImageData<TColorDepth> NormalizeImage(ImageData<TColorDepth> sourceImageData);
-
     }
 }

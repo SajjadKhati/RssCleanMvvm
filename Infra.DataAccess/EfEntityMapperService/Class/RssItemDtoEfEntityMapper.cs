@@ -1,10 +1,25 @@
-﻿using Application.OverallDataModels.OverallDto.EntityDto;
+﻿using Application.InfrastructureContracts.SharedProject.DateTimes.PersianCalenderConvertor.Interface;
+using Application.OverallDataModels.OverallDto.EntityDto;
 using Infra.DataAccess.EfEntities.Class;
 
 namespace Infra.DataAccess.EfEntityMapperService.Class
 {
     public class RssItemDtoEfEntityMapper
     {
+
+        private IPersianCalenderConvertor persianCalenderConvertor;
+
+
+        ///////////////////////////////////////////////////////////////////
+
+
+        public RssItemDtoEfEntityMapper(IPersianCalenderConvertor persianCalenderConvertor)
+        {
+            this.persianCalenderConvertor = persianCalenderConvertor;
+        }
+
+
+        ///////////////////////////////////////////////////////////////////
 
 
         public RssItemDto ToRssItemDto(RssItemEfEntity rssItemEfEntity)
@@ -17,6 +32,7 @@ namespace Infra.DataAccess.EfEntityMapperService.Class
                 Title = rssItemEfEntity.Title,
                 Description = rssItemEfEntity.Description,
                 PublishDate = rssItemEfEntity.PublishDate,
+                PersianPublishDate = this.persianCalenderConvertor.ToPersianDateString(rssItemEfEntity.PublishDate),
                 ImageFullFilePath = rssItemEfEntity.ImageFullFilePath
             };
         }

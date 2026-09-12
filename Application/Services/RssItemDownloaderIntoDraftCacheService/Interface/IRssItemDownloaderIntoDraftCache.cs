@@ -5,6 +5,6 @@ namespace Application.Services.RssItemDownloaderIntoDraftCacheService.Interface
 {
     public interface IRssItemDownloaderIntoDraftCache
     {
-        Task<RssItemsWithDtoBuildingResult> DownloadAndStoreInDraftCacheAsync(RssFeedConfig rssFeedConfig);
+        Task<RssItemsWithDtoReport> DownloadAndStoreInDraftCacheAsync(RssFeedConfig rssFeedConfig);
     }
 }

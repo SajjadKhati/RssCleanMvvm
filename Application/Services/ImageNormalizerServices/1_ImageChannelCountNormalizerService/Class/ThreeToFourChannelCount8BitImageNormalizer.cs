@@ -1,8 +1,8 @@
 ﻿using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalizerService.Interface;
 using Core.ImageServices.ImageCreatorService.Class;
-using Application.Services.CollectionService.Class;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Enum;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
+using Shared.CollectionService.Class;
 
 namespace Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalizerService.Class
 {

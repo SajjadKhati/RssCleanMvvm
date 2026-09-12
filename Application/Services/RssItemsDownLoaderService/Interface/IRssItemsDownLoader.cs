@@ -5,6 +5,6 @@ namespace Application.Services.RssItemsDownLoaderService.Interface
 {
     public interface IRssItemsDownLoader
     {
-        Task<RssItemsBuildingResult> DownLoadRssItemsAsync(RssFeedConfig rssFeedConfig);
+        Task<RssItemsReport> DownLoadRssItemsAsync(RssFeedConfig rssFeedConfig);
     }
 }

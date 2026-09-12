@@ -12,6 +12,7 @@
     <ProjectReference Include="..\Infra.HttpService\Infra.HttpService.csproj" />
     <ProjectReference Include="..\Infra.ImageService\Infra.ImageService.csproj" />
     <ProjectReference Include="..\Infra.JsonService\Infra.JsonService.csproj" />
+    <ProjectReference Include="..\Infra.XmlService\Infra.XmlService.csproj" />
     <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
   </ItemGroup>
 

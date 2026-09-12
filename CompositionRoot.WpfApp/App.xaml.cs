@@ -6,8 +6,8 @@ using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using CompositionRoot.Shared.ClassLibrary.StartupModules.AppFinalizerModule.Class;
+using CompositionRoot.Shared.ClassLibrary.StartupModules.AppPathsModule.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
-using System.Data;
 
 
 namespace CompositionRoot.WpfApp
@@ -17,6 +17,8 @@ namespace CompositionRoot.WpfApp
     /// </summary>
     public partial class App : System.Windows.Application
     {
+
+        private AppPaths appPaths;
 
         private AppInitializer appInitializer;
 
@@ -30,7 +32,8 @@ namespace CompositionRoot.WpfApp
 
         public App()
         {
-            this.appInitializer = new AppInitializer();
+            this.appPaths = new AppPaths();
+            this.appInitializer = new AppInitializer(appPaths);
             this.viewDisplayer = new ViewDisplayer(this.Dispatcher);
         }
 
@@ -81,11 +84,11 @@ namespace CompositionRoot.WpfApp
                 bool isInitialized = await this.appInitializer.InitializeAppAsync(connectionString);
                 ///
                 SingletonProvider singletonProvider = new SingletonProvider(connectionString);
-                await singletonProvider.InitializeComponentsAsync();
+                await singletonProvider.InitializeSingletonPropertiesAsync();
                 ///
                 this.appFinalizer = new AppFinalizer(singletonProvider.RssItemDraftCacheManager);
                 ///
-                ViewModelCompositionRoot viewModelCompositionRoot = this.GetViewModelCompositionRoot(connectionString, singletonProvider);
+                ViewModelCompositionRoot viewModelCompositionRoot = this.GetViewModelCompositionRoot(connectionString, this.appPaths, singletonProvider);
                 MainWindowViewModel mainWindowViewModel = viewModelCompositionRoot.CreateMainWindowViewModel();
                 ///
                 this.viewDisplayer.ShowMainWindow(mainWindowViewModel);
@@ -103,25 +106,33 @@ namespace CompositionRoot.WpfApp
 
         ////////////////////////////////////////////////////////////////////////////
 
-
+        /// <summary>
+        /// این مسیر ، چون شامل مسیر فایل json ای هست که در پروژه ی CompositionRoot.Wpf قرار داره و بنابراین در پروژه ی دیگه (مثلا در Winform) ممکنه تغییر کنه ، -
+        /// بخاطر همین ، این متد را در کلاس AppPaths قرار ندادیم .
+        /// </summary>
+        /// <returns></returns>
         private string GetConnectionStringJsonFullFilePath()
         {
             return Path.Combine(AppContext.BaseDirectory, "Resource", "Config", "ConnectionString.json");
         }
 
 
-        private ViewModelCompositionRoot GetViewModelCompositionRoot(string connectionString, SingletonProvider singletonProvider)
+        private ViewModelCompositionRoot GetViewModelCompositionRoot(string connectionString, AppPaths appPaths, SingletonProvider singletonProvider)
         {
             return new ViewModelCompositionRoot(
                 connectionString, 
+                appPaths,
                 singletonProvider.RssItemDraftCacheManager,
                 singletonProvider.PersistenceCache,
                 singletonProvider.RssFeedConfigCache,
+                singletonProvider.ImageSettingsWriter,
+                singletonProvider.ImageSettingsReader,
                 singletonProvider.RssItemRepositoryFactory,
                 singletonProvider.RssItemDtoQueryFactory,
                 singletonProvider.RssSiteQueryFactory,
                 singletonProvider.UnitOfWorkFactory,
                 singletonProvider.HttpRequestFactory,
+                singletonProvider.RssItemViewModelFactory,
                 singletonProvider.ImageChannelCountNormalizerFactory,
                 singletonProvider.ImageChannelSequenceNormalizerFactory);
         }

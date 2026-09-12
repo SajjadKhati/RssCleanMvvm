@@ -4,12 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView" 
+        xmlns:interaction="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:rssusercontrolview="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView"
         xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.MainWindowViewModelModule.Class;assembly=ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance d:Type=viewModelModules:MainWindowViewModel, IsDesignTimeCreatable=False}"
         Title="خبر خوان" Height="450" Width="800" MinWidth="600" MinHeight="400" WindowStartupLocation="CenterScreen">
-    
+
+    <interaction:Interaction.Triggers>
+        <interaction:EventTrigger EventName="Closing">
+            <interaction:InvokeCommandAction  Command="{Binding Path=ExitCommand}"/>
+        </interaction:EventTrigger>
+    </interaction:Interaction.Triggers>
+
     <Grid FlowDirection="RightToLeft">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,8 +24,18 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Margin="0, 0, 0, 5">
-            <MenuItem Header="خبر خوان">
+            <MenuItem Header="پرونده">
+                <MenuItem Header="خروج" ToolTip="خروج از برنامه" Click="ExitMenuItem_Click"/>
+            </MenuItem>
+
+            <MenuItem DataContext="{Binding Path=RssUserControlViewModel}" Header="خبر خوان">
+                <MenuItem Header="دریافت اخبار جدید" ToolTip="به روزرسانی اخبار جدید از وب"
+                          Command="{Binding Path=DownLoadRssItemsCommand}"/>
                 <MenuItem Header="ذخیره همه" ToolTip="ذخیره همه ی آیتم های ذخیره نشده"/>
+            </MenuItem>
+
+            <MenuItem Header="راهنما">
+                <MenuItem Header="درباره" ToolTip="درباره ی برنامه"/>
             </MenuItem>
         </Menu>
 

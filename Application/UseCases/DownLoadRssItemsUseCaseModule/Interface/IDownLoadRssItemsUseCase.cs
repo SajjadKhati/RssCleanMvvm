@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.OverallDataModels.OverallDto.EntityDto;
+﻿using Application.UseCases.DownLoadRssItemsUseCaseModule.DataModels;
 
 namespace Application.UseCases.DownLoadRssItemsUseCaseModule.Interface
 {
     public interface IDownLoadRssItemsUseCase
     {
-
-        Task<RssItemDto> ExecuteAsync(Uri rssFeedLink, string xmlParentElementName,
-            IList<string> xmlChildElementNames, IList<string> xmlAttributeNames);
-
+        Task<RssItemDtosResult> ExecuteAsync(Uri rssFeedId);
     }
 }

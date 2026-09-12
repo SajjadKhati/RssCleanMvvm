@@ -15,6 +15,8 @@
 
         public DateTime PublishDate { get; set; }
 
+        public string PersianPublishDate { get; set; }
+
         public string ImageFullFilePath { get; set; }
 
     }

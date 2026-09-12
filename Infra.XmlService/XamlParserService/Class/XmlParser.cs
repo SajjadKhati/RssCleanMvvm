@@ -1,9 +1,9 @@
-﻿using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
+﻿using System.Xml.Linq;
+using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces;
 using Shared.CollectionService.Class;
-using System.Xml.Linq;
 
-namespace Infra.XmlParserService.XamlParserService.Class
+namespace Infra.XmlService.XamlParserService.Class
 {
     public class XmlParser : IXmlParser
     {

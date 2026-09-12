@@ -2,7 +2,7 @@
 
 namespace Application.Services.SharedDataModels.Class
 {
-    public class RssItemsBuildingResult
+    public class RssItemsReport
     {
 
         public IList<RssItem> CreatedRssItems { get; init; }
@@ -13,13 +13,13 @@ namespace Application.Services.SharedDataModels.Class
         ////////////////////////////////////////////////////////////////
 
 
-        public RssItemsBuildingResult(IList<RssItem> createdRssItems)
+        public RssItemsReport(IList<RssItem> createdRssItems)
         {
             this.CreatedRssItems = createdRssItems;
         }
 
 
-        public RssItemsBuildingResult(IList<RssItem> createdRssItems, IList<Exception> creationErrors) : this(createdRssItems)
+        public RssItemsReport(IList<RssItem> createdRssItems, IList<Exception> creationErrors) : this(createdRssItems)
         {
             this.CreationErrors = creationErrors;
         }

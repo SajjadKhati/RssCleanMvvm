@@ -10,5 +10,19 @@ namespace Application.InfrastructureContracts.DataAccessProject.AppRepository.Rs
 
         public string FolderPath {  get; set; }
 
+
+        ////////////////////////////////////////////////////////////////////////
+
+        public ImageSaveOptions()
+        {
+
+        }
+
+        public ImageSaveOptions(ImageSettings<ImageInfo> imageInfoSettings, string folderPath)
+        {
+            this.ImageInfoSettings = imageInfoSettings;
+            this.FolderPath = folderPath;
+        }
+
     }
 }

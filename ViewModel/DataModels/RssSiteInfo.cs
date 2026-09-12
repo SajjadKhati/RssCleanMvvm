@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using ViewModel.Services.RangeObservableCollectionService.Class;
 
 namespace ViewModel.DataModels
 {
@@ -7,7 +7,7 @@ namespace ViewModel.DataModels
 
         public string Id { get; }
 
-        public ObservableCollection<RssFeedInfo> RssFeedInfos { get; }
+        public RangeObservableCollection<RssFeedInfo> RssFeedInfos { get; }
 
         public string SiteName { get; }
 
@@ -18,7 +18,7 @@ namespace ViewModel.DataModels
         public RssSiteInfo(string id, IEnumerable<RssFeedInfo> rssFeedInfos, string siteName)
         {
             this.Id = id;
-            this.RssFeedInfos = new ObservableCollection<RssFeedInfo>(rssFeedInfos);
+            this.RssFeedInfos = new RangeObservableCollection<RssFeedInfo>(rssFeedInfos);
             this.SiteName = siteName;
         }
 

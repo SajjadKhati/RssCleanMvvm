@@ -52,7 +52,6 @@ using Infra.ImageService.InfraImageCreatorService.Class;
 using Infra.ImageService.MappingService.Class;
 using Infra.SharedService.FilePathMakerService.Class;
 using Infra.SharedService.MapperService.ImageSettingsMapperService.Class;
-using Infra.XmlParserService.XamlParserService.Class;
 using Shared.ImageServices.ImageUtilityService.Class;
 using System;
 using System.Collections.Generic;
@@ -67,6 +66,7 @@ using Infra.SharedService.DateTimesServices.DateTimeParserService.Class;
 using static System.Net.Mime.MediaTypeNames;
 using Application.InfrastructureContracts.SharedProject.DateTimes.PersianCalenderConvertor.Interface;
 using Infra.SharedService.DateTimesServices.PersianCalenderConvertorService.Class;
+using Infra.XmlService.XamlParserService.Class;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
 {
@@ -363,7 +363,7 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         private IRssItemDtoQuery GetRssItemDtoQuery()
         {
             IRssItemDtoQueryFactory rssItemDtoQueryFactory = new RssItemDtoQueryFactory(
-                this.GetConnectionString(), this.PersistenceCache, new RssItemDtoEfEntityMapper(), this.GetExpressionFactory());
+                this.GetConnectionString(), this.PersistenceCache, new RssItemDtoEfEntityMapper(new PersianCalenderConvertor()), this.GetExpressionFactory());
             return rssItemDtoQueryFactory.Create();
         }
 
@@ -422,7 +422,7 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             ImageSettingsMapper imageSettingsMapper = new ImageSettingsMapper();
             IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, filePathMaker, imageSettingsMapper);
             IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
-            IRssItemDtoMapper rssItemDtoMapper = new Application.Services.Mapper.RssItemDtoMapper();
+            IRssItemDtoMapper rssItemDtoMapper = new Application.Services.Mapper.RssItemDtoMapper(new PersianCalenderConvertor());
             IRssItemEfEntityFactory rssItemEfEntityFactory = new RssItemDtoEfEntityFactory(imageFileSaverCoordinator, rssItemDtoMapper, efEntityMapper);
             return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, draftCacheWriter, imageFileReader, 
                 rssItemEfEntityFactory, this.GetExpressionFactory());

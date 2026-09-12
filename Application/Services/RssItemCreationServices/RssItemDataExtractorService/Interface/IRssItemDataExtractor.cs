@@ -1,4 +1,6 @@
-﻿namespace Application.Services.RssItemCreationServices.RssItemDataExtractorService.Interface
+﻿using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
+
+namespace Application.Services.RssItemCreationServices.RssItemDataExtractorService.Interface
 {
     public interface IRssItemDataExtractor
     {
@@ -9,7 +11,7 @@
 
         DateTime GetPublishDate(string publishDateData);
 
-        Task<byte[,,]> GetArgb8BitImageAsync(string imageLinkData);
+        Task<ImageData<byte>> GetArgb8BitImageDataAsync(string imageLinkData);
 
     }
 }

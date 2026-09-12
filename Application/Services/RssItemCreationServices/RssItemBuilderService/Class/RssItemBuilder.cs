@@ -1,4 +1,6 @@
-﻿using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
+﻿using Application.InfrastructureContracts.ImageProject.ImageSettings.ImageSettingsProvider.Interfaces;
+using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
+using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
 using Application.Services.RssItemCreationServices.RssItemBuilderService.Interface;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Interface;
 using Domain.DomainEntities.RssEntity.Class;
@@ -17,14 +19,18 @@ namespace Application.Services.RssItemCreationServices.RssItemBuilderService.Cla
 
         private IRssItemDataExtractor rssItemDataExtractor;
 
+        private IImageSettingsWriter imageSettingsWriter;
+
 
         //////////////////////////////////////////////////////////
 
 
-        public RssItemBuilder(IRssItemDomainService rssItemDomainService, IRssItemDataExtractor rssItemDataExtractor)
+        public RssItemBuilder(IRssItemDomainService rssItemDomainService, IRssItemDataExtractor rssItemDataExtractor, 
+            IImageSettingsWriter imageSettingsWriter)
         {
             this.rssItemDomainService = rssItemDomainService;
             this.rssItemDataExtractor = rssItemDataExtractor;
+            this.imageSettingsWriter = imageSettingsWriter;
         }
 
 
@@ -46,10 +52,16 @@ namespace Application.Services.RssItemCreationServices.RssItemBuilderService.Cla
             string title = rssItemDictionary[rssItemFieldKeyConfig.TitleKey];
             string description = rssItemDictionary[rssItemFieldKeyConfig.DescriptionKey];
             DateTime publishDate = this.rssItemDataExtractor.GetPublishDate(rssItemDictionary[rssItemFieldKeyConfig.PublishDateKey]);
-            byte[,,] argb8BitImage = await this.rssItemDataExtractor.GetArgb8BitImageAsync(rssItemDictionary[rssItemFieldKeyConfig.Argb8BitImageKey]);
-
-            RssItem rssItem = new RssItem(id, rssFeedId, link, argb8BitImage, category, title, description, publishDate);
-            return rssItem;
+            ImageData<byte> argb8BitImageData = await this.rssItemDataExtractor.GetArgb8BitImageDataAsync(
+                rssItemDictionary[rssItemFieldKeyConfig.Argb8BitImageKey]);
+            try
+            {
+                this.imageSettingsWriter.Store(id, argb8BitImageData);
+            }
+            catch (Exception exception)
+            {
+            }
+            return new RssItem(id, rssFeedId, link, argb8BitImageData.Data, category, title, description, publishDate);
         }
 
     }

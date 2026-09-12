@@ -40,13 +40,29 @@
             <Grid Grid.Row="1" Margin="0, 5">
                 <TextBlock HorizontalAlignment="Left" Text="دسته ی خبری : "/>
                 <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center"  MinWidth="250" IsReadOnly="True"
-                      ItemsSource="{Binding Path=RssSiteInfos/RssFeedInfos}"
-                      DisplayMemberPath="Title"/>
+                      ItemsSource="{Binding  Path=RssSiteInfos/RssFeedInfos}"
+                      DisplayMemberPath="Title"
+                      SelectedItem="{Binding Mode=OneWayToSource, Path=SelectedRssFeedInfo}"/>
             </Grid>
         </Grid>
 
         <Grid Grid.Row="1" Margin="10">
-            <ListBox/>
+            <ListBox ItemsSource="{Binding Path=RssItemViewModels}"
+                     VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" 
+                     VirtualizingPanel.CacheLength="1,1" VirtualizingPanel.CacheLengthUnit="Page"
+                     ScrollViewer.CanContentScroll="True">
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="Transparent" Margin="2" BorderBrush="Gray" BorderThickness="1">
+                            <Grid>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+            </ListBox>
         </Grid>
     </Grid>
     

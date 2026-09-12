@@ -1,6 +1,7 @@
-﻿using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
+﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
 
-namespace ViewModel.Services.RssItemViewModelFactoryService.Interface
+namespace ViewModel.CompositionRootContracts.RssItemViewModelFactory.Interface
 {
     /// <summary>
     /// پیاده سازیِ این رابط ، در لایه ی Composition Root انجام میشه .
@@ -9,8 +10,6 @@ namespace ViewModel.Services.RssItemViewModelFactoryService.Interface
     /// </summary>
     public interface IRssItemViewModelFactory
     {
-
-        RssItemViewModel Create();
-
+        RssItemViewModel Create(RssItemDto rssItemDto);
     }
 }

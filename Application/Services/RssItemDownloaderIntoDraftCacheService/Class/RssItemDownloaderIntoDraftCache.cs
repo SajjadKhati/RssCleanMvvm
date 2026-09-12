@@ -1,6 +1,9 @@
 ﻿using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.RssItemDraftCacheManager.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.DataModels;
 using Application.InfrastructureContracts.DataAccessProject.RssItemDtoFactory.Interface;
+using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
+using Application.InfrastructureContracts.ImageProject.ImageSettings.ImageSettingsProvider.Interfaces;
+using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Application.Services.RssItemDownloaderIntoDraftCacheService.DataModels;
@@ -20,32 +23,35 @@ namespace Application.Services.RssItemDownloaderIntoDraftCacheService.Class
 
         private IRssItemDraftCacheManager rssItemDraftCacheManager;
 
-        private ImageSaveOptions imageSaveOptions;
+        private IImageSettingsReader imageSettingsReader;
+
+        private readonly string draftImageFolderPath;
 
 
         //////////////////////////////////////////////////////////////////////////////
 
 
         public RssItemDownloaderIntoDraftCache(IRssItemsDownLoader rssItemsDownLoader, IRssItemDtoFactory rssItemDtoFactory, 
-            IRssItemDraftCacheManager rssItemDraftCacheManager, ImageSaveOptions imageSaveOptions)
+            IRssItemDraftCacheManager rssItemDraftCacheManager, IImageSettingsReader imageSettingsReader, string draftImageFolderPath)
         {
             this.rssItemsDownLoader = rssItemsDownLoader;
             this.rssItemDtoFactory = rssItemDtoFactory;
             this.rssItemDraftCacheManager = rssItemDraftCacheManager;
-            this.imageSaveOptions = imageSaveOptions;
+            this.imageSettingsReader = imageSettingsReader;
+            this.draftImageFolderPath = draftImageFolderPath;
         }
 
 
         //////////////////////////////////////////////////////////////////////////////
 
 
-        public async Task<RssItemsWithDtoBuildingResult> DownloadAndStoreInDraftCacheAsync(RssFeedConfig rssFeedConfig)
+        public async Task<RssItemsWithDtoReport> DownloadAndStoreInDraftCacheAsync(RssFeedConfig rssFeedConfig)
         {
-            RssItemsBuildingResult rssItemsBuildingResult = await this.rssItemsDownLoader.DownLoadRssItemsAsync(rssFeedConfig);
+            RssItemsReport rssItemsBuildingResult = await this.rssItemsDownLoader.DownLoadRssItemsAsync(rssFeedConfig);
             if (rssItemsBuildingResult.CreatedRssItems == null || rssItemsBuildingResult.CreatedRssItems.Count < 1)
-                return new RssItemsWithDtoBuildingResult(null, null, rssItemsBuildingResult.CreationErrors);
+                return new RssItemsWithDtoReport(null, null, rssItemsBuildingResult.CreationErrors);
             IList<RssItemDto> rssItemDtos = this.CreateDtosAndStoreInDraftCache(rssItemsBuildingResult.CreatedRssItems);
-            return new RssItemsWithDtoBuildingResult(rssItemsBuildingResult.CreatedRssItems, rssItemDtos, rssItemsBuildingResult.CreationErrors);
+            return new RssItemsWithDtoReport(rssItemsBuildingResult.CreatedRssItems, rssItemDtos, rssItemsBuildingResult.CreationErrors);
         }
 
 
@@ -57,7 +63,9 @@ namespace Application.Services.RssItemDownloaderIntoDraftCacheService.Class
             List<RssItemDto> rssItemDtos = new List<RssItemDto>();
             foreach (RssItem rssItem in rssItems)
             {
-                RssItemDto rssItemDto = this.rssItemDtoFactory.CreateRssItemDto(rssItem, this.imageSaveOptions);
+                ImageSettings<ImageInfo> imageSettings = this.imageSettingsReader.GetOrDefault(rssItem.Id, rssItem.Argb8BitImage);
+                ImageSaveOptions imageSaveOptions = new ImageSaveOptions(imageSettings, this.draftImageFolderPath);
+                RssItemDto rssItemDto = this.rssItemDtoFactory.CreateRssItemDto(rssItem, imageSaveOptions);
                 this.rssItemDraftCacheManager.MarkAsAddedInDraftCache(rssItem.Id, rssItem, rssItemDto);
                 rssItemDtos.Add(rssItemDto);
             }

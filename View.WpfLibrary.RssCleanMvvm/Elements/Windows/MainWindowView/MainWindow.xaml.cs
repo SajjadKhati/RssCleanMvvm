@@ -38,5 +38,11 @@ namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
             });
         }
 
+
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
     }
 }

@@ -4,7 +4,7 @@ using Domain.DomainEntities.RssEntity.Class;
 
 namespace Application.Services.RssItemDownloaderIntoDraftCacheService.DataModels
 {
-    public class RssItemsWithDtoBuildingResult :  RssItemsBuildingResult
+    public class RssItemsWithDtoReport :  RssItemsReport
     {
 
         public IList<RssItemDto> CreatedRssItemDtos { get; init; }
@@ -13,13 +13,13 @@ namespace Application.Services.RssItemDownloaderIntoDraftCacheService.DataModels
         ////////////////////////////////////////////////////////////////
 
 
-        public RssItemsWithDtoBuildingResult(IList<RssItem> createdRssItems, IList<RssItemDto> createdRssItemDtos) : base(createdRssItems)
+        public RssItemsWithDtoReport(IList<RssItem> createdRssItems, IList<RssItemDto> createdRssItemDtos) : base(createdRssItems)
         {
             this.CreatedRssItemDtos = createdRssItemDtos;
         }
 
 
-        public RssItemsWithDtoBuildingResult(IList<RssItem> createdRssItems, IList<RssItemDto> createdRssItemDtos, 
+        public RssItemsWithDtoReport(IList<RssItem> createdRssItems, IList<RssItemDto> createdRssItemDtos, 
             IList<Exception> creationErrors) : base(createdRssItems, creationErrors)
         {
             this.CreatedRssItemDtos = createdRssItemDtos;

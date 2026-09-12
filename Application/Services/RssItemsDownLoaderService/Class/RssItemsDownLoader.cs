@@ -33,14 +33,14 @@ namespace Application.Services.RssItemsDownLoaderService.Class
         ////////////////////////////////////////////////////////////////////////////
 
 
-        public async Task<RssItemsBuildingResult> DownLoadRssItemsAsync(RssFeedConfig rssFeedConfig)
+        public async Task<RssItemsReport> DownLoadRssItemsAsync(RssFeedConfig rssFeedConfig)
         {
             RssFeedXmlParsingConfig rssFeedXmlParsingConfig = rssFeedConfig.RssFeedXmlParsingConfig;
             RssItemWithFeedIdFieldKeyConfig rssItemFieldKeyConfig = rssFeedConfig.RssItemWithFeedIdFieldKeyConfig;
             string rssFeedXmlData = await this.DownloadRssFeedXmlData(rssFeedXmlParsingConfig.RssFeedId);
             XmlParsingData xmlParsingData = new XmlParsingData(rssFeedXmlData, rssFeedXmlParsingConfig);
             IList<IDictionary<string, string>> rawRssItems = this.xmlParser.GetXmlData(xmlParsingData);
-            RssItemsBuildingResult rssItemsBuildingResult = await this.BuildRssItems(rawRssItems, rssItemFieldKeyConfig);
+            RssItemsReport rssItemsBuildingResult = await this.BuildRssItems(rawRssItems, rssItemFieldKeyConfig);
             return rssItemsBuildingResult;
         }
 
@@ -55,7 +55,7 @@ namespace Application.Services.RssItemsDownLoaderService.Class
         }
 
 
-        private async Task<RssItemsBuildingResult> BuildRssItems(IList<IDictionary<string, string>> rawRssItems, 
+        private async Task<RssItemsReport> BuildRssItems(IList<IDictionary<string, string>> rawRssItems, 
             RssItemWithFeedIdFieldKeyConfig rssItemFieldKeyConfig)
         {
             List<RssItem> createdRssItems = new List<RssItem>();
@@ -73,7 +73,7 @@ namespace Application.Services.RssItemsDownLoaderService.Class
                 }
 
             }
-            return new RssItemsBuildingResult(createdRssItems, creationErrors);
+            return new RssItemsReport(createdRssItems, creationErrors);
         }
 
     }
