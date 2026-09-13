@@ -7,5 +7,7 @@
 
         void CreateFolder(string folderPath);
 
+        void DeleteFolderWithContents(string folderPath);
+
     }
 }

@@ -19,6 +19,7 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
         {
             return new RssFeedXmlParsingConfigEfEntity[]
             {
+                #region خبرگزاری تسنیم
                 // صفحه اصلی :
                 new RssFeedXmlParsingConfigEfEntity
                 {
@@ -32,7 +33,7 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
                         "title",
                         "description",
                         "pubDate",
-                        "{http://search.yahoo.com/mrss/}content"
+                        "{http://search.yahoo.com/mrss/}thumbnail"
                     },
                     AttributeNames = new List<string>{ "url" }
                 },
@@ -50,7 +51,7 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
                         "title",
                         "description",
                         "pubDate",
-                        "{http://search.yahoo.com/mrss/}content"
+                        "{http://search.yahoo.com/mrss/}thumbnail"
                     },
                     AttributeNames = new List<string>{ "url" }
                 },
@@ -68,7 +69,7 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
                         "title",
                         "description",
                         "pubDate",
-                        "{http://search.yahoo.com/mrss/}content"
+                        "{http://search.yahoo.com/mrss/}thumbnail"
                     },
                     AttributeNames = new List<string>{ "url" }
                 },
@@ -86,7 +87,7 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
                         "title",
                         "description",
                         "pubDate",
-                        "{http://search.yahoo.com/mrss/}content"
+                        "{http://search.yahoo.com/mrss/}thumbnail"
                     },
                     AttributeNames = new List<string>{ "url" }
                 },
@@ -104,7 +105,7 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
                         "title",
                         "description",
                         "pubDate",
-                        "{http://search.yahoo.com/mrss/}content"
+                        "{http://search.yahoo.com/mrss/}thumbnail"
                     },
                     AttributeNames = new List<string>{ "url" }
                 },
@@ -122,12 +123,239 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
                         "title",
                         "description",
                         "pubDate",
-                        "{http://search.yahoo.com/mrss/}content"
+                        "{http://search.yahoo.com/mrss/}thumbnail"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+                #endregion
+
+                #region باشگاه خبرنگاران جوان
+                /// کل اخبار
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.yjc.ir/fa/rss/allnews").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
                     },
                     AttributeNames = new List<string>{ "url" }
                 },
 
+                /// سیاسی
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.yjc.ir/fa/rss/3").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
 
+                /// بین الملل
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.yjc.ir/fa/rss/9").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// اقتصادی
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.yjc.ir/fa/rss/6").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// فرهنگی هنری
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.yjc.ir/fa/rss/4").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// علمی پزشکی
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.yjc.ir/fa/rss/7").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// فیلم و صوت
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.yjc.ir/fa/rss/11").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+                #endregion
+
+                #region خبرگزاری صدا و سیما
+                /// کل اخبار
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.irib-news.ir/fa/rss/allnews").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// سیاسی
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.irib-news.ir/fa/rss/5").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// بین الملل
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.irib-news.ir/fa/rss/41").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// اقتصادی
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.irib-news.ir/fa/rss/6").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// علمی فرهنگی 
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.irib-news.ir/fa/rss/8").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// ورزشی
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.irib-news.ir/fa/rss/4").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+
+                /// فیلم
+                new RssFeedXmlParsingConfigEfEntity
+                {
+                    RssFeedEfEntityId = new Uri("https://www.irib-news.ir/fa/rss/3").AbsoluteUri,
+                    ParentElementName = "item",
+                    ChildElementNames = new List<string>()
+                    {
+                        "title",
+                        "link",
+                        "description",
+                        "enclosure",
+                        "pubDate"
+                    },
+                    AttributeNames = new List<string>{ "url" }
+                },
+                #endregion
             };
         }
 

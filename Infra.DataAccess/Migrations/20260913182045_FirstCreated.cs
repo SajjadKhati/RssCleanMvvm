@@ -71,7 +71,7 @@ namespace Infra.DataAccess.Migrations
                     RssFeedEfEntityId = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
                     IdKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     LinkKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    CategoryKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    CategoryKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     TitleKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     DescriptionKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     PublishDateKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
@@ -95,7 +95,7 @@ namespace Infra.DataAccess.Migrations
                     Id = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
                     RssFeedEfEntityId = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
                     Link = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
                     Title = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PublishDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -115,19 +115,38 @@ namespace Infra.DataAccess.Migrations
             migrationBuilder.InsertData(
                 table: "RssSiteTable",
                 columns: new[] { "Id", "SiteName" },
-                values: new object[] { "http://www.tasnimnews.ir/", "خبرگزاری تسنیم" });
+                values: new object[,]
+                {
+                    { "http://www.tasnimnews.ir/", "خبرگزاری تسنیم" },
+                    { "https://www.irib-news.ir/", "خبرگزاری صدا و سیما" },
+                    { "https://www.yjc.ir/", "باشگاه خبرنگاران جوان" }
+                });
 
             migrationBuilder.InsertData(
                 table: "RssFeedTable",
                 columns: new[] { "Id", "RssSiteEfEntityId", "Title" },
                 values: new object[,]
                 {
+                    { "https://www.irib-news.ir/fa/rss/3", "https://www.irib-news.ir/", "فیلم" },
+                    { "https://www.irib-news.ir/fa/rss/4", "https://www.irib-news.ir/", "ورزشی" },
+                    { "https://www.irib-news.ir/fa/rss/41", "https://www.irib-news.ir/", "بین الملل" },
+                    { "https://www.irib-news.ir/fa/rss/5", "https://www.irib-news.ir/", "سیاسی" },
+                    { "https://www.irib-news.ir/fa/rss/6", "https://www.irib-news.ir/", "اقتصادی" },
+                    { "https://www.irib-news.ir/fa/rss/8", "https://www.irib-news.ir/", "علمی فرهنگی" },
+                    { "https://www.irib-news.ir/fa/rss/allnews", "https://www.irib-news.ir/", "کل اخبار" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "http://www.tasnimnews.ir/", "صفحه اصلی" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "http://www.tasnimnews.ir/", "آخرین خبرهای روز" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "http://www.tasnimnews.ir/", "پر بیننده ترین اخبار امام و رهبری" },
                     { "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0", "http://www.tasnimnews.ir/", "سیاسی" },
                     { "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0", "http://www.tasnimnews.ir/", "فرهنگی" },
-                    { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "http://www.tasnimnews.ir/", "بین الملل" }
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "http://www.tasnimnews.ir/", "بین الملل" },
+                    { "https://www.yjc.ir/fa/rss/11", "https://www.yjc.ir/", "فیلم و صوت" },
+                    { "https://www.yjc.ir/fa/rss/3", "https://www.yjc.ir/", "سیاسی" },
+                    { "https://www.yjc.ir/fa/rss/4", "https://www.yjc.ir/", "فرهنگی هنری" },
+                    { "https://www.yjc.ir/fa/rss/6", "https://www.yjc.ir/", "اقتصادی" },
+                    { "https://www.yjc.ir/fa/rss/7", "https://www.yjc.ir/", "علمی پزشکی" },
+                    { "https://www.yjc.ir/fa/rss/9", "https://www.yjc.ir/", "بین الملل" },
+                    { "https://www.yjc.ir/fa/rss/allnews", "https://www.yjc.ir/", "کل اخبار" }
                 });
 
             migrationBuilder.InsertData(
@@ -135,12 +154,26 @@ namespace Infra.DataAccess.Migrations
                 columns: new[] { "RssFeedEfEntityId", "AttributeNames", "ChildElementNames", "ParentElementName" },
                 values: new object[,]
                 {
-                    { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
-                    { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
-                    { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
-                    { "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
-                    { "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" },
-                    { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]", "item" }
+                    { "https://www.irib-news.ir/fa/rss/3", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.irib-news.ir/fa/rss/4", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.irib-news.ir/fa/rss/41", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.irib-news.ir/fa/rss/5", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.irib-news.ir/fa/rss/6", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.irib-news.ir/fa/rss/8", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.irib-news.ir/fa/rss/allnews", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
+                    { "https://www.yjc.ir/fa/rss/11", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.yjc.ir/fa/rss/3", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.yjc.ir/fa/rss/4", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.yjc.ir/fa/rss/6", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.yjc.ir/fa/rss/7", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.yjc.ir/fa/rss/9", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
+                    { "https://www.yjc.ir/fa/rss/allnews", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" }
                 });
 
             migrationBuilder.InsertData(
@@ -148,12 +181,26 @@ namespace Infra.DataAccess.Migrations
                 columns: new[] { "RssFeedEfEntityId", "Argb8BitImageKey", "CategoryKey", "DescriptionKey", "IdKey", "LinkKey", "PublishDateKey", "TitleKey" },
                 values: new object[,]
                 {
+                    { "https://www.irib-news.ir/fa/rss/3", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.irib-news.ir/fa/rss/4", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.irib-news.ir/fa/rss/41", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.irib-news.ir/fa/rss/5", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.irib-news.ir/fa/rss/6", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.irib-news.ir/fa/rss/8", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.irib-news.ir/fa/rss/allnews", "url", null, "description", "link", "link", "pubDate", "title" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "url", "category", "description", "guid", "link", "pubDate", "title" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "url", "category", "description", "guid", "link", "pubDate", "title" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "url", "category", "description", "guid", "link", "pubDate", "title" },
                     { "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0", "url", "category", "description", "guid", "link", "pubDate", "title" },
                     { "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0", "url", "category", "description", "guid", "link", "pubDate", "title" },
-                    { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "url", "category", "description", "guid", "link", "pubDate", "title" }
+                    { "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0", "url", "category", "description", "guid", "link", "pubDate", "title" },
+                    { "https://www.yjc.ir/fa/rss/11", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.yjc.ir/fa/rss/3", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.yjc.ir/fa/rss/4", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.yjc.ir/fa/rss/6", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.yjc.ir/fa/rss/7", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.yjc.ir/fa/rss/9", "url", null, "description", "link", "link", "pubDate", "title" },
+                    { "https://www.yjc.ir/fa/rss/allnews", "url", null, "description", "link", "link", "pubDate", "title" }
                 });
 
             migrationBuilder.CreateIndex(

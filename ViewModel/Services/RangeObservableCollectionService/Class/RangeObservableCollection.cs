@@ -31,7 +31,7 @@ namespace ViewModel.Services.RangeObservableCollectionService.Class
         /// <param name="startingIndex">ایندکس شروع که از آن ایندکس به بعد ، در شی جاری (RangeObservableCollection) ، شروع به اضافه کردنِ کالکشنِ collection میکند .
         /// اگر مقدارش منفی باشد ، به انتهای کالکشن جاری (RangeObservableCollection) افزوده میشود .
         /// اگر مقدارش 0 باشد ، به ابتدای کالکشن جاری (RangeObservableCollection) افزوده میشود </param>
-        public void InsertRangeAt(ICollection<T> collection, int startingIndex = -1)
+        public void InsertRangeWithSingleNotification(ICollection<T> collection, int startingIndex = -1)
         {
             if (collection == null || collection.Count < 1)
                 return;

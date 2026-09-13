@@ -3,6 +3,7 @@ using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
+using Application.InfrastructureContracts.SharedProject.ImageFileExtensionResolver.Interface;
 using Infra.SharedService.MapperService.ImageSettingsMapperService.Class;
 
 namespace Infra.ImageService.ImageFileSaverService.Class
@@ -17,6 +18,8 @@ namespace Infra.ImageService.ImageFileSaverService.Class
 
         private IImageFileSaver imageFileSaver;
 
+        private IImageFileExtensionResolver imageFileExtensionResolver;
+
         private IFilePathMaker filePathMaker;
 
         private ImageSettingsMapper imageSettingsMapper;
@@ -25,9 +28,11 @@ namespace Infra.ImageService.ImageFileSaverService.Class
         /////////////////////////////////////////////////////////////////////////////
 
 
-        public ImageFileSaverCoordinator(IImageFileSaver imageFileSaver, IFilePathMaker filePathMaker, ImageSettingsMapper imageSettingsMapper)
+        public ImageFileSaverCoordinator(IImageFileSaver imageFileSaver, IImageFileExtensionResolver imageFileExtensionResolver, 
+            IFilePathMaker filePathMaker, ImageSettingsMapper imageSettingsMapper)
         {
             this.imageFileSaver = imageFileSaver;
+            this.imageFileExtensionResolver = imageFileExtensionResolver;
             this.filePathMaker = filePathMaker;
             this.imageSettingsMapper = imageSettingsMapper;
         }
@@ -38,7 +43,9 @@ namespace Infra.ImageService.ImageFileSaverService.Class
 
         public DestinationPath Save8BitImageToFile(byte[,,] image, ImageSettings<ImageInfo> imageInfoSettings, FilePath filePath)
         {
-            DestinationPath destinationPath = this.filePathMaker.CreateFullImageFilePathWithSafeFileName(filePath, imageInfoSettings.Format);
+            string imageFileExtension = this.imageFileExtensionResolver.GetFileExtension(imageInfoSettings.Format);
+            FullFilePath fullFilePath = new FullFilePath(filePath.FolderPath, filePath.FileName, imageFileExtension);
+            DestinationPath destinationPath = this.filePathMaker.CreateDestinationPathWithHashedFileName(fullFilePath);
             try
             {
                 var imageFileSaveSettings = new ImageFileSaveSettings

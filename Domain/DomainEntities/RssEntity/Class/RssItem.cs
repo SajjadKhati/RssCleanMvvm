@@ -13,8 +13,6 @@ namespace Domain.DomainEntities.RssEntity.Class
 
         private Uri _link;
 
-        private string _category;
-
         private string _title;
 
         private byte[,,] _argb8BitImage;
@@ -71,21 +69,7 @@ namespace Domain.DomainEntities.RssEntity.Class
             }
         }
 
-        public string Category
-        {
-            get
-            {
-                return this._category;
-            }
-            set
-            {
-                if(this._category == value)
-                    return;
-
-                this.ValidateCategory(value);
-                this._category = value;
-            }
-        }
+        public string? Category { get; set; }
 
         public string Title
         {
@@ -136,7 +120,7 @@ namespace Domain.DomainEntities.RssEntity.Class
         }
 
 
-        public RssItem(Uri id, Uri rssFeedId, Uri link, byte[,,] argb8BitImage, string category,string title, 
+        public RssItem(Uri id, Uri rssFeedId, Uri link, byte[,,] argb8BitImage, string? category,string title, 
             string description, DateTime publishDate) : this(id, rssFeedId, link, argb8BitImage)
         {
             this.Category = category;
@@ -156,13 +140,6 @@ namespace Domain.DomainEntities.RssEntity.Class
 
             if (argb8BitImage.GetLength(2) != 4)
                 throw new ArgumentException("تصویر باید 4 کانال داشته باشد .");
-        }
-
-
-        private void ValidateCategory(string category)
-        {
-            if (category != null && category.Length > 512)
-                throw new ArgumentNullException(nameof(category), $"{nameof(category)} در فیلد دامنه ، نباید اندازه ی رشته اش بیشتر از 512 کاراکتر باشد .");
         }
 
 

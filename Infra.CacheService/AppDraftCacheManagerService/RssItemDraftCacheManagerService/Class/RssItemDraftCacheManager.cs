@@ -3,6 +3,7 @@ using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.RssI
 using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.DataModels;
 using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.Interfaces;
 using Application.InfrastructureContracts.SharedProject.FileManager.Interface;
+using Application.InfrastructureContracts.SharedProject.FolderManager.Interface;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Domain.DomainEntities.RssEntity.Class;
 
@@ -21,6 +22,10 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
 
         private IFileManager fileManager;
 
+        private IFolderManager folderManager;
+
+        private string tempImagesFolderPath;
+
         #endregion
 
 
@@ -29,13 +34,15 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
 
         #region متد سازنده
 
-        public RssItemDraftCacheManager(IDraftCache<Uri, RssItem> rssItemDraftCache, 
-            IDraftCache<Uri, RssItemDto> rssItemDtoDraftCache, IDraftCacheWriter draftCacheWriter, IFileManager fileManager)
+        public RssItemDraftCacheManager(IDraftCache<Uri, RssItem> rssItemDraftCache, IDraftCache<Uri, RssItemDto> rssItemDtoDraftCache, 
+            IDraftCacheWriter draftCacheWriter, IFileManager fileManager, IFolderManager folderManager, string tempImagesFolderPath)
         {
             this.rssItemDraftCache = rssItemDraftCache;
             this.rssItemDtoDraftCache = rssItemDtoDraftCache;
             this.draftCacheWriter = draftCacheWriter;
             this.fileManager = fileManager;
+            this.folderManager = folderManager;
+            this.tempImagesFolderPath = tempImagesFolderPath;
         }
 
         #endregion
@@ -75,11 +82,7 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
 
         public void Clear()
         {
-            foreach (var rssItemDtoKeyValuePair in this.rssItemDtoDraftCache.GetAllKeyValuesSnapshot())
-            {
-                this.DeleteDraftImageFile(rssItemDtoKeyValuePair.Value.Item.ImageFullFilePath);
-            }
-
+            this.folderManager.DeleteFolderWithContents(this.tempImagesFolderPath);
             this.rssItemDraftCache.Clear();
             this.rssItemDtoDraftCache.Clear();
         }

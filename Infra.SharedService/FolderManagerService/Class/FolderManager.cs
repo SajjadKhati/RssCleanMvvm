@@ -17,5 +17,11 @@ namespace Infra.SharedService.FolderManagerService.Class
             Directory.CreateDirectory(folderPath);
         }
 
+
+        public void DeleteFolderWithContents(string folderPath)
+        {
+            Directory.Delete(folderPath, recursive : true);
+        }
+
     }
 }

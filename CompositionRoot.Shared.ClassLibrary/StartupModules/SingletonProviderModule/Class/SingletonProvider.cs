@@ -16,6 +16,7 @@ using Application.InfrastructureContracts.ImageProject.ImageSettings.ImageInfoTo
 using Application.InfrastructureContracts.ImageProject.ImageSettings.ImageSettingsProvider.Interfaces;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.SharedProject.FileManager.Interface;
+using Application.InfrastructureContracts.SharedProject.FolderManager.Interface;
 using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalizerService.Factory.Class;
@@ -24,6 +25,7 @@ using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormal
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Interface;
 using Application.Services.Mapper;
 using CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactoryService.Class;
+using CompositionRoot.Shared.ClassLibrary.StartupModules.AppPathsModule.Class;
 using Domain.DomainEntities.RssEntity.Class;
 using Infra.CacheService.AppDraftCacheManagerService.DraftCacheWriterService.Class;
 using Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManagerService.Class;
@@ -51,7 +53,10 @@ using Infra.ImageService.MappingService.Class;
 using Infra.SharedService.DateTimesServices.PersianCalenderConvertorService.Class;
 using Infra.SharedService.FileManagerService.Class;
 using Infra.SharedService.FilePathMakerService.Class;
+using Infra.SharedService.FolderManagerService.Class;
+using Infra.SharedService.ImageFileExtensionResolverService.Class;
 using Infra.SharedService.MapperService.ImageSettingsMapperService.Class;
+using Infra.SharedService.StringHasherService.Class;
 using Shared.ImageServices.ImageUtilityService.Class;
 using ViewModel.CompositionRootContracts.RssItemViewModelFactory.Interface;
 
@@ -235,13 +240,16 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderMo
 
         private bool isInitialized;
 
+        private AppPaths appPaths;
+
 
         ////////////////////////////////////////////////////////////////////////
 
 
-        public SingletonProvider(string connectionString)
+        public SingletonProvider(string connectionString, AppPaths appPaths)
         {
             this.connectionString = connectionString;
+            this.appPaths = appPaths;
             this.isInitialized = false;
             this.imageSettingsCache = new Cache<Uri, ImageSettings<ImageInfo>>();
         }
@@ -283,7 +291,9 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderMo
             IDraftCache<Uri, RssItemDto> rssItemDtoDraftCache = new DraftCache<Uri, RssItemDto>();
             IDraftCacheWriter draftCacheWriter = new DraftCacheWriter();
             IFileManager fileManager = new FileManager();
-            return new RssItemDraftCacheManager(rssItemDraftCache, rssItemDtoDraftCache, draftCacheWriter, fileManager);
+            IFolderManager folderManager = new FolderManager();
+            return new RssItemDraftCacheManager(rssItemDraftCache, rssItemDtoDraftCache, draftCacheWriter, fileManager, 
+                folderManager, this.appPaths.TempImagesFolderPath);
         }
 
 
@@ -320,8 +330,9 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderMo
             IImageDataExtractor imageDataExtractor = new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper());
             IImageFileReader imageFileReader = new ImageFileReader(imageDataExtractor);
             IImageFileSaver imageFileSaver = new ImageFileSaver(new ImageUtility(), new ImageFileSettingsMemberMapper(new ImageInfoMemberMapper()));
+            
             IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(
-                imageFileSaver, new FilePathMaker(), new ImageSettingsMapper());
+                imageFileSaver, new ImageFileExtensionResolver(), new FilePathMaker(new StringHasher()), new ImageSettingsMapper());
             RssItemEfEntityMapper rssItemEfEntityMapper = new RssItemEfEntityMapper();
             IRssItemEfEntityFactory rssItemEfEntityFactory = new RssItemDtoEfEntityFactory(
                 imageFileSaverCoordinator, new RssItemDtoMapper(new PersianCalenderConvertor()), new RssItemEfEntityMapper());

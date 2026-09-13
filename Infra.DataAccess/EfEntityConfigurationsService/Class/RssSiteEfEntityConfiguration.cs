@@ -19,11 +19,24 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
         {
             return new RssSiteEfEntity[]
             {
+                /// خبرگزاری تسنیم
                 new RssSiteEfEntity
                 {
                     Id = new Uri("http://www.tasnimnews.ir/").AbsoluteUri,
                     SiteName = "خبرگزاری تسنیم"
-                }
+                },
+                /// خبرگزاری باشگاه خبرنگاران جوان
+                new RssSiteEfEntity
+                {
+                    Id = new Uri("https://www.yjc.ir/").AbsoluteUri,
+                    SiteName = "باشگاه خبرنگاران جوان"
+                },
+                /// خبرگزاری صدا و سیما
+                new RssSiteEfEntity
+                {
+                    Id = new Uri("https://www.irib-news.ir/").AbsoluteUri,
+                    SiteName = "خبرگزاری صدا و سیما"
+                },
             };
         }
 

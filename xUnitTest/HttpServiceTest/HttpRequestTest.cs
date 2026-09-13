@@ -19,6 +19,8 @@ using Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interfaces
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Enum;
 using Application.InfrastructureContracts.SharedProject.DateTimes.DateTimeParser.Interface;
+using Application.InfrastructureContracts.SharedProject.DateTimes.PersianCalenderConvertor.Interface;
+using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
 using Application.InfrastructureContracts.SharedProject.SharedMapper.RssItemDtoMapper.Interface;
 using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
@@ -29,6 +31,8 @@ using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Int
 using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
+using Application.Services.RssItemDownloaderIntoDraftCacheService.Interface;
+using Application.UseCases.DownLoadRssItemsUseCaseModule.Class;
 using Application.UseCases.LoadRssItemsUseCaseModule.Class;
 using Domain.DomainEntities.RssEntity.Class;
 using Infra.CacheService.AppDraftCacheManagerService.DraftCacheWriterService.Class;
@@ -50,8 +54,13 @@ using Infra.ImageService.ImageFileReaderService.Class;
 using Infra.ImageService.ImageFileSaverService.Class;
 using Infra.ImageService.InfraImageCreatorService.Class;
 using Infra.ImageService.MappingService.Class;
+using Infra.SharedService.DateTimesServices.DateTimeParserService.Class;
+using Infra.SharedService.DateTimesServices.PersianCalenderConvertorService.Class;
 using Infra.SharedService.FilePathMakerService.Class;
+using Infra.SharedService.ImageFileExtensionResolverService.Class;
 using Infra.SharedService.MapperService.ImageSettingsMapperService.Class;
+using Infra.SharedService.StringHasherService.Class;
+using Infra.XmlService.XamlParserService.Class;
 using Shared.ImageServices.ImageUtilityService.Class;
 using System;
 using System.Collections.Generic;
@@ -62,11 +71,8 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Infra.SharedService.DateTimesServices.DateTimeParserService.Class;
+using Application.Services.RssItemDownloaderIntoDraftCacheService.Class;
 using static System.Net.Mime.MediaTypeNames;
-using Application.InfrastructureContracts.SharedProject.DateTimes.PersianCalenderConvertor.Interface;
-using Infra.SharedService.DateTimesServices.PersianCalenderConvertorService.Class;
-using Infra.XmlService.XamlParserService.Class;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest
 {
@@ -351,12 +357,58 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
         }
 
 
+        [Fact]
+        public async Task DateTimeTest_10()
+        {
+            IDateTimeParser dateTimeParser = new DateTimeParser();
+            var dateTime = dateTimeParser.ParseDateTime("13 Sep 2026 13:28:59 +0330");
+            IPersianCalenderConvertor persianCalenderConvertor = new PersianCalenderConvertor();
+            string persianCalenderDate = persianCalenderConvertor.ToPersianDateString(dateTime);
+        }
+
+
+        [Fact]
+        public async Task FilePathMakerTest_11()
+        {
+            FilePathMaker filePathMaker = new FilePathMaker(new StringHasher());
+            FullFilePath fullFilePath = new FullFilePath(
+                "C:\\Users\\sajja\\AppData\\Local\\Temp",
+                new Uri("https://www.yjc.ir/fa/news/9128684/رزمایش-و-اجتماع-بزرگ-مردم-جان-فدای-ایران-روز-جمعه-برگزار-می‌شود").AbsoluteUri,
+                "png"
+                );
+            DestinationPath destinationPath = filePathMaker.CreateDestinationPathWithHashedFileName(fullFilePath);
+        }
+
+        [Fact]
+        public async Task OtherNewsBaseTest_12()
+        {
+
+
+            //IRssItemDownloaderIntoDraftCache draftCache = this.GetRssItemDownloaderIntoDraftCache();
+            //ICache<Uri, RssFeedConfig> rssFeedConfigCache = this.GetRssFeedConfigCache();
+            //DownLoadRssItemsUseCase downLoadRssItemsUseCase = new DownLoadRssItemsUseCase(draftCache, rssFeedConfigCache);
+
+            //var abc = await downLoadRssItemsUseCase.ExecuteAsync();
+        }
+
 
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+
+
+
+        //private IRssItemDownloaderIntoDraftCache GetRssItemDownloaderIntoDraftCache()
+        //{
+        //    return new RssItemDownloaderIntoDraftCache()
+        //}
+
+        private ICache<Uri, RssFeedConfig> GetRssFeedConfigCache()
+        {
+            return new Cache<Uri, RssFeedConfig>();
+        }
 
 
 
@@ -418,9 +470,10 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
             IDraftCacheWriter draftCacheWriter = new DraftCacheWriter();
             ImageUtility imageUtility = new ImageUtility();
             IImageFileSaver imageFileSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(new ImageInfoMemberMapper()));
-            IFilePathMaker filePathMaker = new FilePathMaker();
+            IFilePathMaker filePathMaker = new FilePathMaker(new StringHasher());
             ImageSettingsMapper imageSettingsMapper = new ImageSettingsMapper();
-            IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, filePathMaker, imageSettingsMapper);
+            IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, 
+                new ImageFileExtensionResolver(), filePathMaker, imageSettingsMapper);
             IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
             IRssItemDtoMapper rssItemDtoMapper = new Application.Services.Mapper.RssItemDtoMapper(new PersianCalenderConvertor());
             IRssItemEfEntityFactory rssItemEfEntityFactory = new RssItemDtoEfEntityFactory(imageFileSaverCoordinator, rssItemDtoMapper, efEntityMapper);

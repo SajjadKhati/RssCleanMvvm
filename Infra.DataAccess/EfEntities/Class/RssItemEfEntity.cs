@@ -28,7 +28,7 @@ namespace Infra.DataAccess.EfEntities.Class
         public string Link { get; set; }
 
         [MaxLength(512)]
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
         [MaxLength(2048)]
         public string Title { get; set; }

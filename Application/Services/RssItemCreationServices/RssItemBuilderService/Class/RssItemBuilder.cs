@@ -48,7 +48,8 @@ namespace Application.Services.RssItemCreationServices.RssItemBuilderService.Cla
                 throw new InvalidDataException("این شیِ RssItem ، قبلا ساخته شد و شناسه اش موجود است .");
 
             Uri link = this.rssItemDataExtractor.GetLink(rssItemDictionary[rssItemFieldKeyConfig.LinkKey]);
-            string category = rssItemDictionary[rssItemFieldKeyConfig.CategoryKey];
+            string category = (string.IsNullOrWhiteSpace(rssItemFieldKeyConfig.CategoryKey) == false)? 
+                rssItemDictionary[rssItemFieldKeyConfig.CategoryKey] : null;
             string title = rssItemDictionary[rssItemFieldKeyConfig.TitleKey];
             string description = rssItemDictionary[rssItemFieldKeyConfig.DescriptionKey];
             DateTime publishDate = this.rssItemDataExtractor.GetPublishDate(rssItemDictionary[rssItemFieldKeyConfig.PublishDateKey]);

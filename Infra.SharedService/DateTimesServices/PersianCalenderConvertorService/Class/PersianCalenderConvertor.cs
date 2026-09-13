@@ -8,12 +8,14 @@ namespace Infra.SharedService.DateTimesServices.PersianCalenderConvertorService.
 
         public string ToPersianDateString(DateTime dateTime)
         {
-            PersianCalendar pc = new PersianCalendar();
+            PersianCalendar persianCalendar = new PersianCalendar();
 
-            int year = pc.GetYear(dateTime);
-            int month = pc.GetMonth(dateTime);
-            int day = pc.GetDayOfMonth(dateTime);
-            DayOfWeek dayOfWeek = pc.GetDayOfWeek(dateTime);
+            int year = persianCalendar.GetYear(dateTime);
+            int month = persianCalendar.GetMonth(dateTime);
+            int day = persianCalendar.GetDayOfMonth(dateTime);
+            int hour = persianCalendar.GetHour(dateTime);
+            int minute = persianCalendar.GetMinute(dateTime);
+            DayOfWeek dayOfWeek = persianCalendar.GetDayOfWeek(dateTime);
 
             string[] persianDayNames = { "شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه" };
             string[] persianMonthNames = { "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند" };
@@ -23,7 +25,8 @@ namespace Infra.SharedService.DateTimesServices.PersianCalenderConvertorService.
             string dayName = persianDayNames[dayIndex];
             string monthName = persianMonthNames[month - 1];
 
-            return $"{dayName}، {day} {monthName} {year} ({year}/{month:00}/{day:00})";
+            // چهارشنبه، 2 مهر 1405 - ساعت 14:30
+            return $"{dayName}، {day} {monthName} {year} - ساعت {hour:00}:{minute:00}";
         }
 
     }

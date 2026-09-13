@@ -13,6 +13,8 @@ using Application.InfrastructureContracts.ImageProject.ImageSettings.ImageSettin
 using Application.InfrastructureContracts.SharedProject.DateTimes.DateTimeParser.Interface;
 using Application.InfrastructureContracts.SharedProject.DateTimes.PersianCalenderConvertor.Interface;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
+using Application.InfrastructureContracts.SharedProject.Hasher.Interface;
+using Application.InfrastructureContracts.SharedProject.ImageFileExtensionResolver.Interface;
 using Application.InfrastructureContracts.SharedProject.SharedMapper.RssItemDtoMapper.Interface;
 using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
 using Application.InfrastructureContracts.XmlProject.XmlParser.Interfaces;
@@ -53,7 +55,9 @@ using Infra.ImageService.MappingService.Class;
 using Infra.SharedService.DateTimesServices.DateTimeParserService.Class;
 using Infra.SharedService.DateTimesServices.PersianCalenderConvertorService.Class;
 using Infra.SharedService.FilePathMakerService.Class;
+using Infra.SharedService.ImageFileExtensionResolverService.Class;
 using Infra.SharedService.MapperService.ImageSettingsMapperService.Class;
+using Infra.SharedService.StringHasherService.Class;
 using Infra.XmlService.XamlParserService.Class;
 using Shared.ImageServices.ImageUtilityService.Class;
 using Shared.ImageServices.ImageUtilityService.Interface;
@@ -190,13 +194,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         
         private IRssItemDownloaderIntoDraftCache CreateRssItemDownloaderIntoDraftCache()
         {
-            //RssFeedEfEntityMapper rssFeedEfEntityMapper = new RssFeedEfEntityMapper();
-            //RssSiteEfEntityMapper rssSiteEfEntityMapper = new RssSiteEfEntityMapper(rssFeedEfEntityMapper);
-            //IRssSiteQueryFactory rssSiteQueryFactory = new RssSiteQueryFactory(this.connectionString, rssSiteEfEntityMapper);
-            //ILoadRssSiteUseCase initializeAppUseCase = new LoadRssSiteUseCase(rssSiteQueryFactory);
-
             IRssItemsDownLoader rssItemsDownLoader = this.CreateRssItemsDownLoader();
-            //IRssItemDtoFactory rssItemDtoFactory = this.CreateRssItemDtoFactory();
             return new RssItemDownloaderIntoDraftCache(rssItemsDownLoader, rssItemDtoFactory, 
                 this.rssItemDraftCacheManager, this.imageSettingsReader, this.appPaths.TempImagesFolderPath);
         }
@@ -286,7 +284,13 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             IImageFileSaver imageFileSaver = this.CreateImageFileSaver();
             IFilePathMaker filePathMaker = this.CreateFilePathMaker();
             ImageSettingsMapper imageSettingsMapper = this.CreateImageSettingsMapper();
-            return new ImageFileSaverCoordinator(imageFileSaver, filePathMaker, imageSettingsMapper);
+            IImageFileExtensionResolver imageFileExtensionResolver = this.CreateImageFileExtensionResolver();
+            return new ImageFileSaverCoordinator(imageFileSaver, imageFileExtensionResolver, filePathMaker, imageSettingsMapper);
+        }
+
+        private IImageFileExtensionResolver CreateImageFileExtensionResolver()
+        {
+            return new ImageFileExtensionResolver();
         }
 
         private IImageFileSaver CreateImageFileSaver()
@@ -309,7 +313,13 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IFilePathMaker CreateFilePathMaker()
         {
-            return new FilePathMaker();
+            IStringHasher stringHasher = this.CreateStringHasher();
+            return new FilePathMaker(stringHasher);
+        }
+
+        private IStringHasher CreateStringHasher()
+        {
+            return new StringHasher();
         }
 
         private ImageSettingsMapper CreateImageSettingsMapper()

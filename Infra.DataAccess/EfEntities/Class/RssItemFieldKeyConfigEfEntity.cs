@@ -28,8 +28,7 @@ namespace Infra.DataAccess.EfEntities.Class
         public string LinkKey { get; set; }
 
         [MaxLength(256)]
-        [Required()]
-        public string CategoryKey { get; set; }
+        public string? CategoryKey { get; set; }
 
         [MaxLength(256)]
         [Required()]

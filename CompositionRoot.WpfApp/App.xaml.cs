@@ -83,7 +83,7 @@ namespace CompositionRoot.WpfApp
                 string connectionString = await this.appInitializer.GetConnectionStringAsync(connectionStringJsonFullFilePath);
                 bool isInitialized = await this.appInitializer.InitializeAppAsync(connectionString);
                 ///
-                SingletonProvider singletonProvider = new SingletonProvider(connectionString);
+                SingletonProvider singletonProvider = new SingletonProvider(connectionString, this.appPaths);
                 await singletonProvider.InitializeSingletonPropertiesAsync();
                 ///
                 this.appFinalizer = new AppFinalizer(singletonProvider.RssItemDraftCacheManager);

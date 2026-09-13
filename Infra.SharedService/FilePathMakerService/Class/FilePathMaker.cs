@@ -1,53 +1,35 @@
-﻿using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Enum;
-using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
+﻿using Application.InfrastructureContracts.SharedProject.FilePathMaker.DataModels;
 using Application.InfrastructureContracts.SharedProject.FilePathMaker.Interfaces;
+using Application.InfrastructureContracts.SharedProject.Hasher.Interface;
 
 namespace Infra.SharedService.FilePathMakerService.Class
 {
     public class FilePathMaker : IFilePathMaker
     {
 
-        public DestinationPath CreateFullImageFilePathWithSafeFileName(FilePath filePath, MagickFormat magickFormat)
+        private IStringHasher stringHasher;
+
+
+        ///////////////////////////////////////////////////////////////////////////////
+
+
+        public FilePathMaker(IStringHasher stringHasher)
         {
-            string fileExtension = this.GetFileExtension(magickFormat);
-            string safeFileName = this.EncodeFileName(filePath.FileName);
-            return this.GetDestinationPath(filePath.FolderPath, safeFileName, fileExtension);
+            this.stringHasher = stringHasher;
         }
 
 
-        public DestinationPath CreateFullImageFilePath(FilePath filePath, MagickFormat magickFormat)
+        ///////////////////////////////////////////////////////////////////////////////
+
+
+        public DestinationPath CreateDestinationPathWithHashedFileName(FullFilePath fullFilePath)
         {
-            string fileExtension = this.GetFileExtension(magickFormat);
-            return this.GetDestinationPath(filePath.FolderPath, filePath.FileName, fileExtension);
+            string hashedFileName = this.stringHasher.HashString(fullFilePath.InitialFileName);
+            return this.GetDestinationPath(fullFilePath.FolderPath, hashedFileName, fullFilePath.FileExtension);
         }
 
 
-        public string EncodeFileName(string uri)
-        {
-            return Uri.EscapeDataString(uri);
-        }
-
-
-        public string DecodeFileName(string uri)
-        {
-            return Uri.UnescapeDataString(uri);
-        }
-
-
-        ////////////////////////////////
-
-        private string GetFileExtension(MagickFormat magickFormat)
-        {
-            return magickFormat switch
-            {
-                MagickFormat.Png or MagickFormat.Png00 or MagickFormat.Png8 or MagickFormat.Png24 or MagickFormat.Png32
-                    or MagickFormat.Png48 or MagickFormat.Png64 => "png",
-                MagickFormat.Jpeg or MagickFormat.Jpg => "jpg",
-                MagickFormat.Bmp => "bmp",
-                MagickFormat.Tif or MagickFormat.Tiff or MagickFormat.Tiff64 => "tiff",
-                _ => throw new FormatException("فرمت نباید در حالت ناشناخته باشد .")
-            };
-        }
+        ///////////////////////////////////////////////////////////////////////////////
 
 
         private DestinationPath GetDestinationPath(string folderPath, string fileName, string fileExtension)

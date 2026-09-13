@@ -54,6 +54,9 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
         }
 
 
+        /////////////////////////////////////////////////////////////////////////////
+
+
         public IAsyncRelayCommand LoadRssSiteCommand {  get; }
 
         public IAsyncRelayCommand LoadRssItemsCommand { get; }
@@ -128,7 +131,9 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 
                 if(rssItemDtosResult.CreationErrors != null && rssItemDtosResult.CreationErrors.Count > 0)
                 {
-                    Exception rssItemException = new Exception($"به دلایل مختلف از جمله تکراری بودن خبر که از قبل در حافظه یا دیتابیس وجود داشته ، یا سازگار نبودن تصویرِ خبر ، یا هر دلایل دیگری ، دریافت {rssItemDtosResult.CreationErrors.Count} خبر ، انجام نشد .");
+                    Exception rssItemException = new Exception(
+                        $"به دلایل مختلف از جمله تکراری بودن خبر که از قبل در حافظه یا دیتابیس وجود داشته ، یا سازگار نبودن تصویرِ خبر ، یا هر دلایل دیگری ، دریافت " +
+                        $"{rssItemDtosResult.CreationErrors.Count} خبر ، انجام نشد . دلیل خطای اول :\n\n{rssItemDtosResult.CreationErrors[0].Message}");
                     WeakReferenceMessenger.Default.Send(rssItemException, SharedMessengerKey.Exception_ErrorKey);
                 }
             }
@@ -176,7 +181,7 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
                 return;
 
             int startingIndex = 0;
-            this.RssItemViewModels.InsertRangeAt(rssItemViewModels, startingIndex);
+            this.RssItemViewModels.InsertRangeWithSingleNotification(rssItemViewModels, startingIndex);
         }
 
     }

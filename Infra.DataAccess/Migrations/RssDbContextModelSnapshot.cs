@@ -80,6 +80,90 @@ namespace Infra.DataAccess.Migrations
                             Id = "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0",
                             RssSiteEfEntityId = "http://www.tasnimnews.ir/",
                             Title = "فرهنگی"
+                        },
+                        new
+                        {
+                            Id = "https://www.yjc.ir/fa/rss/allnews",
+                            RssSiteEfEntityId = "https://www.yjc.ir/",
+                            Title = "کل اخبار"
+                        },
+                        new
+                        {
+                            Id = "https://www.yjc.ir/fa/rss/3",
+                            RssSiteEfEntityId = "https://www.yjc.ir/",
+                            Title = "سیاسی"
+                        },
+                        new
+                        {
+                            Id = "https://www.yjc.ir/fa/rss/9",
+                            RssSiteEfEntityId = "https://www.yjc.ir/",
+                            Title = "بین الملل"
+                        },
+                        new
+                        {
+                            Id = "https://www.yjc.ir/fa/rss/6",
+                            RssSiteEfEntityId = "https://www.yjc.ir/",
+                            Title = "اقتصادی"
+                        },
+                        new
+                        {
+                            Id = "https://www.yjc.ir/fa/rss/4",
+                            RssSiteEfEntityId = "https://www.yjc.ir/",
+                            Title = "فرهنگی هنری"
+                        },
+                        new
+                        {
+                            Id = "https://www.yjc.ir/fa/rss/7",
+                            RssSiteEfEntityId = "https://www.yjc.ir/",
+                            Title = "علمی پزشکی"
+                        },
+                        new
+                        {
+                            Id = "https://www.yjc.ir/fa/rss/11",
+                            RssSiteEfEntityId = "https://www.yjc.ir/",
+                            Title = "فیلم و صوت"
+                        },
+                        new
+                        {
+                            Id = "https://www.irib-news.ir/fa/rss/allnews",
+                            RssSiteEfEntityId = "https://www.irib-news.ir/",
+                            Title = "کل اخبار"
+                        },
+                        new
+                        {
+                            Id = "https://www.irib-news.ir/fa/rss/5",
+                            RssSiteEfEntityId = "https://www.irib-news.ir/",
+                            Title = "سیاسی"
+                        },
+                        new
+                        {
+                            Id = "https://www.irib-news.ir/fa/rss/41",
+                            RssSiteEfEntityId = "https://www.irib-news.ir/",
+                            Title = "بین الملل"
+                        },
+                        new
+                        {
+                            Id = "https://www.irib-news.ir/fa/rss/6",
+                            RssSiteEfEntityId = "https://www.irib-news.ir/",
+                            Title = "اقتصادی"
+                        },
+                        new
+                        {
+                            Id = "https://www.irib-news.ir/fa/rss/8",
+                            RssSiteEfEntityId = "https://www.irib-news.ir/",
+                            Title = "علمی فرهنگی"
+                        },
+                        new
+                        {
+                            Id = "https://www.irib-news.ir/fa/rss/4",
+                            RssSiteEfEntityId = "https://www.irib-news.ir/",
+                            Title = "ورزشی"
+                        },
+                        new
+                        {
+                            Id = "https://www.irib-news.ir/fa/rss/3",
+                            RssSiteEfEntityId = "https://www.irib-news.ir/",
+                            Title = "فیلم"
                         });
                 });
 
@@ -110,42 +194,140 @@ namespace Infra.DataAccess.Migrations
                         {
                             RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories",
                             AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]",
                             ParentElementName = "item"
                         },
                         new
                         {
                             RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories",
                             AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]",
                             ParentElementName = "item"
                         },
                         new
                         {
                             RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/1/0/0/0",
                             AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]",
                             ParentElementName = "item"
                         },
                         new
                         {
                             RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar",
                             AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]",
                             ParentElementName = "item"
                         },
                         new
                         {
                             RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/8/0/0/0",
                             AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]",
                             ParentElementName = "item"
                         },
                         new
                         {
                             RssFeedEfEntityId = "https://www.tasnimnews.ir/fa/rss/feeds/4/0/0/0",
                             AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}content\"]",
+                            ChildElementNames = "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/allnews",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/3",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/9",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/6",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/4",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/7",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/11",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/allnews",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/5",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/41",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/6",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/8",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/4",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
+                            ParentElementName = "item"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/3",
+                            AttributeNames = "[\"url\"]",
+                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
                             ParentElementName = "item"
                         });
                 });
@@ -157,7 +339,6 @@ namespace Infra.DataAccess.Migrations
                         .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("Category")
-                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
 
@@ -209,7 +390,6 @@ namespace Infra.DataAccess.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("CategoryKey")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -308,6 +488,146 @@ namespace Infra.DataAccess.Migrations
                             LinkKey = "link",
                             PublishDateKey = "pubDate",
                             TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/allnews",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/3",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/9",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/6",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/4",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/7",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/11",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/allnews",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/5",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/41",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/6",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/8",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/4",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
+                        },
+                        new
+                        {
+                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/3",
+                            Argb8BitImageKey = "url",
+                            DescriptionKey = "description",
+                            IdKey = "link",
+                            LinkKey = "link",
+                            PublishDateKey = "pubDate",
+                            TitleKey = "title"
                         });
                 });
 
@@ -331,6 +651,16 @@ namespace Infra.DataAccess.Migrations
                         {
                             Id = "http://www.tasnimnews.ir/",
                             SiteName = "خبرگزاری تسنیم"
+                        },
+                        new
+                        {
+                            Id = "https://www.yjc.ir/",
+                            SiteName = "باشگاه خبرنگاران جوان"
+                        },
+                        new
+                        {
+                            Id = "https://www.irib-news.ir/",
+                            SiteName = "خبرگزاری صدا و سیما"
                         });
                 });
 
