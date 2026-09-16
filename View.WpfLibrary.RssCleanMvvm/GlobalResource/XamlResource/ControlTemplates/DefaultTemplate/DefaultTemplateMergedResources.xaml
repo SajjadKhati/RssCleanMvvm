@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ComboBoxTemplateResource.xaml"/>
+        <ResourceDictionary Source="ScroolViewerTemplateResource.xaml"/>
+        <ResourceDictionary Source="ListBoxTemplateResource.xaml"/>
+        <ResourceDictionary Source="LabelTemplateResource.xaml"/>
+        <ResourceDictionary Source="ToolTipTemplateResource.xaml"/>
+        <ResourceDictionary Source="MenuTemplateResource.xaml"/>
+        <ResourceDictionary Source="ButtonTemplateResource.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

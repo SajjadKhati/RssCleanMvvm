@@ -16,4 +16,8 @@
     <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="BindingConverterModules\FilePathToBitmapImageConverterModule\Class\" />
+  </ItemGroup>
+
 </Project>

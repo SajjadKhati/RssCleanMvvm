@@ -6,10 +6,20 @@
              xmlns:local="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView"
              xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;assembly=ViewModel"
              xmlns:interaction="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:bindingConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.BindingConverterModules.FilePathToBitmapImageConverterModule"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance d:Type=viewModelModules:RssUserControlViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800"
              DataContext="{Binding Path=RssUserControlViewModel}">
+
+    <UserControl.Resources>
+        <system:Double x:Key="ImageWidthKey">192</system:Double>
+
+        <system:Double x:Key="ImageHeightKey">108</system:Double>
+
+        <bindingConverterModule:FilePathToBitmapImageConverter x:Key="FilePathToBitmapImageConverterKey"/>
+    </UserControl.Resources>
 
     <interaction:Interaction.Triggers>
         <interaction:EventTrigger EventName="Loaded">
@@ -31,10 +41,11 @@
 
             <Grid Grid.Row="0" Margin="0, 5">
                 <TextBlock HorizontalAlignment="Left" Text="سایت خبری : "/>
-                <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center" MinWidth="250" IsReadOnly="True"
-                      ItemsSource="{Binding Path=RssSiteInfos }"
-                      DisplayMemberPath="SiteName"
-                      IsSynchronizedWithCurrentItem="True"/>
+                <ComboBox  x:Name="SiteNameComboBox"  HorizontalAlignment="Right" HorizontalContentAlignment="Center" MinWidth="250" IsReadOnly="True"
+                       ItemsSource="{Binding Path=RssSiteInfos }"
+                       DisplayMemberPath="SiteName"
+                       IsSynchronizedWithCurrentItem="True"
+                       Text="خبرگزاری را انتخاب کنید"/>
             </Grid>
 
             <Grid Grid.Row="1" Margin="0, 5">
@@ -42,7 +53,10 @@
                 <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center"  MinWidth="250" IsReadOnly="True"
                       ItemsSource="{Binding  Path=RssSiteInfos/RssFeedInfos}"
                       DisplayMemberPath="Title"
-                      SelectedItem="{Binding Mode=OneWayToSource, Path=SelectedRssFeedInfo}"/>
+                      SelectedItem="{Binding Mode=OneWayToSource, Path=SelectedRssFeedInfo}"
+                      Text="موضوع خبری را انتخاب کنید"
+                      IsEnabled="{Binding ElementName=SiteNameComboBox, Path=SelectedItem, 
+                            Converter={StaticResource NullableToBoolValueConverterKey} }"/>
             </Grid>
         </Grid>
 
@@ -52,34 +66,157 @@
                      VirtualizingPanel.CacheLength="1,1" VirtualizingPanel.CacheLengthUnit="Page"
                      ScrollViewer.CanContentScroll="True">
 
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="Transparent" Margin="2" BorderBrush="Gray" BorderThickness="1">
+                        <Border Background="Transparent" Margin="0, 2" Padding="2, 4" BorderBrush="Gray" BorderThickness="0, 0, 0, 1">
                             <Grid Background="Transparent">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Name="NewsColumn" Width="Auto"/>
+                                    <ColumnDefinition Name="NewsColumn" Width="*"/>
                                     <ColumnDefinition Name="ImageColumn" Width="Auto"/>
-                                    <ColumnDefinition Name="CommandButtonsColumn" Width="*"/>
+                                    <ColumnDefinition Name="CommandButtonsColumn" Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Grid Grid.Column="0" Margin="5, 0">
-
+                                <Grid Grid.Column="0" Background="Transparent">
+                                    
                                 </Grid>
 
-                                <Grid Grid.Column="1" Margin="5, 0">
-                                    <Image />
+                                <Grid Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20, 0" Background="Transparent">
+                                    <!-- توضیحات Image.Stretch  :
+                                        ═══════════════════════════════════════════════════════════════════════════
+                                         Stretch — نحوهٔ جاگیری تصویر داخل کادر کنترل Image
+                                        ═══════════════════════════════════════════════════════════════════════════
+
+                                         سناریو: کادر کنترل 100×100 است، ولی ابعاد تصاویر هر خبرگزاری متفاوت است.
+
+                                         مقادیر:
+
+                                           Fill:
+                                             - تصویر را می‌کشد تا دقیقاً اندازهٔ کادر شود.
+                                             - نسبت ابعاد به‌هم می‌ریزد (اعوجاج).
+                                             - مثال: تصویر 800×200 → کشیده می‌شود به 100×100 → مضحک و کشیده.
+
+                                           Uniform:
+                                             - تصویر را با حفظ نسبت بزرگ/کوچک می‌کند تا کامل درون کادر جا شود.
+                                             - هیچ برشی رخ نمی‌دهد، ولی ممکن است فضای خالی در بالا/پایین یا چپ/راست بماند.
+                                             - مثال: تصویر 800×200 در کادر 100×100 → می‌شود 100×25،
+                                               و بالای/پایینش فضای خالی می‌ماند.
+
+                                           UniformToFill:
+                                             - تصویر را با حفظ نسبت بزرگ می‌کند تا کل کادر را پر کند.
+                                             - بخش‌های اضافی از مرکز برش می‌خورند (نه از گوشه).
+                                             - مثال: تصویر 800×200 در کادر 100×100 → می‌شود 400×100،
+                                               و فقط 100 پیکسل وسط افقی نمایش داده می‌شود.
+                                             - ✅ برای برنامهٔ ما مناسب است، چون ظاهر یکدست ایجاد می‌کند.
+
+                                           None:
+                                             - تصویر دست‌نخورده در گوشهٔ بالا-چپ کادر رندر می‌شود.
+                                             - اگر بزرگ‌تر از کادر باشد، بقیه‌اش بریده می‌شود.
+
+                                         ✅ انتخاب ما: UniformToFill
+                                            دلیل: همیشه کل کادر 100×100 را پر می‌کند، نسبت ابعاد هم حفظ می‌شود،
+                                            و ظاهر لیست خبری یکدست می‌ماند.
+                                        -->
+                                    <!-- توضیحات RenderOptions.BitmapScalingMode :
+                                    
+                                        ═══════════════════════════════════════════════════════════════════════════
+                                         RenderOptions.BitmapScalingMode — الگوریتم مقیاس‌بندی هنگام رسم
+                                        ═══════════════════════════════════════════════════════════════════════════
+
+                                         توجه: این ویژگی به «نمایش» مربوط است، نه به «دیکد».
+                                               یعنی بعد از اینکه تصویر دیکد شد (با DecodePixelWidth)،
+                                               WPF برای رساندن آن به اندازهٔ نهایی کادر، باید مقیاس‌بندی کند.
+                                               این مقیاس‌بندی نیاز به یک الگوریتم دارد.
+
+                                         مقادیر:
+
+                                           Linear (= LowQuality):
+                                             - برای هر پیکسل خروجی، میانگین 4 پیکسل مجاور ورودی را می‌گیرد.
+                                             - سریع، ولی در بزرگ‌نمایی زیاد، تصویر کمی تار می‌شود.
+                                             - ✅ مناسب اسکرول سریع و لیست بلند.
+
+                                           Fant (= HighQuality):
+                                             - الگوریتم پیچیده‌تر (polyphase)؛ لبه‌ها شارپ‌تر و جزئیات بهتر.
+                                             - کندتر، مصرف CPU بیشتر.
+                                             - مناسب تصویر ثابت و بزرگ.
+
+                                           NearestNeighbor:
+                                             - بدون درون‌یابی؛ هر پیکسل خروجی = نزدیک‌ترین پیکسل ورودی.
+                                             - نتیجه: تصویر پیکسلی (blocky).
+                                             - مناسب pixel art، نمودار، اسکرین‌شات.
+
+                                           Unspecified:
+                                             - تصمیم با WPF (معمولاً Linear).
+
+                                         ✅ انتخاب ما: LowQuality (Linear)
+                                            دلیل: ListBox با Virtualization و اسکرول سریع داریم؛ سرعت مهم‌تر از
+                                            شارپ بودن نهایی است. در اندازهٔ کوچک (100×100) تفاوت Fant و Linear
+                                            تقریباً نامحسوس است.
+
+                                        ═══════════════════════════════════════════════════════════════════════════
+                                         خلاصهٔ مسیر یک تصویر از دیسک تا صفحه
+                                        ═══════════════════════════════════════════════════════════════════════════
+
+                                           1) Decode (در Converter):
+                                              فایل با DecodePixelWidth (مثلاً 200 یا 400) از دیسک خوانده و دیکد می‌شود.
+                                              → این مرحله «حافظهٔ مصرفی» را تعیین می‌کند.
+
+                                           2) Scaling (در WPF Render):
+                                              تصویر دیکدشده توسط الگوریتم BitmapScalingMode به اندازهٔ نهایی کادر
+                                              می‌رسد (طبق Stretch).
+                                              → این مرحله «کیفیت بصری» را تعیین می‌کند.
+                                    -->
+                                    <!-- توضیحات علت استفاده از BindingConverter :
+                                        ═══════════════════════════════════════════════════════════════════════════
+                                         چرا از Converter استفاده کردیم و از BitmapImage ای که پروپرتیِ UriSource اش را مقداردهی کنیم ، استفاده نکردیم؟ :
+                                        ═══════════════════════════════════════════════════════════════════════════
+
+                                         روش معمول (بدون Converter):
+
+                                           <Image.Source>
+                                               <BitmapImage UriSource="{Binding ImageFullFilePath}" .../>
+                                           </Image.Source>
+
+                                         مشکل این روش (استفاده از UriSource) :
+
+                                           1) WPF یک Image Cache داخلی دارد که بر اساس URI کلید می‌خورد.
+                                              اگر فایل تصویر روی دیسک تغییر کند ولی مسیر (URI) همان باشد،
+                                              WPF نسخهٔ قدیمی کش‌شده را نمایش می‌دهد.
+
+                                           2) در برنامهٔ ما، دکمهٔ «تبدیل به سیاه و سفید» محتوای فایل را عوض
+                                              می‌کند ولی مسیر فایل ثابت می‌ماند → WPF تغییر را نمی‌بیند.
+
+                                           3) حتی با OnPropertyChanged هم مشکل حل نمی‌شود، چون WPF هنوز
+                                              همان URI را می‌بیند و از cache می‌خواند.
+
+                                         راه‌حل: استفاده از Converter با StreamSource
+
+                                           در Converter، فایل را با FileStream باز می‌کنیم و به BitmapImage.StreamSource
+                                           می‌دهیم. چون URI به WPF داده نمی‌شود، cache داخلی درگیر نمی‌شود و
+                                           هر بار Binding اجرا شود، فایل از دیسک تازه خوانده می‌شود.
+
+                                           + CacheOption = OnLoad  → فایل بلافاصله بعد از دیکد آزاد می‌شود
+                                                                     (برای حذف/جایگزینی فایل لازم است).
+                                           + DecodePixelWidth      → اندازهٔ دیکد را کوچک نگه می‌دارد (صرفه‌جویی حافظه).
+                                           + Freeze()              → BitmapImage غیرقابل تغییر و Thread-safe می‌شود.
+
+                                         برای اجبار به بارگذاری مجدد بعد از تغییر فایل:
+
+                                           در ViewModel متد NotifyImageChanged() صدا زده می‌شود که
+                                           OnPropertyChanged(nameof(ImageFullFilePath)) را اجرا می‌کند.
+                                           چون Binding به PropertyChanged گوش می‌دهد، Converter دوباره اجرا
+                                           می‌شود و فایل تازه از دیسک خوانده می‌شود.
+                                    -->
+                                    <Image Width="{StaticResource ImageWidthKey}" Height="{StaticResource ImageHeightKey}"
+                                           Stretch="UniformToFill" RenderOptions.BitmapScalingMode="LowQuality"
+                                           Source="{Binding Mode=OneWay, Path=ImageFullFilePath, 
+                                                Converter={StaticResource FilePathToBitmapImageConverterKey},
+                                                    ConverterParameter={StaticResource ImageWidthKey}}"/>
                                 </Grid>
 
-                                <StackPanel Grid.Column="2" Orientation="Vertical" Margin="5, 0">
-                                    <Button Content="حالت ویرایش"/>
-                                    <Button Content="تبدیل به سیاه و سفید"/>
-                                    <Button Content="ذخیره"/>
+                                <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="150" Background="Transparent">
+                                    <Button MinHeight="26" Content="حالت ویرایش"/>
+                                    <Button MinHeight="26" Margin="0, 13" Content="تبدیل به سیاه و سفید"/>
+                                    <Button MinHeight="26" Content="ذخیره"/>
                                 </StackPanel>
 
                             </Grid>

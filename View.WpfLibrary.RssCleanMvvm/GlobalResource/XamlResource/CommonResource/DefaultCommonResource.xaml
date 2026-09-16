@@ -1,0 +1,39 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+
+
+    <!--#region   منابع مشترک پیش فرض  -->
+
+    <Path x:Key="checkboxTickPath" Data="M1,7 Q3,7 5,9 Q8,4 12,2 M1,7 Q3.2,7.2 5,11 Q8.2,4.2 12,2" />
+
+
+    <FontFamily x:Key="DefaultCommonFontFamily">Calibri</FontFamily>
+
+    <system:Double x:Key="DefaultCommonVeryLargeFontSize">68</system:Double>
+
+    <system:Double x:Key="DefaultCommonLargeFontSize">54</system:Double>
+
+    <system:Double x:Key="DefaultCommonFontSize">36</system:Double>
+
+    <system:Double x:Key="DefaultCommonSmallFontSize">18</system:Double>
+
+    <FontStyle x:Key="DefaultCommonFontStyle">Normal</FontStyle>
+
+    <FontWeight x:Key="DefaultCommonFontWeight">Normal</FontWeight>
+
+    <FontStretch x:Key="DefaultCommonFontStretch">Normal</FontStretch>
+
+    <system:Double x:Key="DefaultCommonXceedMessageBox_MaxHeightKey">500</system:Double>
+
+    <Thickness x:Key="DefaultCommonXceedMessageBox_BorderThicknessKey">0</Thickness>
+
+    <Thickness x:Key="DefaultCommonXceedMessageBoxButton_BorderThicknessKey">1.5</Thickness>
+
+    <Thickness x:Key="DefaultCommonXceedMessageBoxButton_PaddingKey" Left="10" Top="2" Right="10" Bottom="2"/>
+
+
+    <!--#endregion-->
+
+
+</ResourceDictionary>

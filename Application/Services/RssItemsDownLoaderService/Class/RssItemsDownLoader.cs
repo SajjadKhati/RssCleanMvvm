@@ -71,7 +71,6 @@ namespace Application.Services.RssItemsDownLoaderService.Class
                 {
                     creationErrors.Add(exception);
                 }
-
             }
             return new RssItemsReport(createdRssItems, creationErrors);
         }

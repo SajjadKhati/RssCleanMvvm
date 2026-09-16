@@ -1,0 +1,35 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--#region استایل های ListBox و ListBoxItem  -->
+
+    <!--#region   استایل برای ListBox-->
+
+    <Style TargetType="{x:Type ListBox}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Background" Value="{DynamicResource ListBox_DefaultBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ListBox_DefaultBorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource ListBox_DefaultForegroundBrush}" />
+    </Style>
+
+    <!--#endregion-->
+
+
+
+
+    <!--#region   استایل برای ListBoxItem-->
+
+    <Style TargetType="{x:Type ListBoxItem}">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="HorizontalContentAlignment" 
+                Value="{Binding  RelativeSource={RelativeSource Self}, Path= HorizontalAlignment}" />
+        <Setter Property="Template" Value="{DynamicResource ListBoxItemTemplate}" />
+    </Style>
+
+    <!--#endregion-->
+
+    <!--#endregion-->
+
+
+
+</ResourceDictionary>

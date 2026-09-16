@@ -1,0 +1,38 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--#region   استایل برای ComboBox و ComboBoxItem -->
+
+    <!--#region   استایل برای ComboBox-->
+
+    <Style TargetType="{x:Type ComboBox}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="MinWidth" Value="70" />
+        <Setter Property="MinHeight" Value="18" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="{DynamicResource comb_ToogleBtn_DefaultBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource comb_DefaultBorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource comb_DefaultForegroundBrush}" />
+        <Setter Property="Template" Value="{DynamicResource ComboBoxTemplate}" />
+    </Style>
+
+    <!--#endregion-->
+
+
+
+
+    <!--#region   استایل برای ComboBoxItem-->
+
+    <Style TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template" Value="{DynamicResource ComboBoxItemTemplate}" />
+    </Style>
+
+    <!--#endregion-->
+
+    <!--#endregion-->
+
+
+</ResourceDictionary>

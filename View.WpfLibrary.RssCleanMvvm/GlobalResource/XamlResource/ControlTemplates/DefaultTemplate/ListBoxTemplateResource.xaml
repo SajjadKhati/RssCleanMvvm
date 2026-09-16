@@ -1,0 +1,101 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <!--#region   تمپلیت برای ListBoxItem-->
+
+    <!--#region   تمپلیت برای ListBoxItem بدون نشانه ی تیک-->
+
+    <ControlTemplate x:Key="WithoutTicketListBoxItemTemplate" TargetType="{x:Type ListBoxItem}">
+        <Border
+            x:Name="listItemBorder"
+            Background="Transparent"
+            BorderBrush="Transparent"
+            BorderThickness="1"
+            SnapsToDevicePixels="True">
+            <Grid>
+                <ContentPresenter
+                    x:Name="listItemPresenter"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Grid>
+        </Border>
+
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="listItemBorder" Property="BorderBrush" Value="{DynamicResource combItem_MouseEnterColor}" />
+                <Setter TargetName="listItemPresenter" Property="TextBlock.Foreground" Value="{DynamicResource combItem_MouseEnterColor}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="listItemBorder" Property="BorderBrush" Value="{DynamicResource combItem_MouseEnterColor}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="listItemPresenter" Property="TextBlock.Foreground" Value="{DynamicResource listBoxItem_DisabledBrush}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!--#endregion-->
+
+
+
+
+    <!--#region   تمپلیت برای ListBoxItem-->
+
+    <ControlTemplate x:Key="ListBoxItemTemplate" TargetType="{x:Type ListBoxItem}">
+        <Border
+            x:Name="listItemBorder"
+            Background="Transparent"
+            BorderBrush="Transparent"
+            BorderThickness="1"
+            SnapsToDevicePixels="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Path
+                    x:Name="tickPath"
+                    Grid.Column="0"
+                    Data="{Binding Data, Source={StaticResource checkboxTickPath}}"
+                    Fill="{DynamicResource combItem_MouseEnterColor}"
+                    Stroke="{DynamicResource combItem_MouseEnterColor}"
+                    StrokeEndLineCap="Triangle"
+                    StrokeStartLineCap="Triangle"
+                    StrokeThickness="1"
+                    Visibility="Hidden" />
+                <ContentPresenter
+                    x:Name="listItemPresenter"
+                    Grid.Column="1"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Grid>
+        </Border>
+
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="tickPath" Property="Visibility" Value="Visible" />
+                <Setter TargetName="listItemPresenter" Property="TextBlock.Foreground" Value="{DynamicResource combItem_MouseEnterColor}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="listItemBorder" Property="BorderBrush" Value="{DynamicResource combItem_MouseEnterColor}" />
+            </Trigger>
+            <Trigger Property="FlowDirection" Value="RightToLeft">
+                <Setter TargetName="tickPath" Property="FlowDirection" Value="LeftToRight" />
+                <Setter TargetName="tickPath" Property="Margin" Value="0,0,5,0" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="tickPath" Property="Stroke" Value="{DynamicResource listBoxItem_DisabledBrush}" />
+                <Setter TargetName="listItemPresenter" Property="TextBlock.Foreground" Value="{DynamicResource listBoxItem_DisabledBrush}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!--#endregion-->
+
+    <!--#endregion-->
+
+
+
+</ResourceDictionary>

@@ -1,0 +1,51 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="StatusBarTexBlockStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="#D26900"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="17"/>
+        <!--
+                        نکته: NotifyOnTargetUpdated=True الزامی است.
+                        بدون آن، رویداد Binding.TargetUpdated منتشر نمی‌شود.
+                    -->
+        <Style.Triggers>
+            <!--
+                        EventTrigger: برخلاف DataTrigger که بر اساس «مقدار» کار می‌کند،
+                        این EventTrigger بر اساس «رویداد» کار می‌کند.
+                        هر بار که Binding مقدار Target را به‌روزرسانی کند،
+                        رویداد Binding.TargetUpdated منتشر می‌شود.
+                    -->
+            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                <EventTrigger.Actions>
+                    <!-- BeginStoryboard: شروع یک انیمیشن (Storyboard) -->
+                    <BeginStoryboard>
+                        <BeginStoryboard.Storyboard>
+                            <Storyboard>
+                                <!--
+                                    DoubleAnimationUsingKeyFrames: انیمیشن روی Opacity
+                                    با چند مقدار در زمان‌های مشخص.
+                                    Duration="0:0:11" یعنی کل انیمیشن ۱۱ ثانیه طول می‌کشد
+                                    (۰.۵ ثانیه Fade In + ۱۰ ثانیه نمایش + ۰.۵ ثانیه Fade Out).
+                                -->
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Duration="0:0:11">
+                                    <!-- در ثانیهٔ ۰، Opacity = ۰ → پیام کاملاً نامرئی شروع می‌شود. -->
+                                    <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                                    <!-- از ثانیهٔ ۰ تا ۰.۵، Opacity تدریجی از ۰ به ۱
+                                        → پیام به‌آرامی ظاهر می‌شود (Fade In). -->
+                                    <LinearDoubleKeyFrame KeyTime="0:0:0.5" Value="1"/>
+                                    <!-- در ثانیهٔ ۱۰.۵، Opacity همچنان ۱ → پیام ۱۰ ثانیه کاملاً واضح می‌ماند. -->
+                                    <LinearDoubleKeyFrame KeyTime="0:0:10.5" Value="1"/>
+                                    <!-- از ثانیهٔ ۱۰.۵ تا ۱۱، Opacity تدریجی از ۱ به ۰
+                                        → پیام به‌آرامی محو می‌شود (Fade Out). -->
+                                    <LinearDoubleKeyFrame KeyTime="0:0:11" Value="0"/>
+                                </DoubleAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </BeginStoryboard.Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger.Actions>
+            </EventTrigger>
+        </Style.Triggers>
+    </Style>
+    
+</ResourceDictionary>

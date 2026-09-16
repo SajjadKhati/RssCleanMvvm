@@ -48,10 +48,11 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
             get => this._imageFullFilePath;
             set
             {
-                if(this.SetProperty(ref this._imageFullFilePath, value) == true)
-                {
-
-                }
+                /// دقت کنید که برای این پروپرتی ، نباید شرط بذاریم که اگه مقدارش تغییر نکرد ، رویداد OnPropertyChanged اجرا بشه .
+                /// چون تصویر گاها ممکنه که همون مسیر فایل قبل باشه اما محتوای تصویر ، تغییر کنه (مثل زمانی که تصویر ، تبدیل به سیاه و سفید میشه) .
+                /// متد SetProperty را هم فراخوانی نکردیم چون این متد ، شرط تغییر مقدار را هم اجرا میکنه . بجایش از OnPropertyChanged استفاده کردیم .
+                this._imageFullFilePath = value;
+                this.OnPropertyChanged();
             }
         }
 

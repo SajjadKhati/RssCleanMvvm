@@ -1,0 +1,401 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <!--#region   Brushes-->
+
+
+    <SolidColorBrush x:Key="TextBoxOfComboBoxBackground" Color="#FF3C3C3C" />
+
+    <SolidColorBrush x:Key="TextBoxOfComboBoxBorderBrush" Color="#FFAAAAAA" />
+
+    <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#EEE" />
+
+    <SolidColorBrush x:Key="ScrollBar_Thumb_MouseOverBrush" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="comb_Toggle_Border_MouseOverBrush" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="scrollBar_LineButton_ClickedBrush" Color="#FF0096FF" />
+
+    <SolidColorBrush x:Key="comb_Toggle_Fill_MouseOverBrush" Color="#FF646464" />
+
+    <SolidColorBrush x:Key="combItem_MouseEnterColor" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="comb_Pop_Fill_Brush" Color="#FF212121" />
+
+    <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#FFC8C8C8" />
+
+    <SolidColorBrush x:Key="DisabledBorderBrush" Color="#AAA" />
+
+    <SolidColorBrush x:Key="scrollBackgroundBrush" Color="#FF464646" />
+
+    <SolidColorBrush x:Key="scrollForgroundBrush" Color="#FFB7B7B7" />
+
+    <SolidColorBrush x:Key="scrollBarButton_DisabledBrush" Color="Gray" />
+
+    <SolidColorBrush x:Key="comb_ToogleBtn_DefaultBackgroundBrush" Color="#FF232323" />
+
+    <SolidColorBrush x:Key="comb_DefaultBorderBrush" Color="White" />
+
+    <SolidColorBrush x:Key="comb_DefaultForegroundBrush" Color="White" />
+
+
+
+
+    <SolidColorBrush x:Key="tabPanel_DefaultBackgroundBrush" Color="#FF1E1E1E" />
+
+    <SolidColorBrush x:Key="tabPanel_DefaultBorderBrush" Color="#FF323232" />
+
+    <SolidColorBrush x:Key="tabPanel_DefaultKeyboardFocusedBrush" Color="#FF2D8CFF" />
+
+    <SolidColorBrush x:Key="tabItem_DefaultSelectedBorderBrush" Color="#FF2D8CEB" />
+
+    <SolidColorBrush x:Key="tabItem_DefaultForegroundBrush" Color="WhiteSmoke" />
+
+
+
+    <SolidColorBrush x:Key="ListBox_DefaultBackgroundBrush" Color="#FF232323" />
+
+    <SolidColorBrush x:Key="ListBox_DefaultBorderBrush" Color="#FFC3C3C3" />
+
+    <SolidColorBrush x:Key="ListBox_DefaultForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="listBoxItem_DisabledBrush" Color="#FF007DD8" />
+
+
+
+
+    <SolidColorBrush x:Key="checkBorderBackground_MouseOver" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="checkBox_DisabledBrush" Color="DarkGray" />
+
+    <SolidColorBrush x:Key="checkBox_DefaultBackgroundBrush" Color="Transparent" />
+
+    <SolidColorBrush x:Key="checkBox_DefaultBorderBrush" Color="White" />
+
+    <SolidColorBrush x:Key="checkBox_DefaultForegroundBrush" Color="White" />
+
+
+
+    <SolidColorBrush x:Key="numUpDown_spinnerArrow_MouseOverBrush" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="numUpDown_spinnerArrow_MouseClickBrush" Color="#FF0096FF" />
+
+    <SolidColorBrush x:Key="UpDown_DisableForegroundBrush" Color="#FFBEBEBE" />
+
+    <SolidColorBrush x:Key="UpDown_DisableBorderBrush" Color="#FF969696" />
+
+    <SolidColorBrush x:Key="numericUpDown_DefaultBackgroundBrush" Color="#FF232323" />
+
+    <SolidColorBrush x:Key="numericUpDown_DefaultBorderBrush" Color="White" />
+
+    <SolidColorBrush x:Key="numericUpDown_DefaultForegroundBrush" Color="White" />
+
+
+
+
+    <SolidColorBrush x:Key="TextBox_DefaultBackgroundBrush" Color="#FF232323" />
+
+    <SolidColorBrush x:Key="TextBox_DefaultBorderBrush" Color="#FFC3C3C3" />
+
+    <SolidColorBrush x:Key="TextBox_DefaultForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="TextBox_DefaultSelectionBrush" Color="#FF0082FF" />
+
+
+
+
+    <SolidColorBrush x:Key="PasswordBox_DefaultBackgroundBrush" Color="#FF232323" />
+
+    <SolidColorBrush x:Key="PasswordBox_DefaultBorderBrush" Color="#FFC3C3C3" />
+
+    <SolidColorBrush x:Key="PasswordBox_DefaultForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="PasswordBox_DefaultSelectionBrush" Color="#FF0082FF" />
+
+
+
+
+    <SolidColorBrush x:Key="ProgressBar_DefaultBackgroundBrush" Color="Transparent" />
+
+    <SolidColorBrush x:Key="ProgressBar_DefaultBorderBrush" Color="#FF0074FF" />
+
+    <SolidColorBrush x:Key="ProgressBar_DefaultForegroundBrush" Color="#FF00AAFF" />
+
+    <SolidColorBrush x:Key="ProgressBar_DisableBorderBrush" Color="#FF8C8C8C" />
+
+    <SolidColorBrush x:Key="ProgressBar_DisableForegroundBrush" Color="#FF9BAAB9" />
+
+
+
+
+    <SolidColorBrush x:Key="ShapeTextButton_DefaultContentForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="ShapeTextButton_DefaultMouseEnterContentBrush" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="ShapeTextButton_DefaultMouseDownContentBrush" Color="#FF0096FF" />
+
+    <SolidColorBrush x:Key="ShapeTextButton_ControlDisabledContentBrush" Color="#FF919191" />
+
+
+
+
+    <SolidColorBrush x:Key="GroupBox_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="GroupBox_BorderBrush" Color="#FF2D2D2D" />
+
+    <SolidColorBrush x:Key="GroupBox_DisabledBrush" Color="DarkGray" />
+
+
+
+
+    <SolidColorBrush x:Key="TextBlock_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="TextBlockDriveName_Foreground" Color="#FF32C332" />
+
+    <SolidColorBrush x:Key="TextBlock_DisabledBrush" Color="DarkGray" />
+
+
+
+
+    <SolidColorBrush x:Key="Label_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="Label_DisabledBrush" Color="DarkGray" />
+
+
+
+
+    <SolidColorBrush x:Key="Window_Background" Color="#FF1E1E1E" />
+
+    <SolidColorBrush x:Key="Window_Foreground" Color="White" />
+
+
+
+
+    <SolidColorBrush x:Key="TitleBarUserControl_Background" Color="Black" />
+
+
+
+
+    <SolidColorBrush x:Key="BodyScannerUserControl_Background" Color="Transparent" />
+
+
+
+
+    <SolidColorBrush x:Key="ToolTip_Background" Color="#FF0A0A0A" />
+
+    <SolidColorBrush x:Key="ToolTip_DefaultForeground" Color="White" />
+
+    <SolidColorBrush x:Key="ToolTip_DefaultBorderBrush" Color="White" />
+
+
+
+
+    <SolidColorBrush x:Key="ToolKitMessageBox_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="ToolKitMessageBox_WindowBackground" Color="#FF0A0A0A" />
+
+    <SolidColorBrush x:Key="ToolKitMessageBox_Background" Color="#FF2D2D2D" />
+
+    <SolidColorBrush x:Key="ToolKitMessageBox_WindowBorderBrush" Color="#FF0097FF" />
+
+
+
+
+    <SolidColorBrush x:Key="ToolKitsMessageBoxsButton_Background" Color="Transparent" />
+
+    <SolidColorBrush x:Key="ToolKitsMessageBoxsButton_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="ToolKitsMessageBoxsButton_BorderBrush" Color="White" />
+
+
+
+
+    <SolidColorBrush x:Key="TitleBarUserControlGeometryDrawing_Brush" Color="White" />
+
+
+
+
+    <Color x:Key="ColumnHeaderGripper_Linear1">#FFCCCCCC</Color>
+
+    <Color x:Key="ColumnHeaderGripper_Linear2">#FF444444</Color>
+
+
+
+
+    <SolidColorBrush x:Key="GridViewColumnHeader_DefaultForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="GridViewColumnHeader_DefaultBorderBrush" Color="#FFAAAAAA" />
+
+    <SolidColorBrush x:Key="GridViewColumnHeader_DefaultBackgroundBrush" Color="#FF1E1E1E" />
+
+    <SolidColorBrush x:Key="GridViewColumnHeader_MouseOverBackgroundBrush" Color="#FF646464" />
+
+    <SolidColorBrush x:Key="GridViewColumnHeader_MouseOverBorderBrush" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="GridViewColumnHeaderGripper_DefaultBackgroundBrush" Color="White" />
+
+
+
+
+    <SolidColorBrush x:Key="ListViewItem_DisabledBrush" Color="Gray" />
+
+    <SolidColorBrush x:Key="ListViewItem_MouseEnterBorderBrush" Color="DeepSkyBlue" />
+
+
+
+
+    <SolidColorBrush x:Key="ListView_DefaultBackgroundBrush" Color="#FF232323" />
+
+    <SolidColorBrush x:Key="ListView_DefaultBorderBrush" Color="#FFC3C3C3" />
+
+    <SolidColorBrush x:Key="ListView_DefaultForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="ListView_DisabledBrush" Color="#FFAAAAAA" />
+
+    <SolidColorBrush x:Key="ListView_FocusedBorderBrush" Color="DeepSkyBlue" />
+
+
+
+
+    <SolidColorBrush x:Key="MenuBackgroundBrush" Color="#FF0A0A0A"/>
+
+    <SolidColorBrush x:Key="MenuForegroundBrush" Color="White"/>
+
+    <SolidColorBrush x:Key="Menu_BorderBrush" Color="White"/>
+
+
+
+
+    <SolidColorBrush x:Key="ContextMenu_DefaultBackgroundBrush" Color="#FF0A0A0A" />
+
+    <SolidColorBrush x:Key="ContextMenu_And_MenuItem_DefaultForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="ContextMenu_DefaultBorderBrush" Color="White" />
+
+    <SolidColorBrush x:Key="MenuItem_Separator_DefaultBorderBrush" Color="#FFD2D2D2" />
+
+
+
+
+    <SolidColorBrush x:Key="MenuItem_DefaultBackgroundBrush" Color="Transparent" />
+
+    <SolidColorBrush x:Key="MenuItem_DefaultForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="MenuItem_MouseEnterBorderBrush" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="MenuItem_TickPathBrush" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="MenuItem_DisabledForegroundBrush" Color="#FF8C8C8C" />
+
+
+
+
+    <SolidColorBrush x:Key="MenuItem_TopLevel_MouseEnterBackgroundBrush" Color="#FF5A5A5A" />
+
+    <SolidColorBrush x:Key="MenuItem_TopLevelHeader_AllBrush" Color="#FF5A5A5A" />
+
+
+
+
+    <SolidColorBrush x:Key="DataGridColumnHeader_AscendDescendBackground" Color="#3300BFFF" />
+
+
+
+
+    <SolidColorBrush x:Key="DataGridRow_BackgroundBrush" Color="#FF232323" />
+
+    <Color x:Key="DataGridRow_SelectedRowBackgroundColor" A="255" B="70" G="70" R="70" />
+
+    <Color x:Key="DataGridRow_SelectedRowForegroundColor" A="255" B="255" G="255" R="255" />
+
+    <Color x:Key="DataGridRow_SelectedRowBackgroundInActiveColor" A="255" B="110" G="110" R="110" />
+
+    <Color x:Key="DataGridRow_SelectedRowForegroundInActiveColor" A="255" B="255" G="255" R="255" />
+
+
+
+    <SolidColorBrush x:Key="DataGrid_Background" Color="Transparent" />
+
+    <SolidColorBrush x:Key="DataGrid_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="DataGrid_HorizontalGridLinesBrush" Color="#FF464646" />
+
+    <SolidColorBrush x:Key="DataGrid_VerticalGridLinesBrush" Color="#FF464646" />
+
+    <SolidColorBrush x:Key="DataGrid_GroupContentBrush" Color="#FFEBEBEB" />
+
+
+
+
+    <SolidColorBrush x:Key="XceedDateTimePicker_Background" Color="Transparent" />
+
+    <SolidColorBrush x:Key="XceedDateTimePicker_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="XceedDateTimePicker_BorderBrush" Color="White" />
+
+
+
+
+    <SolidColorBrush x:Key="UserControl_Background" Color="Transparent" />
+
+
+
+
+    <SolidColorBrush x:Key="Expander_Background" Color="Transparent" />
+
+    <SolidColorBrush x:Key="Expander_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="Expander_BorderBrush" Color="#FF5A5A5A" />
+
+
+
+
+    <SolidColorBrush x:Key="BorderedButton_Background" Color="Transparent" />
+
+    <SolidColorBrush x:Key="BorderedButton_Foreground" Color="White" />
+
+    <SolidColorBrush x:Key="BorderedButton_BorderBrush" Color="White" />
+
+    <SolidColorBrush x:Key="BorderedButton_IsMouseOver" Color="DeepSkyBlue" />
+
+    <SolidColorBrush x:Key="BorderedButton_IsPressed" Color="#FF0096FF" />
+
+    <SolidColorBrush x:Key="BorderedButton_IsEnabled" Color="#FF919191" />
+
+
+
+
+    <SolidColorBrush x:Key="ShapedButton_Background" Color="Transparent"/>
+
+    <SolidColorBrush x:Key="ShapedButton_Foreground" Color="White"/>
+
+    <SolidColorBrush x:Key="ShapedButton_BorderBrush" Color="Transparent"/>
+
+    <SolidColorBrush x:Key="ShapedButton_FillBrush" Color="White"/>
+
+    <SolidColorBrush x:Key="ShapedButton_StrokeBrush" Color="Transparent"/>
+
+    <SolidColorBrush x:Key="ShapedButtonFillBrush_IsMouseOver" Color="DeepSkyBlue"/>
+
+    <SolidColorBrush x:Key="ShapedButtonStrokeBrush_IsMouseOver" Color="DeepSkyBlue"/>
+
+    <SolidColorBrush x:Key="ShapedButtonBorderBrush_IsMouseOver" Color="DeepSkyBlue"/>
+
+    <SolidColorBrush x:Key="ShapedButtonFillBrush_IsPressed" Color="#FF0078FF"/>
+
+    <SolidColorBrush x:Key="ShapedButtonStrokeBrush_IsPressed" Color="#FF0078FF"/>
+
+    <SolidColorBrush x:Key="ShapedButtonBorderBrush_IsPressed" Color="#FF0078FF"/>
+
+    <SolidColorBrush x:Key="ShapedButtonFillBrush_IsEnabled" Color="#FFD5D5E0"/>
+
+    <SolidColorBrush x:Key="ShapedButtonStrokeBrush_IsEnabled" Color="#FFD5D5E0"/>
+
+    <SolidColorBrush x:Key="ShapedButtonBorderBrush_IsEnabled" Color="#FFD5D5E0"/>
+
+
+    <!--#endregion-->
+
+
+</ResourceDictionary>

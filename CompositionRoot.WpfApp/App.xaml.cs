@@ -45,7 +45,28 @@ namespace CompositionRoot.WpfApp
         {
             base.OnStartup(e);
 
+            /// هندلر App_DispatcherUnhandledException ، زمانی اجرا میشه که خطای مدیریت نشده ای ، در نخ Dispatcher ، یعنی در نخ اصلی منتشر بشه .
+            /// این هندلر ، قابلیت جلوگیری از کرش برنامه را داره . یعنی بعد از اجرای این هندلر ، اگه e.Handled = true کنیم ، برنامه و پروسه ، کرش نمیشه .
             this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
+            /// هندلر AppDomain_UnhandledException ، زمانی اجرا میشه که در هر نخ ای در پروسه ی مان ، خطای مدیریت نشده ای اتفاق بیفته .
+            /// این هندلر ، قابلیت جلوگیری از کرش برنامه را نداره .یعنی بعد از اجرای این هندلر ، در اغلب اوقات ، برنامه اتوماتیک بسته میشه .
+            /// این هندلر ، در همون نخی که خطا اتفاق افتاد ، اجرا میشه .
+            /// بیشترین کاربردِ این هندلر ، معمولا لاگ کردنِ خطا هست .
+            /// 
+            /// دقت کنید که این هندلر ، تقریبا شاید هیچ وقت خطایی که در شی Task هست را منتشر نمیکنه .
+            /// چون شی Task را یا با await میذاریم که پس معمولا در نخ اصلی منتشر میشه و اگه try-cache اش نکرده باشیم ، در هندلرِ App_DispatcherUnhandledException گرفته میشه .
+            /// اگر await برای Task مون نذاشته باشیم ، رفتار شی Task این طور هست که خطایی که اتفاق افتاد را اصلا منتشر نمیکنه و در خودش ذخیره میکنه .
+            /// یعنی خودِ Task ، یه try-cache ئه داخلی داره و خطا را تا زمانی که کاربر await نکرد یا پروپرتی Result را فراخوانی نکرد یا اعضای دیگه را ، اصلا خطا را منتشر نمیکنه .
+            /// برای خطاهای Task هایی که منتشر یا دیده نشده ، باید از رویداد TaskScheduler_UnobservedTaskException استفاده کنیم .
+            /// 
+            /// دقت کنید اگر در هندلر App_DispatcherUnhandledException ، مقدار e.Handled = true را انجام بدیم ، دیگه خطایی که در نخ اصلی منتشر شد ، -
+            /// در همون هندلر (App_DispatcherUnhandledException) مدیریت میشه . پس اون خطا ، دیگه به هندلرِ AppDomain_UnhandledException نمیرسه -
+            /// چون قبلا در App_DispatcherUnhandledException ، مدیریت شد .
+            AppDomain.CurrentDomain.UnhandledException += this.AppDomain_UnhandledException;
+            /// رویداد و هندلر TaskScheduler_UnobservedTaskException ، زمانی اجرا میشه که خطایی در شی Task اتفاق افتاده باشه و مدیریت نشده باشه و -
+            /// چون خطاهای مدیریت نشده در Task ، منتشر و بنابراین دیده نمیشن ، در این رویداد ، اون هم فقط زمانی که GC داره اون شی Task را جمع میکنه ، فقط در اون زمان قابل مشاهده هست و-
+            /// این هندلر ، در اون زمان اجرا میشه (یعنی فورا بعد از اینکه خطای مدیریت نشده اتفاق افتاد ، منتشر نمیشه و احتمالا ، خیلی بعدا منتشر میشه) .
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             await this.StartAsync();
         }
 
@@ -65,12 +86,55 @@ namespace CompositionRoot.WpfApp
         }
 
 
+        /// هندلر App_DispatcherUnhandledException ، زمانی اجرا میشه که خطای مدیریت نشده ای ، در نخ Dispatcher ، یعنی در نخ اصلی منتشر بشه .
+        /// این هندلر ، قابلیت جلوگیری از کرش برنامه را داره . یعنی بعد از اجرای این هندلر ، اگه e.Handled = true کنیم ، برنامه و پروسه ، کرش نمیشه .
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            this.viewDisplayer.ShowErrorInMainThread(e.Exception);
+            this.viewDisplayer.ShowErrorInMainThread(e.Exception, "خطای مدیریت نشده که در نخ اصلی منتشر شد");
 
             // جلوی کرش شدن برنامه را توسط خطای مدیریت نشده ، میگیره :
             e.Handled = true;
+        }
+
+
+        /// هندلر AppDomain_UnhandledException ، زمانی اجرا میشه که در هر نخ ای در پروسه ی مان ، خطای مدیریت نشده ای اتفاق بیفته .
+        /// این هندلر ، قابلیت جلوگیری از کرش برنامه را نداره .یعنی بعد از اجرای این هندلر ، در اغلب اوقات ، برنامه اتوماتیک بسته میشه .
+        /// این هندلر ، در همون نخی که خطا اتفاق افتاد ، اجرا میشه .
+        /// بیشترین کاربردِ این هندلر ، معمولا لاگ کردنِ خطا هست .
+        /// 
+        /// دقت کنید که این هندلر ، تقریبا شاید هیچ وقت خطایی که در شی Task هست را منتشر نمیکنه .
+        /// چون شی Task را یا با await میذاریم که پس معمولا در نخ اصلی منتشر میشه و اگه try-cache اش نکرده باشیم ، در هندلرِ App_DispatcherUnhandledException گرفته میشه .
+        /// اگر await برای Task مون نذاشته باشیم ، رفتار شی Task این طور هست که خطایی که اتفاق افتاد را اصلا منتشر نمیکنه و در خودش ذخیره میکنه .
+        /// یعنی خودِ Task ، یه try-cache ئه داخلی داره و خطا را تا زمانی که کاربر await نکرد یا پروپرتی Result را فراخوانی نکرد یا اعضای دیگه را ، اصلا خطا را منتشر نمیکنه .
+        /// برای خطاهای Task هایی که منتشر یا دیده نشده ، باید از رویداد TaskScheduler_UnobservedTaskException استفاده کنیم .
+        /// 
+        /// دقت کنید اگر در هندلر App_DispatcherUnhandledException ، مقدار e.Handled = true را انجام بدیم ، دیگه خطایی که در نخ اصلی منتشر شد ، -
+        /// در همون هندلر (App_DispatcherUnhandledException) مدیریت میشه . پس اون خطا ، دیگه به هندلرِ AppDomain_UnhandledException نمیرسه -
+        /// چون قبلا در App_DispatcherUnhandledException ، مدیریت شد .
+        private void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if(e.IsTerminating == true)
+            {
+                /// لاگ کردن خطا .
+                /// بعد از اتامم اجرای این هندلر (AppDomain_UnhandledException) ، برنامه بسته و کرش میشه .
+            }
+        }
+
+
+        /// رویداد و هندلر TaskScheduler_UnobservedTaskException ، زمانی اجرا میشه که خطایی در شی Task اتفاق افتاده باشه و مدیریت نشده باشه و -
+        /// چون خطاهای مدیریت نشده در Task ، منتشر و بنابراین دیده نمیشن ، در این رویداد ، اون هم فقط زمانی که GC داره اون شی Task را جمع میکنه ، فقط در اون زمان قابل مشاهده هست و-
+        /// این هندلر ، در اون زمان اجرا میشه (یعنی فورا بعد از اینکه خطای مدیریت نشده اتفاق افتاد ، منتشر نمیشه و احتمالا ، خیلی بعدا منتشر میشه) .
+        private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+        {
+            if (e.Observed == true)
+                return;
+
+            foreach (Exception exception in e.Exception.InnerExceptions)
+            {
+                this.viewDisplayer.ShowErrorInMainThread(exception, "خطای مدیریت نشده ای که قبلا اتفاق افتاد");
+            }
+            /// این مجموعه ی خطا (این باری که این هندلر اجرا شد) ، خطاهایش دیده شده و برای دفعه ی بعدی ، بخاطر این خطا ، این هندلر (TaskScheduler_UnobservedTaskException) را اجرا نکن .
+            e.SetObserved(); 
         }
 
 
@@ -91,11 +155,11 @@ namespace CompositionRoot.WpfApp
                 ViewModelCompositionRoot viewModelCompositionRoot = this.GetViewModelCompositionRoot(connectionString, this.appPaths, singletonProvider);
                 MainWindowViewModel mainWindowViewModel = viewModelCompositionRoot.CreateMainWindowViewModel();
                 ///
-                this.viewDisplayer.ShowMainWindow(mainWindowViewModel);
+                this.viewDisplayer.ShowMainWindowAndSetupApp(mainWindowViewModel, App.Current);
             }
             catch (Exception exception)
             {
-                this.viewDisplayer.ShowErrorInMainThread(exception);
+                this.viewDisplayer.ShowErrorInMainThread(exception, "خطا زمان ساخت برنامه");
             }
             finally
             {

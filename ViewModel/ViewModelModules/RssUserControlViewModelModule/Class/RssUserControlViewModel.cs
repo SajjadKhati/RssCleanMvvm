@@ -128,14 +128,7 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 
                 ICollection<RssItemViewModel> rssItemViewModels = this.ConvertToRssItemViewModels(rssItemDtosResult.CreatedRssItemDtos);
                 this.InsertToBeginningIndexOfRssItemViewModels(rssItemViewModels);
-
-                if(rssItemDtosResult.CreationErrors != null && rssItemDtosResult.CreationErrors.Count > 0)
-                {
-                    Exception rssItemException = new Exception(
-                        $"به دلایل مختلف از جمله تکراری بودن خبر که از قبل در حافظه یا دیتابیس وجود داشته ، یا سازگار نبودن تصویرِ خبر ، یا هر دلایل دیگری ، دریافت " +
-                        $"{rssItemDtosResult.CreationErrors.Count} خبر ، انجام نشد . دلیل خطای اول :\n\n{rssItemDtosResult.CreationErrors[0].Message}");
-                    WeakReferenceMessenger.Default.Send(rssItemException, SharedMessengerKey.Exception_ErrorKey);
-                }
+                this.SendMessages(rssItemDtosResult);
             }
             catch (Exception exception)
             {
@@ -182,6 +175,31 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 
             int startingIndex = 0;
             this.RssItemViewModels.InsertRangeWithSingleNotification(rssItemViewModels, startingIndex);
+        }
+
+
+        private void SendMessages(RssItemDtosResult rssItemDtosResult)
+        {
+            if (rssItemDtosResult == null)
+                return;
+            string message = "";
+            if (rssItemDtosResult.CreatedRssItemDtos == null || rssItemDtosResult.CreatedRssItemDtos.Count < 1)
+            {
+                message = "هیچ خبر جدیدی وجود ندارد .";
+            }
+            else
+            {
+                message = $"تعداد  {rssItemDtosResult.CreatedRssItemDtos.Count}  خبر جدید دریافت شد .";
+            }
+            WeakReferenceMessenger.Default.Send(message, SharedMessengerKey.String_GeneralMessageKey);
+
+            if (rssItemDtosResult.CreationErrors != null && rssItemDtosResult.CreationErrors.Count > 0)
+            {
+                Exception rssItemException = new Exception(
+                    $"به دلایل مختلف از جمله تکراری بودن خبر که از قبل در حافظه یا دیتابیس وجود داشته ، یا سازگار نبودن تصویرِ خبر ، یا هر دلایل دیگری ، دریافت " +
+                    $"{rssItemDtosResult.CreationErrors.Count} خبر ، انجام نشد . دلیل خطای اول :\n\n{rssItemDtosResult.CreationErrors[0].Message}");
+                WeakReferenceMessenger.Default.Send(rssItemException, SharedMessengerKey.Exception_ErrorKey);
+            }
         }
 
     }

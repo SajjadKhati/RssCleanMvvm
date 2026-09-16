@@ -2,7 +2,17 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:CompositionRoot.WpfApp">
+
     <Application.Resources>
-         
+         <ResourceDictionary>
+             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/BindingConverters/BindingConverterResource.xaml"/>
+                <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/CommonResource/DefaultCommonResource.xaml"/>
+                <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/Theme/DarkThemeResource.xaml"/>
+                <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/ControlTemplates/DefaultTemplate/DefaultTemplateMergedResources.xaml"/>
+                <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/Styles/StyleMergedResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+         </ResourceDictionary>
     </Application.Resources>
+
 </Application>

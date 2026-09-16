@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:bindingConverters="clr-namespace:View.WpfLibrary.RssCleanMvvm.GlobalResource.XamlResource.BindingConverters.Class">
+
+
+    <!--#region  Binding Converters-->
+
+    <bindingConverters:ToolTipsRecBoundMultiValueConverter x:Key="ToolTipsRecBound_MultiValueConverter" />
+
+    <bindingConverters:ToolTipsTrianglePointValueConverter x:Key="ToolTipsTrianglePoint_ValueConverter" />
+
+    <bindingConverters:ToolTipsPlacementValueConverter x:Key="ToolTipsPlacement_ValueConverter" />
+
+    <bindingConverters:NullableToBoolValueConverter x:Key="NullableToBoolValueConverterKey"/>
+
+    <!--#endregion-->
+
+
+</ResourceDictionary>

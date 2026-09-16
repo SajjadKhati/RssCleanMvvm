@@ -24,11 +24,11 @@ namespace CompositionRoot.WpfApp.ViewModules
         ///////////////////////////////////////////////////////////
 
 
-        public void ShowErrorInMainThread(Exception exception)
+        public void ShowErrorInMainThread(Exception exception, string messageCaption)
         {
             this.mainThreadDispatcher.Invoke(() =>
             {
-                MessageBox.Show(exception.ToString());
+                MessageBox.Show(exception.ToString(), messageCaption);
             });
         }
 
@@ -41,10 +41,11 @@ namespace CompositionRoot.WpfApp.ViewModules
         }
 
 
-        public void ShowMainWindow(MainWindowViewModel mainWindowViewModel)
+        public void ShowMainWindowAndSetupApp(MainWindowViewModel mainWindowViewModel, System.Windows.Application currentApp)
         {
             MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = mainWindowViewModel;
+            currentApp.MainWindow = mainWindow;
             mainWindow.Show();
         }
 

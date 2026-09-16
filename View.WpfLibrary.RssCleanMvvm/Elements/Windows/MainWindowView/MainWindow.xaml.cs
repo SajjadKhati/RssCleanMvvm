@@ -23,11 +23,11 @@ namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
 
         private void InitializeView()
         {
-            this.RegisterErrorMessageHandler();
+            this.RegisterMessageHandler();
         }
 
 
-        private void RegisterErrorMessageHandler()
+        private void RegisterMessageHandler()
         {
             WeakReferenceMessenger.Default.Register<Exception, string>(this, SharedMessengerKey.Exception_ErrorKey, (_, exception) =>
             {
