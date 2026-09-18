@@ -18,6 +18,8 @@
 
     <system:Double x:Key="DefaultCommonSmallFontSize">18</system:Double>
 
+    <system:Double x:Key="DefaultCommonVerySmallFontSize">15</system:Double>
+
     <FontStyle x:Key="DefaultCommonFontStyle">Normal</FontStyle>
 
     <FontWeight x:Key="DefaultCommonFontWeight">Normal</FontWeight>

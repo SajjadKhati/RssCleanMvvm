@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:filePathToBitmapImageConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.FilePathToBitmapImageConverterModule"
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+
+
+    <system:Double x:Key="ImageWidthKey">192</system:Double>
+
+    <system:Double x:Key="ImageHeightKey">108</system:Double>
+
+    <filePathToBitmapImageConverterModule:FilePathToBitmapImageConverter x:Key="FilePathToBitmapImageConverterKey"/>
+
+</ResourceDictionary>

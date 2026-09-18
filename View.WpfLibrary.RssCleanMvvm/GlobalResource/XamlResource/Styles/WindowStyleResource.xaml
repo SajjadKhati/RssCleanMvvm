@@ -7,7 +7,7 @@
     <Style TargetType="{x:Type Window}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultCommonFontFamily}" />
-        <Setter Property="FontSize" Value="{DynamicResource DefaultCommonFontSize}" />
+        <Setter Property="FontSize" Value="{DynamicResource DefaultCommonVerySmallFontSize}" />
         <Setter Property="FontStyle" Value="{DynamicResource DefaultCommonFontStyle}"/>
         <Setter Property="FontWeight" Value="{DynamicResource DefaultCommonFontWeight}"/>
         <Setter Property="FontStretch" Value="{DynamicResource DefaultCommonFontStretch}"/>

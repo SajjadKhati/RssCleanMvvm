@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
-namespace View.WpfLibrary.RssCleanMvvm.BindingConverterModules.FilePathToBitmapImageConverterModule
+namespace View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.FilePathToBitmapImageConverterModule
 {
     public class FilePathToBitmapImageConverter : IValueConverter
     {

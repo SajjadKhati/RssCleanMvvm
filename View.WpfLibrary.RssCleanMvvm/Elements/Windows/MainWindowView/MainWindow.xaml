@@ -10,8 +10,7 @@
         xmlns:appearanceSwitcherDataModel="clr-namespace:ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;assembly=ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance d:Type=viewModelModules:MainWindowViewModel, IsDesignTimeCreatable=False}"
-        Title="خبر خوان" Width="1280" Height="720" MinWidth="600" MinHeight="400" WindowStartupLocation="CenterScreen" FontFamily="Calibri" FontSize="15"
-        Style="{StaticResource {x:Type Window}}">
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -47,9 +46,17 @@
 
             <MenuItem Header="تنظیمات">
                 <MenuItem Header="حالت رنگی">
+                    <!-- x:Static برای دسترسی به اعضای static یک کلاس استفاده میشود.
+                        اعضای enum در C# همیشه static هستند (مثلاً ThemeName.Dark).
+                        بنابراین برای فرستادن مقدار enum به عنوان CommandParameter،
+                        از x:Static استفاده میکنیم:
+                            CommandParameter="{x:Static local:ThemeName.Dark}"
+
+                        نکته: خود enum یک نوع است، ولی هر عضو آن یک مقدار ثابت (static) است.
+                        پس x:Static اینجا یعنی "مقدار ثابت Dark از نوع ThemeName". -->
                     <MenuItem Header="تاریک" ToolTip="تم تاریک" 
-                          Command="{Binding Path=ChangeThemeCommand}"
-                          CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Dark}"/>
+                              Command="{Binding Path=ChangeThemeCommand}"
+                              CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Dark}"/>
                     <MenuItem Header="روشن" ToolTip="تم روشن"
                           Command="{Binding Path=ChangeThemeCommand}"
                           CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Light}"/>
