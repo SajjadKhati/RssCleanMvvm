@@ -7,6 +7,7 @@
         xmlns:interaction="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:rssusercontrolview="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView"
         xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.MainWindowViewModelModule.Class;assembly=ViewModel"
+        xmlns:appearanceSwitcherDataModel="clr-namespace:ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;assembly=ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance d:Type=viewModelModules:MainWindowViewModel, IsDesignTimeCreatable=False}"
         Title="خبر خوان" Width="1280" Height="720" MinWidth="600" MinHeight="400" WindowStartupLocation="CenterScreen" FontFamily="Calibri" FontSize="15"
@@ -44,8 +45,15 @@
                 <MenuItem Header="ذخیره همه" ToolTip="ذخیره همه ی آیتم های ذخیره نشده"/>
             </MenuItem>
 
-            <MenuItem Header="راهنما">
-                <MenuItem Header="درباره" ToolTip="درباره ی برنامه"/>
+            <MenuItem Header="تنظیمات">
+                <MenuItem Header="حالت رنگی">
+                    <MenuItem Header="تاریک" ToolTip="تم تاریک" 
+                          Command="{Binding Path=ChangeThemeCommand}"
+                          CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Dark}"/>
+                    <MenuItem Header="روشن" ToolTip="تم روشن"
+                          Command="{Binding Path=ChangeThemeCommand}"
+                          CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Light}"/>
+                </MenuItem>
             </MenuItem>
         </Menu>
 

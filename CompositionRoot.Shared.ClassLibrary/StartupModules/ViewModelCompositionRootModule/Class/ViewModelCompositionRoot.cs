@@ -2,7 +2,6 @@
 using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemDtoQuery.Factory.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Factory.Interface;
-using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.DataModels;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Factory.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.RssItemDtoFactory.Interface;
 using Application.InfrastructureContracts.DataAccessProject.UnitOfWorkFactory.Interfaces;
@@ -38,12 +37,10 @@ using Application.UseCases.DownLoadRssItemsUseCaseModule.Class;
 using Application.UseCases.DownLoadRssItemsUseCaseModule.Interface;
 using Application.UseCases.LoadRssSiteUseCaseModule.Class;
 using Application.UseCases.LoadRssSiteUseCaseModule.Interface;
-using CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactoryService.Class;
 using CompositionRoot.Shared.ClassLibrary.StartupModules.AppPathsModule.Class;
 using Domain.ApplicationServiceContracts.RssItemAllSourcesCoordinator.Interface;
 using Domain.DomainService.RssItemDomainService.Class;
 using Domain.DomainService.RssItemDomainService.Interface;
-using Infra.DataAccess.AppQueryService.RssSiteQueryService.Class.Factory;
 using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Class;
@@ -61,7 +58,8 @@ using Infra.SharedService.StringHasherService.Class;
 using Infra.XmlService.XamlParserService.Class;
 using Shared.ImageServices.ImageUtilityService.Class;
 using Shared.ImageServices.ImageUtilityService.Interface;
-using ViewModel.CompositionRootContracts.RssItemViewModelFactory.Interface;
+using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
+using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
@@ -100,6 +98,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private readonly IImageChannelCountNormalizerFactory<byte> imageChannelCountNormalizerFactory;
 
         private readonly IImageChannelSequenceNormalizerFactory<byte> imageChannelSequenceNormalizerFactory;
+
+        private IAppearanceSwitcher appearanceSwitcher;
         /// 
         private readonly IRssItemExistenceChecker rssItemExistenceChecker;
 
@@ -128,7 +128,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             IHttpRequestFactory httpRequestFactory,
             IRssItemViewModelFactory rssItemViewModelFactory,
             IImageChannelCountNormalizerFactory<byte> imageChannelCountNormalizerFactory,
-            IImageChannelSequenceNormalizerFactory<byte> imageChannelSequenceNormalizerFactory)
+            IImageChannelSequenceNormalizerFactory<byte> imageChannelSequenceNormalizerFactory,
+            IAppearanceSwitcher appearanceSwitcher)
         {
             this.connectionString = connectionString;
             this.appPaths = appPaths;
@@ -145,6 +146,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             this.rssItemViewModelFactory = rssItemViewModelFactory;
             this.imageChannelCountNormalizerFactory = imageChannelCountNormalizerFactory;
             this.imageChannelSequenceNormalizerFactory = imageChannelSequenceNormalizerFactory;
+            this.appearanceSwitcher = appearanceSwitcher;
             this.rssItemExistenceChecker = this.CreateRssItemExistenceChecker();
             this.rssItemAllSourcesCoordinator = (IRssItemAllSourcesCoordinator)this.rssItemExistenceChecker;
             this.rssItemDtoFactory = this.CreateRssItemDtoFactory();
@@ -158,7 +160,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         public MainWindowViewModel CreateMainWindowViewModel()
         {
             RssUserControlViewModel rssUserControlViewModel = this.CreateRssUserControlViewModel();
-            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(rssUserControlViewModel);
+            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(rssUserControlViewModel, this.appearanceSwitcher);
             return mainWindowViewModel;
         }
 

@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.Messaging;
+using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;
+using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
 using ViewModel.DataModels;
 using ViewModel.Services.SharedMessengerKeyService.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
@@ -14,7 +16,15 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
 {
     public class MainWindowViewModel : ObservableObject
     {
+
+        private IAppearanceSwitcher appearanceSwitcher;
+
+
+        /////////////////////////////////////////////////////////////////////////////
+
+
         private string _statusMessage;
+
 
         /////////////////////////////////////////////////////////////////////////////
 
@@ -37,14 +47,18 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
 
         public IAsyncRelayCommand ExitCommand { get; }
 
+        public IAsyncRelayCommand ChangeThemeCommand { get; }
+
 
         /////////////////////////////////////////////////////////////////////////////
 
 
-        public MainWindowViewModel(RssUserControlViewModel rssUserControlViewModel)
+        public MainWindowViewModel(RssUserControlViewModel rssUserControlViewModel, IAppearanceSwitcher appearanceSwitcher)
         {
             this.RssUserControlViewModel = rssUserControlViewModel;
+            this.appearanceSwitcher = appearanceSwitcher;
             this.ExitCommand = new AsyncRelayCommand(this.Exit);
+            this.ChangeThemeCommand = new AsyncRelayCommand<ThemeName>(this.ChangeTheme, this.CanChangeTheme);
             this.RegisterMessageHandler();
         }
 
@@ -73,6 +87,19 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
         }
 
 
+        private bool CanChangeTheme(ThemeName themeName)
+        {
+            return this.appearanceSwitcher.GetCurrentTheme() != themeName;
+        }
+
+
+        private async Task ChangeTheme(ThemeName themeName)
+        {
+            this.appearanceSwitcher.ChangeTheme(themeName);
+            /// پس از تغییر تم، وضعیت CanExecute کامند را بهروزرسانی میکنیم
+            /// تا المنت و کنترل هایی که به این Command مون Binding هستند ، وضعیت فعال یا غیر فعال بودن شون را به روزرسانی کنند ..
+            this.ChangeThemeCommand.NotifyCanExecuteChanged();
+        }
 
 
         /////////////////////////////////////////////////////////////////////////////

@@ -1,12 +1,15 @@
-﻿using CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModule.Class;
+﻿using CompositionRoot.Shared.ClassLibrary.StartupModules.AppFinalizerModule.Class;
+using CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModule.Class;
+using CompositionRoot.Shared.ClassLibrary.StartupModules.AppPathsModule.Class;
 using CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderModule.Class;
 using CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositionRootModule.Class;
 using CompositionRoot.WpfApp.ViewModules;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
-using CompositionRoot.Shared.ClassLibrary.StartupModules.AppFinalizerModule.Class;
-using CompositionRoot.Shared.ClassLibrary.StartupModules.AppPathsModule.Class;
+using View.WpfLibrary.RssCleanMvvm.UiLogicModules.AppearanceSwitcherModule.Class;
+using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;
+using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 
 
@@ -152,7 +155,9 @@ namespace CompositionRoot.WpfApp
                 ///
                 this.appFinalizer = new AppFinalizer(singletonProvider.RssItemDraftCacheManager);
                 ///
-                ViewModelCompositionRoot viewModelCompositionRoot = this.GetViewModelCompositionRoot(connectionString, this.appPaths, singletonProvider);
+                IAppearanceSwitcher appearanceSwitcher = this.CreateAppearanceSwitcher();
+                ViewModelCompositionRoot viewModelCompositionRoot = this.GetViewModelCompositionRoot(
+                    connectionString, this.appPaths, singletonProvider, appearanceSwitcher);
                 MainWindowViewModel mainWindowViewModel = viewModelCompositionRoot.CreateMainWindowViewModel();
                 ///
                 this.viewDisplayer.ShowMainWindowAndSetupApp(mainWindowViewModel, App.Current);
@@ -181,7 +186,8 @@ namespace CompositionRoot.WpfApp
         }
 
 
-        private ViewModelCompositionRoot GetViewModelCompositionRoot(string connectionString, AppPaths appPaths, SingletonProvider singletonProvider)
+        private ViewModelCompositionRoot GetViewModelCompositionRoot(string connectionString, AppPaths appPaths, 
+            SingletonProvider singletonProvider, IAppearanceSwitcher appearanceSwitcher)
         {
             return new ViewModelCompositionRoot(
                 connectionString, 
@@ -198,7 +204,21 @@ namespace CompositionRoot.WpfApp
                 singletonProvider.HttpRequestFactory,
                 singletonProvider.RssItemViewModelFactory,
                 singletonProvider.ImageChannelCountNormalizerFactory,
-                singletonProvider.ImageChannelSequenceNormalizerFactory);
+                singletonProvider.ImageChannelSequenceNormalizerFactory,
+                appearanceSwitcher);
+        }
+
+
+        private IAppearanceSwitcher CreateAppearanceSwitcher()
+        {
+            SwitchableResourceInfo themeResourceInfo = new SwitchableResourceInfo
+            {
+                BasePath = "/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/Theme/",
+                FileSuffix = "ThemeResource.xaml",
+                Index = 2
+            };
+            ThemeName defaultThemeName = ThemeName.Dark;
+            return new AppearanceSwitcher(App.Current.Resources.MergedDictionaries, themeResourceInfo, defaultThemeName);
         }
 
     }

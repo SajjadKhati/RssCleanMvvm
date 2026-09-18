@@ -58,7 +58,7 @@ using Infra.SharedService.ImageFileExtensionResolverService.Class;
 using Infra.SharedService.MapperService.ImageSettingsMapperService.Class;
 using Infra.SharedService.StringHasherService.Class;
 using Shared.ImageServices.ImageUtilityService.Class;
-using ViewModel.CompositionRootContracts.RssItemViewModelFactory.Interface;
+using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
 
 namespace CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderModule.Class
 {

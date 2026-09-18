@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BindingConverterModules\FilePathToBitmapImageConverterModule\Class\" />
+    <Folder Include="Elements\UserControls\RssUserControlView\BindingConverterModules\FilePathToBitmapImageConverterModule\Class\" />
   </ItemGroup>
 
 </Project>

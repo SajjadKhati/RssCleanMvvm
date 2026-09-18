@@ -1,5 +1,5 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
-using ViewModel.CompositionRootContracts.RssItemViewModelFactory.Interface;
+using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
 using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
 
 namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactoryService.Class

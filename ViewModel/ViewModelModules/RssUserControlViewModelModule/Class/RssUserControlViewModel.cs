@@ -7,7 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Shared.CollectionService.Class;
 using System.Collections.Generic;
-using ViewModel.CompositionRootContracts.RssItemViewModelFactory.Interface;
+using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
 using ViewModel.DataModels;
 using ViewModel.Services.RangeObservableCollectionService.Class;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;

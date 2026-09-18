@@ -1,7 +1,7 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
 using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
 
-namespace ViewModel.CompositionRootContracts.RssItemViewModelFactory.Interface
+namespace ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface
 {
     /// <summary>
     /// پیاده سازیِ این رابط ، در لایه ی Composition Root انجام میشه .
