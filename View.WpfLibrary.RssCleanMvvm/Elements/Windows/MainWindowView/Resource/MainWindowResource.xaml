@@ -2,6 +2,60 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:mainWindowView="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView">
 
+
+    <DrawingImage x:Key="RssIconKey">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- آینه کردن افقی حول محور عمودی x=12 -->
+                <DrawingGroup.Transform>
+                    <ScaleTransform ScaleX="-1" CenterX="12"/>
+                </DrawingGroup.Transform>
+
+                <!-- نقطهٔ پایین-چپ (بعد از آینه، پایین-راست می‌شود) -->
+                <GeometryDrawing Brush="Orange">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="4.5,20.5" RadiusX="2.5" RadiusY="2.5"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+                <!-- کمان اول -->
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="Orange" Thickness="3" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M 2,12 A 10,10 0 0 1 12,22"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+                <!-- کمان دوم -->
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="Orange" Thickness="3" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M 2,5 A 17,17 0 0 1 19,22"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+
+
+
+    <Style TargetType="{x:Type mainWindowView:MainWindow}" BasedOn="{StaticResource {x:Type Window}}">
+        <Setter Property="Icon" Value="{StaticResource RssIconKey}"/>
+        <Setter Property="Width" Value="1280"/>
+        <Setter Property="Height" Value="720"/>
+        <Setter Property="MinWidth" Value="600"/>
+        <Setter Property="MinHeight" Value="400"/>
+        <Setter Property="Title" Value="خبرخوان"/>
+    </Style>
+
+
+
+
     <Style x:Key="StatusBarTexBlockStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="#D26900"/>
         <Setter Property="FontWeight" Value="Bold"/>
@@ -51,53 +105,5 @@
 
 
 
-
-    <DrawingImage x:Key="RssIconKey">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <!-- آینه کردن افقی حول محور عمودی x=12 -->
-                <DrawingGroup.Transform>
-                    <ScaleTransform ScaleX="-1" CenterX="12"/>
-                </DrawingGroup.Transform>
-
-                <!-- نقطهٔ پایین-چپ (بعد از آینه، پایین-راست می‌شود) -->
-                <GeometryDrawing Brush="Orange">
-                    <GeometryDrawing.Geometry>
-                        <EllipseGeometry Center="4.5,20.5" RadiusX="2.5" RadiusY="2.5"/>
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-
-                <!-- کمان اول -->
-                <GeometryDrawing>
-                    <GeometryDrawing.Pen>
-                        <Pen Brush="Orange" Thickness="3" StartLineCap="Round" EndLineCap="Round"/>
-                    </GeometryDrawing.Pen>
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M 2,12 A 10,10 0 0 1 12,22"/>
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-
-                <!-- کمان دوم -->
-                <GeometryDrawing>
-                    <GeometryDrawing.Pen>
-                        <Pen Brush="Orange" Thickness="3" StartLineCap="Round" EndLineCap="Round"/>
-                    </GeometryDrawing.Pen>
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M 2,5 A 17,17 0 0 1 19,22"/>
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-
-
-    <Style TargetType="{x:Type mainWindowView:MainWindow}" BasedOn="{StaticResource {x:Type Window}}">
-        <Setter Property="Icon" Value="{StaticResource RssIconKey}"/>
-        <Setter Property="Width" Value="1280"/>
-        <Setter Property="Height" Value="720"/>
-        <Setter Property="MinWidth" Value="600"/>
-        <Setter Property="MinHeight" Value="400"/>
-        <Setter Property="Title" Value="خبرخوان"/>
-    </Style>
 
 </ResourceDictionary>

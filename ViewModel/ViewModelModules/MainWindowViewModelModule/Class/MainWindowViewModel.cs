@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;
 using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
-using ViewModel.DataModels;
 using ViewModel.Services.SharedMessengerKeyService.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
 

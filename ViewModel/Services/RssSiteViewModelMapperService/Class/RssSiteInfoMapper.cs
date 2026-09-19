@@ -1,15 +1,33 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
-using ViewModel.DataModels;
+using ViewModel.Contracts.CompositionRootContracts.RssFeedViewModelFactory.Interface;
+using ViewModel.ViewModelModules.RssFeedViewModelModule.Class;
+using ViewModel.ViewModelModules.RssSiteViewModelModule.Class;
 
 namespace ViewModel.Services.RssSiteViewModelMapperService.Class
 {
     public class RssSiteInfoMapper
     {
 
-        public RssSiteInfo ToRssSiteInfo(RssSiteDto rssSiteDto)
+        private IRssFeedViewModelFactory rssFeedViewModelFactory;
+
+
+        /////////////////////////////////////////////////////////////////////////////
+
+
+        public RssSiteInfoMapper(IRssFeedViewModelFactory rssFeedViewModelFactory)
         {
-            IList<RssFeedInfo> rssFeedInfos = rssSiteDto.RssFeedDtos?.Select(rssFeedDto => new RssFeedInfo(rssFeedDto.Id, rssFeedDto.Title))?.ToList();
-            return new RssSiteInfo(rssSiteDto.Id, rssFeedInfos, rssSiteDto.SiteName);
+            this.rssFeedViewModelFactory = rssFeedViewModelFactory;
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////////
+
+
+        public RssSiteViewModel ToRssSiteViewModel(RssSiteDto rssSiteDto)
+        {
+            IList<RssFeedViewModel> rssFeedViewModels = rssSiteDto.RssFeedDtos?.Select(
+                rssFeedDto => this.rssFeedViewModelFactory.Create(rssFeedDto.Id, rssFeedDto.Title))?.ToList();
+            return new RssSiteViewModel(rssSiteDto.Id, rssFeedViewModels, rssSiteDto.SiteName);
         }
 
     }

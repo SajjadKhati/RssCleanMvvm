@@ -8,22 +8,25 @@ using CommunityToolkit.Mvvm.Messaging;
 using Shared.CollectionService.Class;
 using System.Collections.Generic;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
-using ViewModel.DataModels;
 using ViewModel.Services.RangeObservableCollectionService.Class;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;
 using ViewModel.Services.SharedMessengerKeyService.Class;
+using ViewModel.ViewModelModules.RssFeedViewModelModule.Class;
 using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
+using ViewModel.ViewModelModules.RssSiteViewModelModule.Class;
 
 namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 {
     public class RssUserControlViewModel : ObservableObject
     {
 
-        private IRssItemViewModelFactory rssItemViewModelFactory;
+        private RssSiteViewModel _selectedRssSiteViewModel;
+
+
+        /////////////////////////////////////////////////////////////////////////////
+
 
         private ILoadRssSiteUseCase loadRssSiteUseCase;
-
-        private IDownLoadRssItemsUseCase downLoadRssItemsUseCase;
 
         private RssSiteInfoMapper rssSiteInfoMapper;
 
@@ -31,25 +34,15 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
         /////////////////////////////////////////////////////////////////////////////
 
 
-        private RssFeedInfo _selectedRssFeedInfo;
+        public RangeObservableCollection<RssSiteViewModel> RssSiteViewModels { get; }
 
 
-        /////////////////////////////////////////////////////////////////////////////
-
-
-        public RangeObservableCollection<RssSiteInfo> RssSiteInfos { get; }
-
-        public RangeObservableCollection<RssItemViewModel> RssItemViewModels { get; }
-
-        public RssFeedInfo SelectedRssFeedInfo
+        public RssSiteViewModel SelectedRssSiteViewModel
         {
-            get => this._selectedRssFeedInfo;
+            get => this._selectedRssSiteViewModel;
             set
             {
-                if(this.SetProperty(ref  this._selectedRssFeedInfo, value) == true)
-                    /// اعلام میشه که وضعیت CanExecute در کامندِ DownLoadRssItemsCommand تغییر کرد تا با اجرای متد CanExecute در این کامند از سوی کنترلِ ButtonBase ئه بایند شده ، 
-                    /// در صورتی که مقدار true برگردانده بشه ، وضعیت فعال شدنِ کنترلِ ButtonBase ، تغییر کنه .
-                    this.DownLoadRssItemsCommand.NotifyCanExecuteChanged();
+                this.SetProperty(ref this._selectedRssSiteViewModel, value);
             }
         }
 
@@ -61,25 +54,18 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 
         public IAsyncRelayCommand LoadRssItemsCommand { get; }
 
-        public IAsyncRelayCommand DownLoadRssItemsCommand { get; }
-
 
         /////////////////////////////////////////////////////////////////////////////
 
 
-        public RssUserControlViewModel(IRssItemViewModelFactory rssItemViewModelFactory, ILoadRssSiteUseCase loadRssSiteUseCase,
-            IDownLoadRssItemsUseCase downLoadRssItemsUseCase, RssSiteInfoMapper rssSiteInfoMapper)
+        public RssUserControlViewModel(ILoadRssSiteUseCase loadRssSiteUseCase, RssSiteInfoMapper rssSiteInfoMapper)
         {
-            this.rssItemViewModelFactory = rssItemViewModelFactory;
             this.loadRssSiteUseCase = loadRssSiteUseCase;
-            this.downLoadRssItemsUseCase = downLoadRssItemsUseCase;
             this.rssSiteInfoMapper = rssSiteInfoMapper;
 
-            this.RssSiteInfos = new RangeObservableCollection<RssSiteInfo>();
-            this.RssItemViewModels = new RangeObservableCollection<RssItemViewModel>();
+            this.RssSiteViewModels = new RangeObservableCollection<RssSiteViewModel>();
             this.LoadRssSiteCommand = new AsyncRelayCommand(this.LoadRssSite);
             this.LoadRssItemsCommand = new AsyncRelayCommand(this.LoadRssItems, this.CanExecuteLoadRssItems);
-            this.DownLoadRssItemsCommand = new AsyncRelayCommand(this.DownLoadRssItems, this.CanExecuteDownLoadRssItems);
         }
 
 
@@ -91,7 +77,7 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
             try
             {
                 IList<RssSiteDto> rssSiteDtos = await this.loadRssSiteUseCase.ExecuteAsync();
-                this.AddToRssSiteInfos(rssSiteDtos);
+                this.AddToRssSiteViewModels(rssSiteDtos);
             }
             catch (Exception exception)
             {
@@ -102,7 +88,7 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 
         private bool CanExecuteLoadRssItems()
         {
-            return this.SelectedRssFeedInfo != null;
+            throw new NotImplementedException();
         }
 
 
@@ -112,93 +98,17 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
         }
 
 
-        private bool CanExecuteDownLoadRssItems()
-        {
-            return this.SelectedRssFeedInfo != null;
-        }
-
-
-        private async Task DownLoadRssItems()
-        {
-            try
-            {
-                RssItemDtosResult rssItemDtosResult = await this.downLoadRssItemsUseCase.ExecuteAsync(new Uri(this.SelectedRssFeedInfo.Id));
-                if (rssItemDtosResult == null)
-                    return;
-
-                ICollection<RssItemViewModel> rssItemViewModels = this.ConvertToRssItemViewModels(rssItemDtosResult.CreatedRssItemDtos);
-                this.InsertToBeginningIndexOfRssItemViewModels(rssItemViewModels);
-                this.SendMessages(rssItemDtosResult);
-            }
-            catch (Exception exception)
-            {
-                WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
-            }
-
-        }
-
-
         /////////////////////////////////////////////////////////////////////////////
 
 
-        private void AddToRssSiteInfos(IList<RssSiteDto> rssSiteDtos)
+        private void AddToRssSiteViewModels(IList<RssSiteDto> rssSiteDtos)
         {
-            this.RssSiteInfos.Clear();
+            this.RssSiteViewModels.Clear();
 
             foreach (RssSiteDto rssSiteDto in rssSiteDtos)
             {
-                RssSiteInfo rssSiteInfos = this.rssSiteInfoMapper.ToRssSiteInfo(rssSiteDto);
-                this.RssSiteInfos.Add(rssSiteInfos);
-            }
-        }
-
-
-        private ICollection<RssItemViewModel> ConvertToRssItemViewModels(ICollection<RssItemDto> rssItemDtos)
-        {
-            if (rssItemDtos == null || rssItemDtos.Count == 0)
-                return null;
-
-            ICollection<RssItemViewModel> rssItemViewModels = new List<RssItemViewModel>();
-            foreach (RssItemDto rssItemDto in rssItemDtos)
-            {
-                RssItemViewModel rssItemViewModel = this.rssItemViewModelFactory.Create(rssItemDto);
-                rssItemViewModels.Add(rssItemViewModel);
-            }
-            return rssItemViewModels;
-        }
-
-
-        private void InsertToBeginningIndexOfRssItemViewModels(ICollection<RssItemViewModel> rssItemViewModels)
-        {
-            if (rssItemViewModels == null || rssItemViewModels.Count == 0)
-                return;
-
-            int startingIndex = 0;
-            this.RssItemViewModels.InsertRangeWithSingleNotification(rssItemViewModels, startingIndex);
-        }
-
-
-        private void SendMessages(RssItemDtosResult rssItemDtosResult)
-        {
-            if (rssItemDtosResult == null)
-                return;
-            string message = "";
-            if (rssItemDtosResult.CreatedRssItemDtos == null || rssItemDtosResult.CreatedRssItemDtos.Count < 1)
-            {
-                message = "هیچ خبر جدیدی وجود ندارد .";
-            }
-            else
-            {
-                message = $"تعداد  {rssItemDtosResult.CreatedRssItemDtos.Count}  خبر جدید دریافت شد .";
-            }
-            WeakReferenceMessenger.Default.Send(message, SharedMessengerKey.String_GeneralMessageKey);
-
-            if (rssItemDtosResult.CreationErrors != null && rssItemDtosResult.CreationErrors.Count > 0)
-            {
-                Exception rssItemException = new Exception(
-                    $"به دلایل مختلف از جمله تکراری بودن خبر که از قبل در حافظه یا دیتابیس وجود داشته ، یا سازگار نبودن تصویرِ خبر ، یا هر دلایل دیگری ، دریافت " +
-                    $"{rssItemDtosResult.CreationErrors.Count} خبر ، انجام نشد . دلیل خطای اول :\n\n{rssItemDtosResult.CreationErrors[0].Message}");
-                WeakReferenceMessenger.Default.Send(rssItemException, SharedMessengerKey.Exception_ErrorKey);
+                RssSiteViewModel rssSiteViewModel = this.rssSiteInfoMapper.ToRssSiteViewModel(rssSiteDto);
+                this.RssSiteViewModels.Add(rssSiteViewModel);
             }
         }
 

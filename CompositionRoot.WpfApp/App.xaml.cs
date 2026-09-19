@@ -195,16 +195,6 @@ namespace CompositionRoot.WpfApp
                 singletonProvider.RssItemDraftCacheManager,
                 singletonProvider.PersistenceCache,
                 singletonProvider.RssFeedConfigCache,
-                singletonProvider.ImageSettingsWriter,
-                singletonProvider.ImageSettingsReader,
-                singletonProvider.RssItemRepositoryFactory,
-                singletonProvider.RssItemDtoQueryFactory,
-                singletonProvider.RssSiteQueryFactory,
-                singletonProvider.UnitOfWorkFactory,
-                singletonProvider.HttpRequestFactory,
-                singletonProvider.RssItemViewModelFactory,
-                singletonProvider.ImageChannelCountNormalizerFactory,
-                singletonProvider.ImageChannelSequenceNormalizerFactory,
                 appearanceSwitcher);
         }
 

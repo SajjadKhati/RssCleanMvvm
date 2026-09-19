@@ -7,8 +7,8 @@
              xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;assembly=ViewModel"
              xmlns:interaction="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance d:Type=viewModelModules:RssUserControlViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance d:Type=viewModelModules:RssUserControlViewModel, IsDesignTimeCreatable=False}"
              DataContext="{Binding Path=RssUserControlViewModel}">
 
     <UserControl.Resources>
@@ -39,27 +39,29 @@
 
             <Grid Grid.Row="0" Margin="0, 5">
                 <TextBlock HorizontalAlignment="Left" Text="سایت خبری : "/>
+
                 <ComboBox  x:Name="SiteNameComboBox"  HorizontalAlignment="Right" HorizontalContentAlignment="Center" MinWidth="250" IsReadOnly="True"
-                       ItemsSource="{Binding Path=RssSiteInfos }"
+                       Text="خبرگزاری را انتخاب کنید" IsSynchronizedWithCurrentItem="True"
+                       ItemsSource="{Binding Path=RssSiteViewModels }"
                        DisplayMemberPath="SiteName"
-                       IsSynchronizedWithCurrentItem="True"
-                       Text="خبرگزاری را انتخاب کنید"/>
+                       SelectedItem="{Binding Mode=OneWayToSource, Path=SelectedRssSiteViewModel}"/>
             </Grid>
 
             <Grid Grid.Row="1" Margin="0, 5">
                 <TextBlock HorizontalAlignment="Left" Text="دسته ی خبری : "/>
-                <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center"  MinWidth="250" IsReadOnly="True"
-                      ItemsSource="{Binding  Path=RssSiteInfos/RssFeedInfos}"
+
+                <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center"  MinWidth="250" IsReadOnly="True" Text="موضوع خبری را انتخاب کنید"
+                      IsSynchronizedWithCurrentItem="True"
+                      ItemsSource="{Binding  Path=RssSiteViewModels/RssFeedViewModels}"
                       DisplayMemberPath="Title"
-                      SelectedItem="{Binding Mode=OneWayToSource, Path=SelectedRssFeedInfo}"
-                      Text="موضوع خبری را انتخاب کنید"
-                      IsEnabled="{Binding ElementName=SiteNameComboBox, Path=SelectedItem, 
+                      SelectedItem="{Binding Mode=OneWayToSource, Path=RssSiteViewModels/SelectedRssFeedViewModel}"
+                      IsEnabled="{Binding Path=SelectedRssSiteViewModel, 
                             Converter={StaticResource NullableToBoolValueConverterKey} }"/>
             </Grid>
         </Grid>
 
         <Grid Grid.Row="1" Margin="10">
-            <ListBox ItemsSource="{Binding Path=RssItemViewModels}"
+            <ListBox ItemsSource="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.RssItemViewModels}"
                      VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" 
                      VirtualizingPanel.CacheLength="1,1" VirtualizingPanel.CacheLengthUnit="Page"
                      ScrollViewer.CanContentScroll="True">
