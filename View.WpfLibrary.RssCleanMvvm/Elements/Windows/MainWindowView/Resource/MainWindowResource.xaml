@@ -56,21 +56,21 @@
 
 
 
-    <Style x:Key="StatusBarTexBlockStyle" TargetType="{x:Type TextBlock}">
+    <Style x:Key="StatusBarTexBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Foreground" Value="#D26900"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="17"/>
         <!--
-                        نکته: NotifyOnTargetUpdated=True الزامی است.
-                        بدون آن، رویداد Binding.TargetUpdated منتشر نمی‌شود.
-                    -->
+            نکته: NotifyOnTargetUpdated=True الزامی است.
+            بدون آن، رویداد Binding.TargetUpdated منتشر نمی‌شود.
+        -->
         <Style.Triggers>
             <!--
-                        EventTrigger: برخلاف DataTrigger که بر اساس «مقدار» کار می‌کند،
-                        این EventTrigger بر اساس «رویداد» کار می‌کند.
-                        هر بار که Binding مقدار Target را به‌روزرسانی کند،
-                        رویداد Binding.TargetUpdated منتشر می‌شود.
-                    -->
+                EventTrigger: برخلاف DataTrigger که بر اساس «مقدار» کار می‌کند،
+                این EventTrigger بر اساس «رویداد» کار می‌کند.
+                هر بار که Binding مقدار Target را به‌روزرسانی کند،
+                رویداد Binding.TargetUpdated منتشر می‌شود.
+            -->
             <EventTrigger RoutedEvent="Binding.TargetUpdated">
                 <EventTrigger.Actions>
                     <!-- BeginStoryboard: شروع یک انیمیشن (Storyboard) -->

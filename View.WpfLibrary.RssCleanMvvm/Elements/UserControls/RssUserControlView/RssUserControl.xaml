@@ -64,11 +64,13 @@
             <ListBox ItemsSource="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.RssItemViewModels}"
                      VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" 
                      VirtualizingPanel.CacheLength="1,1" VirtualizingPanel.CacheLengthUnit="Page"
-                     ScrollViewer.CanContentScroll="True">
+                     ScrollViewer.CanContentScroll="True"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     VerticalContentAlignment="Center">
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="Transparent" Margin="0, 2" Padding="2, 4" BorderBrush="Gray" BorderThickness="0, 0, 0, 1">
+                        <Border Background="Transparent" Margin="0, 2" Padding="6, 4" BorderBrush="Gray" BorderThickness="0, 0, 0, 1">
                             <Grid Background="Transparent">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Name="NewsColumn" Width="*"/>
@@ -77,7 +79,17 @@
                                 </Grid.ColumnDefinitions>
 
                                 <Grid Grid.Column="0" Background="Transparent">
-                                    
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" FontSize="17" FontWeight="UltraBold" Text="{Binding Path=Title}"/>
+                                    <TextBlock Grid.Row="1" FontSize="14" Text="{Binding Path=Category, StringFormat='در دسته بندی : {0}'}"/>
+                                    <TextBlock Grid.Row="2" Margin="0, 10" TextWrapping="Wrap" Text="{Binding Path=Description}"/>
+                                    <TextBlock Grid.Row="3" Text="{Binding Path=PersianPublishDate}"/>
                                 </Grid>
 
                                 <Grid Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20, 0" Background="Transparent">
@@ -213,10 +225,10 @@
                                                     ConverterParameter={StaticResource ImageWidthKey}}"/>
                                 </Grid>
 
-                                <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="150" Background="Transparent">
-                                    <Button MinHeight="26" Content="حالت ویرایش"/>
-                                    <Button MinHeight="26" Margin="0, 13" Content="تبدیل به سیاه و سفید"/>
-                                    <Button MinHeight="26" Content="ذخیره"/>
+                                <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent">
+                                    <Button Content="حالت ویرایش" Style="{StaticResource RssBorderedButtonStyleKey}"/>
+                                    <Button Margin="0, 13" Content="تبدیل به سیاه و سفید" Style="{StaticResource RssBorderedButtonStyleKey}"/>
+                                    <Button Content="ذخیره" Style="{StaticResource RssBorderedButtonStyleKey}"/>
                                 </StackPanel>
 
                             </Grid>

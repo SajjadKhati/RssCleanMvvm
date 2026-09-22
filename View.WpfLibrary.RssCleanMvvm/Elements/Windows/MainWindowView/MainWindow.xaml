@@ -70,6 +70,7 @@
                     <MenuItem Header="تاریک" ToolTip="تم تاریک" 
                               Command="{Binding Path=ChangeThemeCommand}"
                               CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Dark}"/>
+
                     <MenuItem Header="روشن" ToolTip="تم روشن"
                           Command="{Binding Path=ChangeThemeCommand}"
                           CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Light}"/>

@@ -10,4 +10,11 @@
 
     <filePathToBitmapImageConverterModule:FilePathToBitmapImageConverter x:Key="FilePathToBitmapImageConverterKey"/>
 
+
+    <Style x:Key="RssBorderedButtonStyleKey" TargetType="{x:Type Button}" BasedOn="{StaticResource BorderedButtonStyleKey}">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="MinHeight" Value="26"/>
+    </Style>
+
+
 </ResourceDictionary>

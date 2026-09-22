@@ -1,4 +1,5 @@
-﻿using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.DraftCacheWriter.Interface;
+﻿#region فضای نام
+using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.DraftCacheWriter.Interface;
 using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.RssItemDraftCacheManager.Interface;
 using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemDtoQuery.Factory.Interface;
@@ -84,13 +85,14 @@ using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
+#endregion
 
 namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositionRootModule.Class
 {
     public class ViewModelCompositionRoot
     {
 
-        // ====== تزریق‌های Stateful / مشترک ======
+        // ====== تزریق‌های Stateful / مشترک و شی های Singleton ======
         private readonly string connectionString;
 
         private readonly AppPaths appPaths;
@@ -121,13 +123,13 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IHttpRequestFactory httpRequestFactory;
 
-        private IRssItemViewModelFactory rssItemViewModelFactory;
-
-        private IRssFeedViewModelFactory rssFeedViewModelFactory;
-
         private IImageChannelCountNormalizerFactory<byte> imageChannelCountNormalizerFactory;
 
         private IImageChannelSequenceNormalizerFactory<byte> imageChannelSequenceNormalizerFactory;
+
+        private IRssItemViewModelFactory rssItemViewModelFactory;
+
+        private IRssFeedViewModelFactory rssFeedViewModelFactory;
 
         // ====== وابسته‌ها ======
         private IRssItemExistenceChecker rssItemExistenceChecker;
@@ -180,7 +182,6 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             this.rssSiteQueryFactory = this.CreateRssSiteQueryFactory();
             this.unitOfWorkFactory = this.CreateUnitOfWorkFactory();
             this.httpRequestFactory = this.CreateHttpRequestFactory();
-            this.rssItemViewModelFactory = this.CreateRssItemViewModelFactory();
             this.imageChannelCountNormalizerFactory = this.CreateImageChannelCountNormalizerFactory();
             this.imageChannelSequenceNormalizerFactory = this.CreateImageChannelSequenceNormalizerFactory();
         }
@@ -197,6 +198,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         // ۴. Factoryهای ViewModel (به UseCaseها نیاز دارند)
         private void InitializeViewModelFactories()
         {
+            this.rssItemViewModelFactory = this.CreateRssItemViewModelFactory();
             this.rssFeedViewModelFactory = this.CreateRssFeedViewModelFactory();
         }
 

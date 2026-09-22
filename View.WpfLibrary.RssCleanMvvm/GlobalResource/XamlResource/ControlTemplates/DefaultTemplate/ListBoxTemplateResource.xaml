@@ -61,6 +61,8 @@
                     Data="{Binding Data, Source={StaticResource checkboxTickPath}}"
                     Fill="{DynamicResource combItem_MouseEnterColor}"
                     Stroke="{DynamicResource combItem_MouseEnterColor}"
+                    VerticalAlignment="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}, 
+                        Path=VerticalContentAlignment}"
                     StrokeEndLineCap="Triangle"
                     StrokeStartLineCap="Triangle"
                     StrokeThickness="1"
