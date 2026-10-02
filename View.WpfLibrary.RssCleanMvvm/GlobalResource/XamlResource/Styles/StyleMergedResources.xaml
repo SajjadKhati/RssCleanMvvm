@@ -12,7 +12,8 @@
         <ResourceDictionary Source="ToolTipStyleResource.xaml"/>
         <ResourceDictionary Source="MenuStyleResource.xaml"/>
         <ResourceDictionary Source="UserControlStyleResource.xaml"/>
-        <ResourceDictionary Source="ButtonStyleResource.xaml"/>
+        <ResourceDictionary Source="ButtonBaseStyleResource.xaml"/>
+        <ResourceDictionary Source="ToggleButtonStyleResource.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

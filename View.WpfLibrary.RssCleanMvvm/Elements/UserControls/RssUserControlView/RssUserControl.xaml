@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView"
              xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;assembly=ViewModel"
              xmlns:interaction="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:routedEventTriggerModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.UiLogicModules.RoutedEventTriggerModule.Class"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance d:Type=viewModelModules:RssUserControlViewModel, IsDesignTimeCreatable=False}"
@@ -38,7 +39,7 @@
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Margin="0, 5">
-                <TextBlock HorizontalAlignment="Left" Text="سایت خبری : "/>
+                <TextBlock HorizontalAlignment="Left" Text="سایت خبری : " Style="{StaticResource TextBlockStyleKey}"/>
 
                 <ComboBox  x:Name="SiteNameComboBox"  HorizontalAlignment="Right" HorizontalContentAlignment="Center" MinWidth="250" IsReadOnly="True"
                        Text="خبرگزاری را انتخاب کنید" IsSynchronizedWithCurrentItem="True"
@@ -48,7 +49,7 @@
             </Grid>
 
             <Grid Grid.Row="1" Margin="0, 5">
-                <TextBlock HorizontalAlignment="Left" Text="دسته ی خبری : "/>
+                <TextBlock HorizontalAlignment="Left" Text="دسته ی خبری : " Style="{StaticResource TextBlockStyleKey}"/>
 
                 <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center"  MinWidth="250" IsReadOnly="True" Text="موضوع خبری را انتخاب کنید"
                       IsSynchronizedWithCurrentItem="True"
@@ -86,10 +87,45 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <TextBlock Grid.Row="0" FontSize="17" FontWeight="UltraBold" Text="{Binding Path=Title}"/>
-                                    <TextBlock Grid.Row="1" FontSize="14" Text="{Binding Path=Category, StringFormat='در دسته بندی : {0}'}"/>
-                                    <TextBlock Grid.Row="2" Margin="0, 10" TextWrapping="Wrap" Text="{Binding Path=Description}"/>
-                                    <TextBlock Grid.Row="3" Text="{Binding Path=PersianPublishDate}"/>
+                                    <TextBlock Grid.Row="0" FontSize="17" FontWeight="UltraBold" Text="{Binding Path=Title}"
+                                               Style="{StaticResource TextBlockStyleKey}"/>
+
+                                    <TextBlock Grid.Row="1" FontSize="14" Text="{Binding Path=Category, StringFormat='در دسته بندی : {0}'}"
+                                               Style="{StaticResource TextBlockStyleKey}"/>
+
+                                    <TextBlock Grid.Row="2" Margin="0, 10" TextWrapping="Wrap" Text="{Binding Mode=OneWay, Path=Description}"
+                                               Visibility="{Binding Mode=OneWay, Path=IsInEditMode, 
+                                                    Converter={StaticResource IsInEditModeToVisibilityConverterKey}}"
+                                               Style="{StaticResource TextBlockStyleKey}"/>
+
+                                    <!-- Binding.TargetUpdated یک Routed Event حبابی است که هر بار مقدار از Source به Target منتقل شود، منتشر میشود.
+                                    شرط انتشار: NotifyOnTargetUpdated=True در Binding.
+
+                                    نکتهی مهم: این رویداد به ازای هر کنترل، فقط یکبار روی عنصر مینشیند.
+                                    اما به ازای هر بایندینگی که در آن کنترل NotifyOnTargetUpdated=True دارد، یکبار fire میشود.
+                                    پس اگر این TextBlock چند پراپرتی بایند شده داشته باشد (مثل Text و ToolTip)،
+                                    هندلر برای هر پراپرتی جداگانه اجرا میشود.
+                                    برای تفکیک، در هندلر از e.Property استفاده کنید.
+
+                                    چون حبابی است، به والدین هم میرسد؛ اگر والدین هندلری برای آن داشته باشند،
+                                    آن هم اجرا میشود (که ممکن است ناخواسته باشد).
+
+                                    به همین دلیل در هندلر، بعد از انجام کار، حتماً e.Handled = true بگذارید
+                                    تا رویداد به والدین حباب نکند و هندلرهای ناخواستهی والدین اجرا نشوند.
+                                -->
+                                    <TextBox Grid.Row="2" Margin="0, 10" AcceptsReturn="True" TextWrapping="Wrap"
+                                             Text="{Binding Mode=TwoWay, Path=Description, NotifyOnSourceUpdated=True}"
+                                             Visibility="{Binding Mode=OneWay, Path=IsInEditMode, 
+                                                    Converter={StaticResource IsInEditModeToVisibilityConverterKey}, ConverterParameter='Invert'}">
+                                        <interaction:Interaction.Triggers>
+                                            <routedEventTriggerModule:RoutedEventTrigger RoutedEvent="{x:Static Binding.SourceUpdatedEvent}">
+                                                <interaction:InvokeCommandAction Command="{Binding Path=SaveRssItemDataToDraftCacheCommand}"/>
+                                            </routedEventTriggerModule:RoutedEventTrigger>
+                                        </interaction:Interaction.Triggers>
+                                    </TextBox>
+
+                                    <TextBlock Grid.Row="3" Text="{Binding Path=PersianPublishDate}"
+                                               Style="{StaticResource TextBlockStyleKey}"/>
                                 </Grid>
 
                                 <Grid Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20, 0" Background="Transparent">
@@ -226,9 +262,12 @@
                                 </Grid>
 
                                 <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent">
-                                    <Button Content="حالت ویرایش" Style="{StaticResource RssBorderedButtonStyleKey}"/>
-                                    <Button Margin="0, 13" Content="تبدیل به سیاه و سفید" Style="{StaticResource RssBorderedButtonStyleKey}"/>
-                                    <Button Content="ذخیره" Style="{StaticResource RssBorderedButtonStyleKey}"/>
+                                    <ToggleButton IsChecked="{Binding Mode=TwoWay, Path=IsInEditMode}"
+                                            Content="{Binding Mode=OneWay, Path=IsInEditMode, 
+                                                Converter={StaticResource IsInEditModeToStringConverterKey}}"
+                                            Style="{StaticResource RssBorderedToggleButtonStyleKey}"/>
+                                    <Button Margin="0, 13" Content="تبدیل به سیاه و سفید" Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
+                                    <Button Content="ذخیره" Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
                                 </StackPanel>
 
                             </Grid>

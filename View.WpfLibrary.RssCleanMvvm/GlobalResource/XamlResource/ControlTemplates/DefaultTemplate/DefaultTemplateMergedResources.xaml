@@ -7,6 +7,6 @@
         <ResourceDictionary Source="LabelTemplateResource.xaml"/>
         <ResourceDictionary Source="ToolTipTemplateResource.xaml"/>
         <ResourceDictionary Source="MenuTemplateResource.xaml"/>
-        <ResourceDictionary Source="ButtonTemplateResource.xaml"/>
+        <ResourceDictionary Source="ButtonBaseTemplateResource.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

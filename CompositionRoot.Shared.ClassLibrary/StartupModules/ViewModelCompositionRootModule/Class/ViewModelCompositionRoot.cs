@@ -31,24 +31,30 @@ using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormal
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Interface;
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
 using Application.Services.Mapper;
-using Application.Services.RssItemAllSourcesCoordinatorService.Class;
-using Application.Services.RssItemAllSourcesCoordinatorService.Interface;
 using Application.Services.RssItemCreationServices.RssItemBuilderService.Class;
 using Application.Services.RssItemCreationServices.RssItemBuilderService.Interface;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Class;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Interface;
-using Application.Services.RssItemDownloaderIntoDraftCacheService.Class;
-using Application.Services.RssItemDownloaderIntoDraftCacheService.Interface;
-using Application.Services.RssItemsDownLoaderService.Class;
-using Application.Services.RssItemsDownLoaderService.Interface;
-using Application.UseCases.DownLoadRssItemsUseCaseModule.Class;
-using Application.UseCases.DownLoadRssItemsUseCaseModule.Interface;
-using Application.UseCases.LoadRssSiteUseCaseModule.Class;
-using Application.UseCases.LoadRssSiteUseCaseModule.Interface;
+using Application.UseCases.Entry.DownLoadRssItems.Class;
+using Application.UseCases.Entry.DownLoadRssItems.Interface;
+using Application.UseCases.Entry.LoadRssSite.Class;
+using Application.UseCases.Entry.LoadRssSite.Interface;
+using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Class;
+using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
+using Application.UseCases.Shared.RssItemAllSources.Class;
+using Application.UseCases.Shared.RssItemAllSources.Interface;
+using Application.UseCases.Shared.RssItemDownloaderIntoDraftCache.Class;
+using Application.UseCases.Shared.RssItemDownloaderIntoDraftCache.Interface;
+using Application.UseCases.Shared.RssItemDtoFactory.Class;
+using Application.UseCases.Shared.RssItemDtoFactory.Interface;
+using Application.UseCases.Shared.RssItemsDownLoader.Class;
+using Application.UseCases.Shared.RssItemsDownLoader.Interface;
+using Application.UseCases.Shared.SaveRssItemToDraftCache.Class;
+using Application.UseCases.Shared.SaveRssItemToDraftCache.Interface;
 using CompositionRoot.Shared.ClassLibrary.Services.RssFeedViewModelFactoryService.Class;
 using CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactoryService.Class;
 using CompositionRoot.Shared.ClassLibrary.StartupModules.AppPathsModule.Class;
-using Domain.ApplicationServiceContracts.RssItemAllSourcesCoordinator.Interface;
+using Domain.ApplicationServiceContracts.RssItemAllSourcesOrchestrator.Interface;
 using Domain.DomainService.RssItemDomainService.Class;
 using Domain.DomainService.RssItemDomainService.Interface;
 using Infra.CacheService.AppDraftCacheManagerService.DraftCacheWriterService.Class;
@@ -85,6 +91,7 @@ using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
+
 #endregion
 
 namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositionRootModule.Class
@@ -134,11 +141,13 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         // ====== وابسته‌ها ======
         private IRssItemExistenceChecker rssItemExistenceChecker;
 
-        private IRssItemAllSourcesCoordinator rssItemAllSourcesCoordinator;
+        private IRssItemAllSourcesOrchestrator rssItemAllSourcesOrchestrator;
 
         private IRssItemDtoFactory rssItemDtoFactory;
 
         private IRssItemEfEntityFactory rssItemEfEntityFactory;
+
+        private IRssItemDtoFactoryOrchestrator rssItemDtoFactoryOrchestrator;
 
 
         ///////////////////////////////////////////////////////////////////////
@@ -190,9 +199,11 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private void InitializeDependentServices()
         {
             this.rssItemExistenceChecker = this.CreateRssItemExistenceChecker();
-            this.rssItemAllSourcesCoordinator = (IRssItemAllSourcesCoordinator)this.rssItemExistenceChecker;
+            this.rssItemAllSourcesOrchestrator = (IRssItemAllSourcesOrchestrator)this.rssItemExistenceChecker;
             this.rssItemDtoFactory = this.CreateRssItemDtoFactory();
             this.rssItemEfEntityFactory = (IRssItemEfEntityFactory)this.rssItemDtoFactory;
+
+            this.rssItemDtoFactoryOrchestrator = this.CreateRssItemDtoFactoryOrchestrator();
         }
 
         // ۴. Factoryهای ViewModel (به UseCaseها نیاز دارند)
@@ -246,22 +257,22 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IDownLoadRssItemsUseCase CreateDownLoadRssItemsUseCase()
         {
-            IRssItemDownloaderIntoDraftCache rssItemDownloaderIntoDraftCache = this.CreateRssItemDownloaderIntoDraftCache();
-            return new DownLoadRssItemsUseCase(rssItemDownloaderIntoDraftCache, this.rssFeedConfigCache);
+            IRssItemDownloaderIntoDraftCacheOrchestrator rssItemDownloaderIntoDraftCacheOrchestrator = this.CreateRssItemDownloaderIntoDraftCacheOrchestrator();
+            return new DownLoadRssItemsUseCase(rssItemDownloaderIntoDraftCacheOrchestrator, this.rssFeedConfigCache);
         }
 
-        private IRssItemDownloaderIntoDraftCache CreateRssItemDownloaderIntoDraftCache()
+        private IRssItemDownloaderIntoDraftCacheOrchestrator CreateRssItemDownloaderIntoDraftCacheOrchestrator()
         {
-            IRssItemsDownLoader rssItemsDownLoader = this.CreateRssItemsDownLoader();
-            return new RssItemDownloaderIntoDraftCache(rssItemsDownLoader, this.rssItemDtoFactory,
-                this.rssItemDraftCacheManager, this.imageSettingsReader, this.appPaths.TempImagesFolderPath);
+            IRssItemsDownLoaderOrchestrator rssItemsDownLoaderOrchestrator = this.CreateRssItemsDownLoaderOrchestrator();
+            return new RssItemDownloaderIntoDraftCacheOrchestrator(
+                rssItemsDownLoaderOrchestrator, this.rssItemDtoFactoryOrchestrator, this.rssItemDraftCacheManager);
         }
 
-        private IRssItemsDownLoader CreateRssItemsDownLoader()
+        private IRssItemsDownLoaderOrchestrator CreateRssItemsDownLoaderOrchestrator()
         {
             IXmlParser xmlParser = this.CreateXmlParser();
             IRssItemBuilder rssItemBuilder = this.CreateRssItemBuilder();
-            return new RssItemsDownLoader(this.httpRequestFactory, xmlParser, rssItemBuilder);
+            return new RssItemsDownLoaderOrchestrator(this.httpRequestFactory, xmlParser, rssItemBuilder);
         }
 
         private IXmlParser CreateXmlParser()
@@ -283,7 +294,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IRssItemExistenceChecker CreateRssItemExistenceChecker()
         {
-            return new RssItemAllSourcesCoordinator(this.rssItemDraftCacheManager, this.rssItemDtoQueryFactory,
+            return new RssItemAllSourcesOrchestrator(this.rssItemDraftCacheManager, this.rssItemDtoQueryFactory,
                 this.rssItemRepositoryFactory, this.unitOfWorkFactory);
         }
 
@@ -391,7 +402,20 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IRssItemViewModelFactory CreateRssItemViewModelFactory()
         {
-            return new RssItemViewModelFactory();
+            ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase = this.CreateSaveRssItemDataToDraftCacheUseCase();
+            return new RssItemViewModelFactory(saveRssItemDataToDraftCacheUseCase);
+        }
+
+        private ISaveRssItemDataToDraftCacheUseCase CreateSaveRssItemDataToDraftCacheUseCase()
+        {
+            ISaveRssItemToDraftCacheOrchestrator saveRssItemToDraftCacheOrchestrator = this.CreateSaveRssItemToDraftCacheOrchestrator();
+            return new SaveRssItemDataToDraftCacheUseCase(saveRssItemToDraftCacheOrchestrator);
+        }
+
+        private ISaveRssItemToDraftCacheOrchestrator CreateSaveRssItemToDraftCacheOrchestrator()
+        {
+            return new SaveRssItemToDraftCacheOrchestrator(this.rssItemDraftCacheManager, this.rssItemDtoQueryFactory,
+                this.rssItemExistenceChecker, this.rssItemAllSourcesOrchestrator);
         }
 
         private IImageChannelCountNormalizerFactory<byte> CreateImageChannelCountNormalizerFactory()
@@ -478,6 +502,11 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private RssItemEfEntityMapper CreateRssItemEfEntityMapper()
         {
             return new RssItemEfEntityMapper();
+        }
+
+        private IRssItemDtoFactoryOrchestrator CreateRssItemDtoFactoryOrchestrator()
+        {
+            return new RssItemDtoFactoryOrchestrator(this.rssItemDtoFactory, this.imageSettingsReader, this.appPaths.TempImagesFolderPath);
         }
 
     }

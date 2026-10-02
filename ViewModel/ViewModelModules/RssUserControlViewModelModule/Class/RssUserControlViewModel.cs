@@ -1,12 +1,10 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
-using Application.UseCases.DownLoadRssItemsUseCaseModule.DataModels;
-using Application.UseCases.DownLoadRssItemsUseCaseModule.Interface;
-using Application.UseCases.LoadRssSiteUseCaseModule.Interface;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Shared.CollectionService.Class;
 using System.Collections.Generic;
+using Application.UseCases.Entry.LoadRssSite.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
 using ViewModel.Services.RangeObservableCollectionService.Class;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;

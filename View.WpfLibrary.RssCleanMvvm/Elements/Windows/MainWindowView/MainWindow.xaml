@@ -39,8 +39,7 @@
             </MenuItem>
 
             <MenuItem DataContext="{Binding Path=RssUserControlViewModel}" Header="خبر خوان">
-                <!--
-                    FallbackValue=False برای وقتی است که مسیر Binding قابل حل نباشد.
+                <!-- FallbackValue=False برای وقتی است که مسیر Binding قابل حل نباشد.
                     مثلاً وقتی SelectedRssSiteViewModel برابر null باشد، WPF مقدار UnsetValue
                     برمی‌گرداند (نه null). در این حالت Converter اصلاً صدا زده نمی‌شود و
                     مقدار FallbackValue استفاده می‌شود.

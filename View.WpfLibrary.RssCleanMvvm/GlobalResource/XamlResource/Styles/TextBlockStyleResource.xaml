@@ -3,7 +3,7 @@
 
     <!--#region  استایل برای TextBlock-->
 
-    <Style TargetType="{x:Type TextBlock}">
+    <Style x:Key="TextBlockStyleKey" TargetType="{x:Type TextBlock}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Foreground" Value="{DynamicResource TextBlock_Foreground}" />
         <Style.Triggers>

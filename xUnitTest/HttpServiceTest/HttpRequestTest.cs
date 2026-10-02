@@ -31,9 +31,6 @@ using Application.Services.ImageNormalizerServices._0_ImageNormalizerService.Int
 using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
-using Application.Services.RssItemDownloaderIntoDraftCacheService.Interface;
-using Application.UseCases.DownLoadRssItemsUseCaseModule.Class;
-using Application.UseCases.LoadRssItemsUseCaseModule.Class;
 using Domain.DomainEntities.RssEntity.Class;
 using Infra.CacheService.AppDraftCacheManagerService.DraftCacheWriterService.Class;
 using Infra.CacheService.CacheBaseServices.CacheServices.Class;
@@ -71,7 +68,6 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Application.Services.RssItemDownloaderIntoDraftCacheService.Class;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace xUnitTest.Infrastructure.HttpServiceTest

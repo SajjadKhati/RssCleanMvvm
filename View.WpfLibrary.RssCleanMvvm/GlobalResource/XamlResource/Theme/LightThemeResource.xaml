@@ -366,6 +366,11 @@
 
 
 
+    <SolidColorBrush x:Key="ToggleButton_IsChecked" Color="#FFFF8C00" />
+
+
+
+
     <SolidColorBrush x:Key="ShapedButton_Background" Color="Transparent"/>
 
     <SolidColorBrush x:Key="ShapedButton_Foreground" Color="Black"/>

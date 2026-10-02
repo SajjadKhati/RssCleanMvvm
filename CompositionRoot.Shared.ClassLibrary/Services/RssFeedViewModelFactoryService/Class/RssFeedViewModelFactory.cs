@@ -1,4 +1,4 @@
-﻿using Application.UseCases.DownLoadRssItemsUseCaseModule.Interface;
+﻿using Application.UseCases.Entry.DownLoadRssItems.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssFeedViewModelFactory.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
 using ViewModel.ViewModelModules.RssFeedViewModelModule.Class;

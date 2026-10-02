@@ -1,14 +1,22 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Application.UseCases.Entry.SaveRssItemDataToDraftCache.DataModels;
+using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ViewModel.Services.SharedMessengerKeyService.Class;
 
 namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
 {
     public class RssItemViewModel : ObservableObject
     {
+
+        private ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase;
+
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -16,6 +24,8 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         private string _description;
 
         private string _imageFullFilePath;
+
+        private bool _isInEditMode;
 
 
         /////////////////////////////////////////////////////////////////////////
@@ -34,10 +44,7 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
             get => this._description;
             set
             {
-                if(this.SetProperty(ref this._description, value) == true)
-                {
-
-                }
+                this.SetProperty(ref this._description, value);
             }
         }
 
@@ -56,11 +63,32 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
             }
         }
 
+        /////////////////////////////////////////////////////////////////////////
+
+
+        public bool IsInEditMode
+        {
+            get => this._isInEditMode;
+            set
+            {
+                this.SetProperty(ref this._isInEditMode, value);
+            }
+        }
+
 
         /////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemViewModel(string id, string link, string category, string title, string description, string persianPublishDate, string imageFullFilePath)
+        public IAsyncRelayCommand SaveRssItemDataToDraftCacheCommand { get; }
+
+        public IAsyncRelayCommand CommitRssItemCommand {  get; }
+
+
+        /////////////////////////////////////////////////////////////////////////
+
+
+        public RssItemViewModel(string id, string link, string category, string title, string description, string persianPublishDate, string imageFullFilePath,
+            ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase)
         {
             this.Id = id;
             this.Link = link;
@@ -69,11 +97,43 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
             this.Description = description;
             this.PersianPublishDate = persianPublishDate;
             this.ImageFullFilePath = imageFullFilePath;
+
+            this.IsInEditMode = false;
+            this.saveRssItemDataToDraftCacheUseCase = saveRssItemDataToDraftCacheUseCase;
+
+            this.SaveRssItemDataToDraftCacheCommand = new AsyncRelayCommand(this.SaveRssItemDataToDraftCache);
+            this.CommitRssItemCommand = new AsyncRelayCommand(this.CommitRssItem, this.CanExecuteCommitRssItem);
         }
 
 
         /////////////////////////////////////////////////////////////////////////
 
+
+        private async Task SaveRssItemDataToDraftCache()
+        {
+            try
+            {
+                await this.saveRssItemDataToDraftCacheUseCase.ExecuteAsync(new RssItemDataEditableInput(new Uri(this.Id), this.Description));
+                this.CommitRssItemCommand.NotifyCanExecuteChanged();
+            }
+            catch (Exception exception)
+            {
+                WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
+            }
+        }
+
+
+        private bool CanExecuteCommitRssItem()
+        {
+            /// یه usecase را فراخوانی کنه که ببینه آیا شناسه ی این آیتم ، درون کش موقت وجود داره یا نه؟
+            throw new NotImplementedException();
+        }
+
+
+        private Task CommitRssItem()
+        {
+            throw new NotImplementedException();
+        }
 
     }
 }

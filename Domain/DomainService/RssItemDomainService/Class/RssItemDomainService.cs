@@ -1,5 +1,5 @@
-﻿using Domain.DomainService.RssItemDomainService.Interface;
-using Domain.ApplicationServiceContracts.RssItemAllSourcesCoordinator.Interface;
+﻿using Domain.ApplicationServiceContracts.RssItemAllSourcesOrchestrator.Interface;
+using Domain.DomainService.RssItemDomainService.Interface;
 
 namespace Domain.DomainService.RssItemDomainService.Class
 {

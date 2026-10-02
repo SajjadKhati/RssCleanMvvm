@@ -6,8 +6,6 @@ namespace Application.InfrastructureContracts.ImageProject.ImageFileSaver.Interf
 {
     public interface IImageFileSaverCoordinator
     {
-
         DestinationPath Save8BitImageToFile(byte[,,] image, ImageSettings<ImageInfo> imageSettings, FilePath filePath);
-
     }
 }

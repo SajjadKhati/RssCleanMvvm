@@ -1,6 +1,6 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
-using Application.UseCases.DownLoadRssItemsUseCaseModule.DataModels;
-using Application.UseCases.DownLoadRssItemsUseCaseModule.Interface;
+using Application.UseCases.Entry.DownLoadRssItems.DataModels;
+using Application.UseCases.Entry.DownLoadRssItems.Interface;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;

@@ -1,4 +1,5 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
 using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
 
@@ -6,6 +7,21 @@ namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactorySe
 {
     public class RssItemViewModelFactory : IRssItemViewModelFactory
     {
+
+        private ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase;
+
+
+        /////////////////////////////////////////////////////////////////////////
+
+
+        public RssItemViewModelFactory(ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase)
+        {
+            this.saveRssItemDataToDraftCacheUseCase = saveRssItemDataToDraftCacheUseCase;
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////
+
 
         public RssItemViewModel Create(RssItemDto rssItemDto)
         {
@@ -16,7 +32,8 @@ namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactorySe
                 rssItemDto.Title,
                 rssItemDto.Description,
                 rssItemDto.PersianPublishDate,
-                rssItemDto.ImageFullFilePath);
+                rssItemDto.ImageFullFilePath, 
+                this.saveRssItemDataToDraftCacheUseCase);
         }
 
     }

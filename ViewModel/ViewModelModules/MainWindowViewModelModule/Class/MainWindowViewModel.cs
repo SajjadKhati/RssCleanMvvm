@@ -10,6 +10,7 @@ using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;
 using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
 using ViewModel.Services.SharedMessengerKeyService.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
 {
@@ -102,7 +103,6 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
 
 
         /////////////////////////////////////////////////////////////////////////////
-
 
 
     }

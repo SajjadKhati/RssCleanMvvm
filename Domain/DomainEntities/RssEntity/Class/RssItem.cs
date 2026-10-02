@@ -130,6 +130,13 @@ namespace Domain.DomainEntities.RssEntity.Class
         }
 
 
+        public RssItem(RssItem rssItem) : 
+            this(rssItem.Id, rssItem.RssFeedId, rssItem.Link, rssItem.Argb8BitImage, rssItem.Category, rssItem.Title, rssItem.Description, rssItem.PublishDate)
+        {
+
+        }
+
+
         /////////////////////////////////////////////////////////
 
 

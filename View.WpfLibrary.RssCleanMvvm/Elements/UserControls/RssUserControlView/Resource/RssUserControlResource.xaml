@@ -1,7 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:filePathToBitmapImageConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.FilePathToBitmapImageConverterModule"
-                    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+                    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+                    xmlns:isInEditModeToStringConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.IsInEditModeToStringConverterModule"
+                    xmlns:isInEditModeToVisibilityConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.IsInEditModeToVisibility">
 
 
     <system:Double x:Key="ImageWidthKey">192</system:Double>
@@ -10,8 +12,20 @@
 
     <filePathToBitmapImageConverterModule:FilePathToBitmapImageConverter x:Key="FilePathToBitmapImageConverterKey"/>
 
+    <isInEditModeToStringConverterModule:IsInEditModeToStringConverter x:Key="IsInEditModeToStringConverterKey"/>
 
-    <Style x:Key="RssBorderedButtonStyleKey" TargetType="{x:Type Button}" BasedOn="{StaticResource BorderedButtonStyleKey}">
+    <isInEditModeToVisibilityConverterModule:IsInEditModeToVisibilityConverter x:Key="IsInEditModeToVisibilityConverterKey"/>
+
+
+    <Style x:Key="RssBorderedButtonBaseStyleKey" TargetType="{x:Type ButtonBase}" 
+                BasedOn="{StaticResource BorderedButtonBaseStyleKey}">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="MinHeight" Value="26"/>
+    </Style>
+
+
+    <Style x:Key="RssBorderedToggleButtonStyleKey" TargetType="{x:Type ToggleButton}" 
+                BasedOn="{StaticResource BorderedToggleButtonStyleKey}">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="MinHeight" Value="26"/>
     </Style>

@@ -1,0 +1,35 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        چرا اینجا MergedDictionaries کردیم و به App.xaml اتکا نکردیم؟
+
+        مسئله: StaticResource در زمان Parse شدن همان فایل ، حل یا بارگزاری میشود ، نه زمان اجرا.
+        وقتی این فایل (که خواهر ButtonBaseStyleResource.xaml است) در حال Parse است،
+        فایلهای خواهر و برادرش هنوز به درخت منابع اضافه نشدهاند.
+        پس StaticResource نمیتواند کلید BorderedButtonBaseStyleKey را پیدا کند.
+
+        راهحل: فایل موردنیاز را در همینجا Merge کنیم.
+        حالا در لحظه ی Parse این فایل، BorderedButtonBaseStyleKey از قبل در دسترس است
+        و StaticResource بهدرستی آن را حل میکند.
+    -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ButtonBaseStyleResource.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+
+    <!--#region  استایل دکمه ی شفاف حاشیه دار با کلید خصوصی -->
+
+    <Style x:Key="BorderedToggleButtonStyleKey" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource BorderedButtonBaseStyleKey}">
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource ToggleButton_IsChecked}"/>
+                <Setter Property="Foreground" Value="{DynamicResource ToggleButton_IsChecked}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--#endregion-->
+
+
+</ResourceDictionary>
