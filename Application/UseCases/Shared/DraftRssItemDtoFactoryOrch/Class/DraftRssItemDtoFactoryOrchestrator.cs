@@ -3,41 +3,42 @@ using Application.InfrastructureContracts.DataAccessProject.RssItemDtoFactory.In
 using Application.InfrastructureContracts.ImageProject.ImageFileSaver.DataModels.Class;
 using Application.InfrastructureContracts.ImageProject.ImageSettings.ImageSettingsProvider.Interfaces;
 using Application.InfrastructureContracts.ImageProject.SharedDataModels.Class;
+using Application.InfrastructureContracts.SharedProject.AppFolderPath.Interface;
 using Application.OverallDataModels.OverallDto.EntityDto;
-using Application.UseCases.Shared.RssItemDtoFactory.Interface;
+using Application.UseCases.Shared.DraftRssItemDtoFactoryOrch.Interface;
 using Domain.DomainEntities.RssEntity.Class;
 
-namespace Application.UseCases.Shared.RssItemDtoFactory.Class
+namespace Application.UseCases.Shared.DraftRssItemDtoFactoryOrch.Class
 {
-    public class RssItemDtoFactoryOrchestrator : IRssItemDtoFactoryOrchestrator
+    public class DraftRssItemDtoFactoryOrchestrator : IDraftRssItemDtoFactoryOrchestrator
     {
 
         private IRssItemDtoFactory rssItemDtoFactory;
 
         private IImageSettingsReader imageSettingsReader;
 
-        private readonly string draftImageFolderPath;
+        private ITempImageFolderPath tempImageFolderPath;
 
 
         /////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemDtoFactoryOrchestrator(IRssItemDtoFactory rssItemDtoFactory, 
-            IImageSettingsReader imageSettingsReader, string draftImageFolderPath)
+        public DraftRssItemDtoFactoryOrchestrator(IRssItemDtoFactory rssItemDtoFactory, 
+            IImageSettingsReader imageSettingsReader, ITempImageFolderPath tempImageFolderPath)
         {
             this.rssItemDtoFactory = rssItemDtoFactory;
             this.imageSettingsReader = imageSettingsReader;
-            this.draftImageFolderPath = draftImageFolderPath;
+            this.tempImageFolderPath = tempImageFolderPath;
         }
 
 
         /////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemDto CreateRssItemDto(RssItem rssItem)
+        public RssItemDto CreateRssItemDtoWithSaveImage(RssItem rssItem)
         {
             ImageSettings<ImageInfo> imageSettings = this.imageSettingsReader.GetOrDefault(rssItem.Id, rssItem.Argb8BitImage);
-            ImageSaveOptions imageSaveOptions = new ImageSaveOptions(imageSettings, this.draftImageFolderPath);
+            ImageSaveOptions imageSaveOptions = new ImageSaveOptions(imageSettings, this.tempImageFolderPath.FolderPath);
             return this.rssItemDtoFactory.CreateRssItemDto(rssItem, imageSaveOptions);
         }
 

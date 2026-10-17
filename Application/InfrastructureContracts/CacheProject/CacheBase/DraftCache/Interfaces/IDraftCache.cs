@@ -7,9 +7,9 @@ namespace Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.
         where TKey : notnull
     {
 
-        TItem GetItem(TKey key);
+        bool TryGetItem(TKey key, out TItem value);
 
-        IReadOnlyList<TItem> GetAllItems();
+        IReadOnlyList<TItem> GetAllItemsCopy();
 
     }
 }

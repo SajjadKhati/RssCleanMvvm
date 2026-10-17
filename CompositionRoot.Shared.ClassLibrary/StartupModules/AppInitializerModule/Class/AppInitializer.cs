@@ -44,7 +44,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppInitializerModul
         {
             return await Task.Run(() =>
             {
-                this.EnsureAppFoldersCreated(new List<string> { this.appPaths.TempImagesFolderPath, this.appPaths.PermanentImagesFolderPath });
+                this.EnsureAppFoldersCreated(new List<string> { this.appPaths.TempImagesFolderPath, this.appPaths.PersistentImagesFolderPath });
                 return this.InitializeApp(connectionString);
             });
         }

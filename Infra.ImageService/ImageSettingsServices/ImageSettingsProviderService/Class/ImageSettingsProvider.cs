@@ -8,6 +8,25 @@ using Application.InfrastructureContracts.ImageProject.SharedDataModels.Enum;
 
 namespace Infra.ImageService.ImageSettingsServices.ImageSettingsProviderService.Class
 {
+    /// <summary>
+    /// ارائه‌دهنده‌ی ImageSettings — با cache داخلی برای ذخیره‌ی تنظیمات هر RssItem.
+    /// 
+    /// ⚠️ چرا این کلاس قفل ندارد؟
+    /// 
+    /// اگر چه این کلاس یک فیلد داده‌ای مشترک دارد (imageSettingsCache)، ولی قفل
+    /// لازم نیست — به سه دلیل:
+    /// 
+    /// ۱. تمام عملیات روی cache، تک‌عملیات اتمی هستند (Set, TryGetValue). 
+    ///    ConcurrentDictionary خودش اتمی بودنشان را تضمین می‌کند.
+    /// 
+    /// ۲. هیچ invariant بین چند عملیات وجود ندارد. هر متد فقط یک عملیات 
+    ///    اتمی روی cache انجام می‌دهد.
+    /// 
+    /// ۳. حتی در GetOrDefault که یک check-then-act است (Get، سپس در صورت 
+    ///    null بودن GetDefault)، هر دو جواب معتبرند — هم نسخه‌ی cache و هم 
+    ///    default settings. بنابراین قفل، هیچ چیز اضافه‌ای را تضمین نمی‌کند.
+    ///    (برای توضیح بیشتر، توضیحات متد GetOrDefault را ببینید.)
+    /// </summary>
     public class ImageSettingsProvider : IImageSettingsWriter, IImageSettingsReader
     {
 
@@ -50,12 +69,36 @@ namespace Infra.ImageService.ImageSettingsServices.ImageSettingsProviderService.
 
         public ImageSettings<ImageInfo> Get(Uri rssItemId)
         {
-            if(this.imageSettingsCache.ContainsKey(rssItemId) == true)
-                return this.imageSettingsCache.Get(rssItemId);
-            return null;
+            return (this.imageSettingsCache.TryGetValue(rssItemId, out ImageSettings<ImageInfo> imageSetting) == true)? imageSetting : null;
         }
 
 
+        /// <summary>
+        /// گرفتن تنظیمات تصویر برای یک RssItem — از cache، و اگر نبود، default settings.
+        /// 
+        /// ⚠️ چرا این متد قفل ندارد؟ (check-then-act)
+        /// 
+        /// این متد یک الگوی check-then-act دارد: ابتدا Get از cache، و اگر null 
+        /// بود، GetDefault. اگر بین این دو، نخ دیگری Store کند، ممکن است default 
+        /// برگردانده شود در حالی که نسخه‌ی جدید در cache هست.
+        /// 
+        /// ولی این race بدون ضرر است — به سه دلیل:
+        /// 
+        /// ۱. هر دو جواب معتبرند. default settings هم یک تنظیمات کامل و قابل 
+        ///    استفاده است (فقط کمی ساده‌تر از تنظیمات ذخیره‌شده در cache).
+        /// 
+        /// ۲. داده از دست نمی‌رود. نسخه‌ی Store شده در cache باقی می‌ماند و 
+        ///    دفعه‌ی بعد (در فراخوانی مجدد) استفاده می‌شود.
+        /// 
+        /// ۳. فاصله‌ی زمانی بین Get و GetDefault بسیار کوتاه است (چند نانوثانیه) 
+        ///    — چون GetDefault فقط از image می‌سازد و به cache دست نمی‌زند. 
+        ///    احتمال اینکه نخ دیگری دقیقاً در این فاصله Store کند، بسیار کم است.
+        /// 
+        /// قفل، در این حالت فقط سربار است — چون خروجی نهایی (default) هم معتبر 
+        /// است، و atomicity چیزی به درستی این متد اضافه نمی‌کند.
+        /// </summary>
+        /// <param name="image"></param>
+        /// <returns></returns>
         public ImageSettings<ImageInfo> GetDefault(byte[,,] image)
         {
             ImageInfo imageInfo = this.CreateDefaultImageInfo(image);
@@ -67,11 +110,7 @@ namespace Infra.ImageService.ImageSettingsServices.ImageSettingsProviderService.
         public ImageSettings<ImageInfo> GetOrDefault(Uri rssItemId, byte[,,] image)
         {
             ImageSettings<ImageInfo> imageSettings = this.Get(rssItemId);
-            if (imageSettings == null)
-            {
-                imageSettings = this.GetDefault(image);
-            }
-            return imageSettings;
+            return (imageSettings == null) ? this.GetDefault(image) : imageSettings;
         }
 
 

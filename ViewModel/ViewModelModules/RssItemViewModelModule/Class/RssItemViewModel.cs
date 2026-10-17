@@ -113,7 +113,10 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         {
             try
             {
-                await this.saveRssItemDataToDraftCacheUseCase.ExecuteAsync(new RssItemDataEditableInput(new Uri(this.Id), this.Description));
+                bool isSavedToDraftCache = await this.saveRssItemDataToDraftCacheUseCase.ExecuteAsync(
+                    new RssItemDataEditableInput(new Uri(this.Id), this.Description));
+                if (isSavedToDraftCache == false)
+                    throw new InvalidOperationException("آیتم مورد نظر ، در کش موقت ذخیره نشد چون نخ دیگری این آیتم را در حین انجام کار ، تغییر داد. لطفا دوباره تلاش کنید.");
                 this.CommitRssItemCommand.NotifyCanExecuteChanged();
             }
             catch (Exception exception)

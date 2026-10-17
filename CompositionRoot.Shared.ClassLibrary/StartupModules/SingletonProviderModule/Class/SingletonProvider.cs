@@ -35,9 +35,11 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderMo
         ///////////////////////////////////////////////////////////////////////
 
 
-        private IRssItemDraftCacheManager _rssItemDraftCacheManager;
+        private RssItemDraftCacheManager _rssItemDraftCacheManager;
 
         private ICache<Uri, RssItemEfEntity> _persistenceCache;
+
+        private ReaderWriterLockSlim _sharedPersistenceCacheLock;
 
         private ICache<Uri, RssFeedConfig> _rssFeedConfigCache;
 
@@ -45,7 +47,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderMo
         ///////////////////////////////////////////////////////////////////////
 
 
-        public IRssItemDraftCacheManager RssItemDraftCacheManager
+        public RssItemDraftCacheManager RssItemDraftCacheManager
         {
             get => this._rssItemDraftCacheManager;
             private set
@@ -62,6 +64,16 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderMo
             {
                 if (this._persistenceCache == null)
                     this._persistenceCache = value;
+            }
+        }
+
+        public ReaderWriterLockSlim SharedPersistenceCacheLock
+        {
+            get => this._sharedPersistenceCacheLock;
+            private set
+            {
+                if(this._sharedPersistenceCacheLock == null)
+                    this._sharedPersistenceCacheLock = value;
             }
         }
 
@@ -98,25 +110,30 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.SingletonProviderMo
 
             this.RssItemDraftCacheManager = this.CreateRssItemDraftCacheManager();
             this.PersistenceCache = this.CreatePersistenceCache();
+            this.SharedPersistenceCacheLock = CreateSharedPersistenceCacheLock();
             this.RssFeedConfigCache = await Task.Run(() => this.CreateRssFeedConfigCache(this.connectionString));
         }
 
 
-        private IRssItemDraftCacheManager CreateRssItemDraftCacheManager()
+        private RssItemDraftCacheManager CreateRssItemDraftCacheManager()
         {
-            IDraftCache<Uri, RssItem> rssItemDraftCache = new DraftCache<Uri, RssItem>();
-            IDraftCache<Uri, RssItemDto> rssItemDtoDraftCache = new DraftCache<Uri, RssItemDto>();
             IDraftCacheWriter draftCacheWriter = new DraftCacheWriter();
             IFileManager fileManager = new FileManager();
             IFolderManager folderManager = new FolderManager();
-            return new RssItemDraftCacheManager(rssItemDraftCache, rssItemDtoDraftCache, draftCacheWriter, fileManager,
-                folderManager, this.appPaths.TempImagesFolderPath);
+            return new RssItemDraftCacheManager(draftCacheWriter, fileManager,
+                folderManager, this.appPaths);
         }
 
 
         private ICache<Uri, RssItemEfEntity> CreatePersistenceCache()
         {
             return new Cache<Uri, RssItemEfEntity>();
+        }
+
+
+        private ReaderWriterLockSlim CreateSharedPersistenceCacheLock()
+        {
+            return new ReaderWriterLockSlim();
         }
 
 

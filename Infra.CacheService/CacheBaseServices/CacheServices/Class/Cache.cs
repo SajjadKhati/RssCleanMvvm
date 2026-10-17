@@ -42,27 +42,47 @@ namespace Infra.CacheService.CacheBaseServices.CacheServices.Class
         }
 
 
-        public ICollection<TKey> GetKeys()
+        public IReadOnlyCollection<TKey> GetKeys()
         {
-            return this.itemsDictionary.Keys;
+            /// itemsDictionary.Keys در همان لحظه، یک snapshot (کپی) از کلیدها می‌گیرد.
+            /// پس اگر بین این خط و iterate کردن مصرف‌کننده، نخ دیگری چیزی به دیکشنری اضافه/حذف کند،
+            /// این snapshot دست‌نخورده می‌ماند و iterate امن است.
+            return this.itemsDictionary.Keys.ToList().AsReadOnly();
         }
 
 
-        public TItem Get(TKey key)
+        public bool TryGetValue(TKey key, out TItem value)
         {
-            return this.itemsDictionary[key];
+            return this.itemsDictionary.TryGetValue(key, out value);
         }
 
 
-        public IReadOnlyList<TItem> GetAll()
+        public IReadOnlyList<TItem> GetAllValuesCopy()
         {
+            /// itemsDictionary.Values در همان لحظه، یک snapshot (کپی) از مقدارها می‌گیرد.
+            /// پس مراحل بعدی (ToList و AsReadOnly) روی همان snapshot کار می‌کنند، نه روی داده‌ی زنده.
+            /// تغییرات همزمانِ نخ‌های دیگر روی itemsDictionary، به این snapshot آسیب نمی‌زند.
+            /// به همین دلیل، این زنجیره‌ی چند متدی race ندارد — برخلاف ContainsKey + Get که هر دو روی داده‌ی زنده کار می‌کنند.
             return this.itemsDictionary.Values.ToList().AsReadOnly();
         }
 
 
-        public IReadOnlyDictionary<TKey, TItem> GetAllKeyValuesSnapshot()
+        public IReadOnlyDictionary<TKey, TItem> GetAllKeyValues()
         {
+            /// دقت کنید که سازنده ی ReadOnlyDictionary ، آیتم های دیکشنری را کپی نمیکنه .
+            /// برخلاف سازنده ها ی Dictionary و ConcurrentDictionary که کپی میکنه ، 
+            /// یعنی ReadOnlyDictionary ، همون شیِ دیکشنری را اشاره میکنه که itemsDictionary هم هست .
+            /// یعنی با تغییر در itemsDictionary ، شی ReadOnlyDictionary هم تغییر میکنه .
             return new ReadOnlyDictionary<TKey, TItem>(this.itemsDictionary);
+        }
+
+
+        public IReadOnlyDictionary<TKey, TItem> GetAllKeyValuesCopy()
+        {
+            ///  سازنده ها ی Dictionary و ConcurrentDictionary کالکشن را کپی میکنن ، 
+            ///  همچنین چون شی Dictionary زیر ، اولا نهایتا در wrapper ئه ReadOnlyDictionary پیچیده میشه و کسی نمیتونه در اون چیزی بنویسه و -
+            ///  دوما چون شی Dictionary ، بخاطر قفل داخلی که نداره (نسبت به ConcurrentDictionary که قفل داخلی داره) ، موقع خوندن میتونه توسط چند نخ هم خونده بشه و سریعتر هست .
+            return new Dictionary<TKey, TItem>(this.itemsDictionary).AsReadOnly();
         }
 
 
@@ -80,8 +100,7 @@ namespace Infra.CacheService.CacheBaseServices.CacheServices.Class
 
         public TItem AddOrUpdate(TKey key, TItem value)
         {
-            this.itemsDictionary[key] = value;
-            return this.itemsDictionary[key];
+            return this.itemsDictionary.AddOrUpdate(key, value, (_, _) => value);
         }
 
 
@@ -97,9 +116,15 @@ namespace Infra.CacheService.CacheBaseServices.CacheServices.Class
         }
 
 
-        public bool Remove(TKey key)
+        public bool TryRemove(TKey key)
         {
-            return this.itemsDictionary.Remove(key, out TItem item);
+            return this.itemsDictionary.TryRemove(key, out TItem item);
+        }
+
+
+        public bool TryRemove(TKey key, out TItem value)
+        {
+            return this.itemsDictionary.TryRemove(key, out value);
         }
 
 

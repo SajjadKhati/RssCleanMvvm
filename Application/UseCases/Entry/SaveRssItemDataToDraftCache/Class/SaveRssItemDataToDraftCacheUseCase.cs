@@ -1,7 +1,7 @@
-﻿using Application.OverallDataModels.OverallDto.EntityDto;
+﻿using Application.OverallDataModels.OverallDto.CompositeDto;
+using Application.OverallDataModels.OverallDto.EntityDto;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.DataModels;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
-using Application.UseCases.Shared.SaveRssItemToDraftCache.DataModels;
 using Application.UseCases.Shared.SaveRssItemToDraftCache.Interface;
 using Domain.DomainEntities.RssEntity.Class;
 
@@ -25,17 +25,18 @@ namespace Application.UseCases.Entry.SaveRssItemDataToDraftCache.Class
         /////////////////////////////////////////////////////////////////////
 
 
-        public async Task ExecuteAsync(RssItemDataEditableInput rssItemDataEditableInput)
+        public async Task<bool> ExecuteAsync(RssItemDataEditableInput rssItemDataEditableInput)
         {
-            await Task.Run(() => this.Execute(rssItemDataEditableInput));
+            return await Task.Run(() => this.Execute(rssItemDataEditableInput));
         }
+
 
         /////////////////////////////////////////////////////////////////////
 
 
-        private void Execute(RssItemDataEditableInput rssItemDataEditableInput)
+        private bool Execute(RssItemDataEditableInput rssItemDataEditableInput)
         {
-            this.saveRssItemToDraftCacheOrchestrator.SaveToDraftCache(rssItemDataEditableInput.Id,
+            return this.saveRssItemToDraftCacheOrchestrator.SaveToDraftCache(rssItemDataEditableInput.Id,
                 (RssItemWithDto currentRssItemWithDto) =>
                 {
                     if (currentRssItemWithDto ==null || currentRssItemWithDto.RssItem == null || currentRssItemWithDto.RssItemDto == null)

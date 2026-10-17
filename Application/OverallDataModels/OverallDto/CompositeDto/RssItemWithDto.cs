@@ -1,7 +1,7 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
 using Domain.DomainEntities.RssEntity.Class;
 
-namespace Application.UseCases.Shared.SaveRssItemToDraftCache.DataModels
+namespace Application.OverallDataModels.OverallDto.CompositeDto
 {
     public class RssItemWithDto
     {

@@ -40,10 +40,9 @@ namespace Application.UseCases.Entry.DownLoadRssItems.Class
 
         private async Task<RssItemDtosResult> Execute(Uri rssFeedId)
         {
-            if (this.rssFeedConfigCache.ContainsKey(rssFeedId) == false)
+            if (this.rssFeedConfigCache.TryGetValue(rssFeedId, out RssFeedConfig rssFeedConfig) == false)
                 throw new Exception($"تنظیماتِ {nameof(RssFeedConfig)} برای این شناسه ی RssFeed ، پیدا نشد .");
 
-            RssFeedConfig rssFeedConfig = this.rssFeedConfigCache.Get(rssFeedId);
             RssItemsWithDtoReport rssItemsWithDtoBuildingResult = 
                 await this.rssItemDownloaderIntoDraftCacheOrchestrator.DownloadAndStoreInDraftCacheAsync(rssFeedConfig);
             return new RssItemDtosResult(rssItemsWithDtoBuildingResult.CreatedRssItemDtos, rssItemsWithDtoBuildingResult.CreationErrors);

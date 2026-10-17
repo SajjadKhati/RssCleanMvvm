@@ -3,7 +3,6 @@ using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interface
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Factory.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.DataAccessBase.UnitOfWork.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
 using Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class;
 using Infra.DataAccess.DataAccessBaseServices.UnitOfWorkService.InternalInterface;
 using Infra.DataAccess.DbContextService.Class;
@@ -11,6 +10,7 @@ using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
 using Infra.DataAccess.ExpressionFactoryService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
+using Infra.DataAccess.RssItemReconstructorService.Interface;
 
 namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory.Class
 {
@@ -19,11 +19,13 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
 
         private ICache<Uri, RssItemEfEntity> persistenceCache;
 
+        private ReaderWriterLockSlim sharedPersistenceCacheLock;
+
         private IDraftCacheWriter draftCacheWriter;
 
         private RssItemEfEntityMapper efEntityMapper;
 
-        private IImageFileReader imageFileReader;
+        private IRssItemReconstructor rssItemReconstructor;
 
         private IRssItemEfEntityFactory rssItemEfEntityFactory;
 
@@ -34,13 +36,14 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
 
 
         public RssItemRepositoryFactory(RssItemEfEntityMapper efEntityMapper, ICache<Uri, RssItemEfEntity> persistenceCache,
-            IDraftCacheWriter draftCacheWriter, IImageFileReader imageFileReader, IRssItemEfEntityFactory rssItemEfEntityFactory,
-                RssItemEfEntityExpressionFactory expressionFactory)
+            ReaderWriterLockSlim sharedPersistenceCacheLock, IDraftCacheWriter draftCacheWriter, IRssItemReconstructor rssItemReconstructor, 
+            IRssItemEfEntityFactory rssItemEfEntityFactory, RssItemEfEntityExpressionFactory expressionFactory)
         {
             this.persistenceCache = persistenceCache;
+            this.sharedPersistenceCacheLock = sharedPersistenceCacheLock;
             this.draftCacheWriter = draftCacheWriter;
             this.efEntityMapper = efEntityMapper;
-            this.imageFileReader = imageFileReader;
+            this.rssItemReconstructor = rssItemReconstructor;
             this.rssItemEfEntityFactory = rssItemEfEntityFactory;
             this.expressionFactory = expressionFactory;
         }
@@ -58,8 +61,8 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory
             if(dbContextProvider.DbContext is not RssDbContext rssDbContext)
                 throw new ArgumentException($"نوع {nameof(dbContextProvider.DbContext)} ، باید از نوع RssDbContext باشد .");
 
-            return new RssItemRepository(rssDbContext, this.persistenceCache, this.draftCacheWriter, 
-                this.efEntityMapper, this.imageFileReader, this.rssItemEfEntityFactory, this.expressionFactory);
+            return new RssItemRepository(rssDbContext, this.persistenceCache, this.sharedPersistenceCacheLock, this.draftCacheWriter, 
+                this.efEntityMapper, this.rssItemReconstructor, this.rssItemEfEntityFactory, this.expressionFactory);
         }
 
     }

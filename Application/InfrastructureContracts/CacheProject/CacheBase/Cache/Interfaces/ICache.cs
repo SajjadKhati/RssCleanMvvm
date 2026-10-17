@@ -7,13 +7,15 @@
 
         bool ContainsKey(TKey key);
 
-        ICollection<TKey> GetKeys();
+        IReadOnlyCollection<TKey> GetKeys();
 
-        TItem Get(TKey key);
+        bool TryGetValue(TKey key, out TItem value);
 
-        IReadOnlyList<TItem> GetAll();
+        IReadOnlyList<TItem> GetAllValuesCopy();
 
-        IReadOnlyDictionary<TKey, TItem> GetAllKeyValuesSnapshot();
+        IReadOnlyDictionary<TKey, TItem> GetAllKeyValues();
+
+        IReadOnlyDictionary<TKey, TItem> GetAllKeyValuesCopy();
 
         TItem GetOrAdd(TKey key, TItem value);
 
@@ -25,7 +27,9 @@
 
         void Set(TKey key, TItem value);
 
-        bool Remove(TKey key);
+        bool TryRemove(TKey key);
+
+        bool TryRemove(TKey key, out TItem value);
 
         void Clear();
 

@@ -3,11 +3,11 @@
     public class DraftEntry<TItem>
     {
 
-        public TItem Item { get; set; }
+        public TItem Item { get; init; }
 
-        public DraftState DraftState { get; set; }
+        public DraftState DraftState { get; init; }
 
-        public object Tag {  get; set; }
+        public object Tag {  get; init; }
 
 
         ///////////////////////////////////////////////////////////////

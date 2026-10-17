@@ -8,8 +8,6 @@ namespace Application.InfrastructureContracts.ImageProject.ImageSettings.ImageSe
 
         ImageSettings<ImageInfo> Get(Uri rssItemId);
 
-        ImageSettings<ImageInfo> GetDefault(byte[,,] image);
-
         ImageSettings<ImageInfo> GetOrDefault(Uri rssItemId, byte[,,] image);
 
     }

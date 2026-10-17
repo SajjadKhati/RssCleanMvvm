@@ -153,7 +153,7 @@ namespace CompositionRoot.WpfApp
                 SingletonProvider singletonProvider = new SingletonProvider(connectionString, this.appPaths);
                 await singletonProvider.InitializeSingletonPropertiesAsync();
                 ///
-                this.appFinalizer = new AppFinalizer(singletonProvider.RssItemDraftCacheManager);
+                this.appFinalizer = new AppFinalizer(new List<IDisposable> { singletonProvider.RssItemDraftCacheManager });
                 ///
                 IAppearanceSwitcher appearanceSwitcher = this.CreateAppearanceSwitcher();
                 ViewModelCompositionRoot viewModelCompositionRoot = this.GetViewModelCompositionRoot(
@@ -194,6 +194,7 @@ namespace CompositionRoot.WpfApp
                 appPaths,
                 singletonProvider.RssItemDraftCacheManager,
                 singletonProvider.PersistenceCache,
+                singletonProvider.SharedPersistenceCacheLock,
                 singletonProvider.RssFeedConfigCache,
                 appearanceSwitcher);
         }

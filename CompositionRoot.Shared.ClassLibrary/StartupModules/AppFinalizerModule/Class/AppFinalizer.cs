@@ -1,19 +1,17 @@
-﻿using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.RssItemDraftCacheManager.Interface;
-
-namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppFinalizerModule.Class
+﻿namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppFinalizerModule.Class
 {
     public class AppFinalizer : IDisposable
     {
 
-        private IRssItemDraftCacheManager rssItemDraftCacheManager;
+        private IList<IDisposable> disposables;
 
 
         ////////////////////////////////////////////////////////////////////////
 
 
-        public AppFinalizer(IRssItemDraftCacheManager rssItemDraftCacheManager)
+        public AppFinalizer(IList<IDisposable> disposables)
         {
-            this.rssItemDraftCacheManager = rssItemDraftCacheManager;
+            this.disposables = disposables;
         }
 
 
@@ -22,7 +20,11 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.AppFinalizerModule.
 
         public void Dispose()
         {
-            this.rssItemDraftCacheManager.Dispose();
+            foreach (IDisposable disposable in this.disposables)
+            {
+                disposable.Dispose();
+            }
+            this.disposables = null;
         }
 
     }

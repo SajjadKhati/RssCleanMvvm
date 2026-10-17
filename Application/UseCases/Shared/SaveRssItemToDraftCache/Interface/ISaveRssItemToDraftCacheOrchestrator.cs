@@ -1,9 +1,9 @@
-﻿using Application.UseCases.Shared.SaveRssItemToDraftCache.DataModels;
+﻿using Application.OverallDataModels.OverallDto.CompositeDto;
 
 namespace Application.UseCases.Shared.SaveRssItemToDraftCache.Interface
 {
     public interface ISaveRssItemToDraftCacheOrchestrator
     {
-        void SaveToDraftCache(Uri rssItemId, Func<RssItemWithDto, RssItemWithDto> updateFunc);
+        bool SaveToDraftCache(Uri rssItemId, Func<RssItemWithDto, RssItemWithDto> updateFunc);
     }
 }

@@ -17,17 +17,28 @@ namespace Infra.CacheService.CacheBaseServices.DraftCacheServices.Class
         {
         }
 
+
         ////////////////////////////////////////////////
 
 
-        public TItem GetItem(TKey key)
+        public bool TryGetItem(TKey key, out TItem value)
         {
-            return this.Get(key).Item;
+            if(this.TryGetValue(key, out DraftEntry<TItem> draftEntry) == true)
+            {
+                value = draftEntry.Item;
+                return true;
+            }
+            value = default(TItem);
+            return false;
         }
 
 
-        public IReadOnlyList<TItem> GetAllItems()
+        public IReadOnlyList<TItem> GetAllItemsCopy()
         {
+            /// همانند GetAllValuesCopy در کلاس Cache:
+            /// Values ابتدا یک snapshot می‌گیرد، سپس Select و ToList و AsReadOnly
+            /// روی همان snapshot کار می‌کنند. تغییرات همزمان نخ‌های دیگر روی itemsDictionary،
+            /// به این snapshot آسیب نمی‌زند. پس این زنجیره‌ی چند متدی، race ندارد.
             return this.itemsDictionary.Values.Select(draftEntry => draftEntry.Item).ToList().AsReadOnly();
         }
 

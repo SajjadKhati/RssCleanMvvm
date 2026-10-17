@@ -410,9 +410,10 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
         private IRssItemDtoQuery GetRssItemDtoQuery()
         {
-            IRssItemDtoQueryFactory rssItemDtoQueryFactory = new RssItemDtoQueryFactory(
-                this.GetConnectionString(), this.PersistenceCache, new RssItemDtoEfEntityMapper(new PersianCalenderConvertor()), this.GetExpressionFactory());
-            return rssItemDtoQueryFactory.Create();
+            throw new NotImplementedException();
+            //IRssItemDtoQueryFactory rssItemDtoQueryFactory = new RssItemDtoQueryFactory(
+            //    this.GetConnectionString(), this.PersistenceCache, new RssItemDtoEfEntityMapper(new PersianCalenderConvertor()), this.GetExpressionFactory());
+            //return rssItemDtoQueryFactory.Create();
         }
 
 
@@ -462,19 +463,21 @@ namespace xUnitTest.Infrastructure.HttpServiceTest
 
         private IRssItemRepositoryFactory GetRssItemRepositoryFactory()
         {
-            RssItemEfEntityMapper efEntityMapper = new RssItemEfEntityMapper();
-            IDraftCacheWriter draftCacheWriter = new DraftCacheWriter();
-            ImageUtility imageUtility = new ImageUtility();
-            IImageFileSaver imageFileSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(new ImageInfoMemberMapper()));
-            IFilePathMaker filePathMaker = new FilePathMaker(new StringHasher());
-            ImageSettingsMapper imageSettingsMapper = new ImageSettingsMapper();
-            IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, 
-                new ImageFileExtensionResolver(), filePathMaker, imageSettingsMapper);
-            IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
-            IRssItemDtoMapper rssItemDtoMapper = new Application.Services.Mapper.RssItemDtoMapper(new PersianCalenderConvertor());
-            IRssItemEfEntityFactory rssItemEfEntityFactory = new RssItemDtoEfEntityFactory(imageFileSaverCoordinator, rssItemDtoMapper, efEntityMapper);
-            return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, draftCacheWriter, imageFileReader, 
-                rssItemEfEntityFactory, this.GetExpressionFactory());
+            throw new NotImplementedException();
+
+            //RssItemEfEntityMapper efEntityMapper = new RssItemEfEntityMapper();
+            //IDraftCacheWriter draftCacheWriter = new DraftCacheWriter();
+            //ImageUtility imageUtility = new ImageUtility();
+            //IImageFileSaver imageFileSaver = new ImageFileSaver(imageUtility, new ImageFileSettingsMemberMapper(new ImageInfoMemberMapper()));
+            //IFilePathMaker filePathMaker = new FilePathMaker(new StringHasher());
+            //ImageSettingsMapper imageSettingsMapper = new ImageSettingsMapper();
+            //IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(imageFileSaver, 
+            //    new ImageFileExtensionResolver(), filePathMaker, imageSettingsMapper);
+            //IImageFileReader imageFileReader = new ImageFileReader(new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper()));
+            //IRssItemDtoMapper rssItemDtoMapper = new Application.Services.Mapper.RssItemDtoMapper(new PersianCalenderConvertor());
+            //IRssItemEfEntityFactory rssItemEfEntityFactory = new RssItemDtoEfEntityFactory(imageFileSaverCoordinator, rssItemDtoMapper, efEntityMapper);
+            //return new RssItemRepositoryFactory(efEntityMapper, this.PersistenceCache, draftCacheWriter, imageFileReader, 
+            //    rssItemEfEntityFactory, this.GetExpressionFactory());
         }
 
 

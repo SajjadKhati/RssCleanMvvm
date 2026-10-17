@@ -16,6 +16,8 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class
 
         private ICache<Uri, RssItemEfEntity> persistenceCache;
 
+        private ReaderWriterLockSlim sharedPersistenceCacheLock;
+
         private RssItemDtoEfEntityMapper rssItemDtoMapper;
 
         private RssItemEfEntityExpressionFactory expressionFactory;
@@ -25,10 +27,12 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class
 
 
         public RssItemDtoQueryFactory(string connectionString, ICache<Uri, RssItemEfEntity> persistenceCache, 
-            RssItemDtoEfEntityMapper rssItemDtoMapper, RssItemEfEntityExpressionFactory expressionFactory)
+            ReaderWriterLockSlim sharedPersistenceCacheLock, RssItemDtoEfEntityMapper rssItemDtoMapper, 
+            RssItemEfEntityExpressionFactory expressionFactory)
         {
             this.connectionString = connectionString;
             this.persistenceCache = persistenceCache;
+            this.sharedPersistenceCacheLock = sharedPersistenceCacheLock;
             this.rssItemDtoMapper = rssItemDtoMapper;
             this.expressionFactory = expressionFactory;
         }
@@ -42,7 +46,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class
         /// یعنی سرویس Factory شون ، فقط شی DbContext را بسازه اما این سرویس ها ، مسئول Dispose کردنش باشند .
         public IRssItemDtoQuery Create()
         {
-            return new RssItemDtoQuery(new RssDbContext(this.connectionString), this.persistenceCache, 
+            return new RssItemDtoQuery(new RssDbContext(this.connectionString), this.persistenceCache, this.sharedPersistenceCacheLock,
                 this.rssItemDtoMapper, this.expressionFactory);
         }
 

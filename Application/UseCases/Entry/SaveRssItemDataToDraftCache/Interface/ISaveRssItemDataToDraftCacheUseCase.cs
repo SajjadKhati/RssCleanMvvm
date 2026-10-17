@@ -4,6 +4,6 @@ namespace Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface
 {
     public interface ISaveRssItemDataToDraftCacheUseCase
     {
-        Task ExecuteAsync(RssItemDataEditableInput rssItemDataEditableInput);
+        Task<bool> ExecuteAsync(RssItemDataEditableInput rssItemDataEditableInput);
     }
 }

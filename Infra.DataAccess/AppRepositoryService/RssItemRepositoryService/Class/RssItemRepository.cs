@@ -2,7 +2,6 @@
 using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.DataModels;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Interfaces;
-using Application.InfrastructureContracts.ImageProject.ImageFileReader.Interfaces;
 using Application.InfrastructureContracts.SharedProject.Disposed.Interface;
 using Domain.DomainEntities.RssEntity.Class;
 using Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordinatorService.InternalClass;
@@ -13,6 +12,7 @@ using Infra.DataAccess.EfEntities.Class;
 using Infra.DataAccess.EfEntityMapperService.Class;
 using Infra.DataAccess.ExpressionFactoryService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
+using Infra.DataAccess.RssItemReconstructorService.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
@@ -20,11 +20,53 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
     public class RssItemRepository : RepositoryBase, IRssItemRepository
     {
 
-        private RssItemEfEntityMapper efEntityMapper;
-        
-        private IImageFileReader imageFileReader;
-
         private IRssItemRepositoryCacheCoordinator rssItemCacheCoordinator;
+
+        /// <summary>
+        /// قفل مشترک برای همگام‌سازیِ کش دائم (persistenceCache) با دیتابیس.
+        /// 
+        /// <para>
+        /// <b>جهت همگام‌سازی:</b>
+        /// این قفل طراحی شده تا کش دائم را با دیتابیس هماهنگ کند — <b>نه</b> دیتابیس را 
+        /// با کش. یعنی: «هر تغییری که در دیتابیس رخ می‌دهد، کش دائم هم همان لحظه 
+        /// به‌روز شود.» (write-through cache)
+        /// </para>
+        /// 
+        /// <para>
+        /// <b>الگوی استفاده (سه فاز):</b>
+        /// ۱. <c>DbContext_SavingChanges</c>: قبل از SaveChanges، write lock گرفته می‌شود
+        ///    → همه‌ی خواننده‌های persistenceCache (کلاس‌های Query) بلاک می‌شوند.
+        /// ۲. SaveChanges: دیتابیس commit می‌شود.
+        /// ۳. <c>DbContext_SavedChanges</c>: کش دائم از کش موقت به‌روز می‌شود، سپس 
+        ///    write lock آزاد می‌شود.
+        /// در صورت شکست (<c>DbContext_SaveChangesFailed</c>)، قفل آزاد می‌شود بدون 
+        /// دست‌زدن به کش — تا دیتابیس و کش هر دو روی نسخه‌ی قبلی بمانند.
+        /// </para>
+        /// 
+        /// <para>
+        /// <b>چه چیزی محافظت می‌شود؟</b>
+        /// در طول SaveChanges (که کند است — I/O)، هیچ Queryی نمی‌تواند نسخه‌ی قدیمی 
+        /// کش را بخواند. بدون این قفل، بین commit شدن دیتابیس و به‌روز شدن کش، یک 
+        /// پنجره‌ی چند میلی‌ثانیه‌ای وجود داشت که در آن، Queryها داده‌ی قدیمی می‌دیدند.
+        /// </para>
+        /// 
+        /// <para>
+        /// <b>⚠️ هزینه:</b>
+        /// در طول SaveChanges، همه‌ی Queryها بلاک می‌شوند. این trade-off آگاهانه است — 
+        /// برای اطمینان از سازگاری کامل بین دیتابیس و کش، به قیمت کارایی خواندن در 
+        /// لحظه‌ی ذخیره‌سازی.
+        /// </para>
+        /// 
+        /// در متدهای Add و Update و Delete ، قفل کردن نیازی نیست چون اصلا این متدها در کش دائم نمینویسند .
+        /// کش دائم ، فقط در موقع SaveChanges نوشته میشه که قفل داره .
+        /// متدهای Find و کلا متدهای خوندن در این کلاس ، چون اطلاعات را از کش دائم نمیخونند ، نیاز به قفل ندارند .
+        /// خوندن از کش دائم ، در کلاس های Query انجام میشه که اونجا هم از همین شی قفل ، استفاده میشه .
+        /// </summary>
+        private ReaderWriterLockSlim sharedPersistenceCacheLock;
+
+        private RssItemEfEntityMapper efEntityMapper;
+
+        private IRssItemReconstructor rssItemReconstructor;
 
         private IRssItemEfEntityFactory rssItemEfEntityFactory;
 
@@ -34,19 +76,23 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemRepository(RssDbContext rssDbContext, ICache<Uri, RssItemEfEntity> persistenceCache,
-            IDraftCacheWriter draftCacheWriter, RssItemEfEntityMapper efEntityMapper, IImageFileReader imageFileReader, 
+        public RssItemRepository(RssDbContext rssDbContext, ICache<Uri, RssItemEfEntity> persistenceCache, 
+            ReaderWriterLockSlim sharedPersistenceCacheLock, IDraftCacheWriter draftCacheWriter, 
+            RssItemEfEntityMapper efEntityMapper, IRssItemReconstructor rssItemReconstructor, 
             IRssItemEfEntityFactory rssItemEfEntityFactory, RssItemEfEntityExpressionFactory expressionFactory) : base(rssDbContext)
         {
-            /// شی RssItemRepositoryCacheCoordinator ، نیاز به تزریق نداره . چون هم سنگین نیست که خیلی لازم به تست باشه و -
-            /// هم برای مدیریت طول عمر draftCache ، که به ازای هر شی RssItemRepository ، باید یک شی draftCache داشته باشه ، نباید تزریق بشه .
+            /// شی RssItemRepositoryCacheCoordinator ، نیاز به تزریق نداره . 
+            /// چون برای مدیریت طول عمر draftCache ، که به ازای هر شی RssItemRepository ، باید یک شی draftCache داشته باشه ، نباید تزریق بشه .
             this.rssItemCacheCoordinator = new RssItemRepositoryCacheCoordinator(persistenceCache, draftCacheWriter);
+            this.sharedPersistenceCacheLock = sharedPersistenceCacheLock;
             this.efEntityMapper = efEntityMapper;
-            this.imageFileReader = imageFileReader;
+            this.rssItemReconstructor = rssItemReconstructor;
             this.rssItemEfEntityFactory = rssItemEfEntityFactory;
             this.expressionFactory = expressionFactory;
 
+            rssDbContext.SavingChanges += this.DbContext_SavingChanges;
             rssDbContext.SavedChanges += this.DbContext_SavedChanges;
+            rssDbContext.SaveChangesFailed += this.DbContext_SaveChangesFailed;
             rssDbContext.Disposed += this.DbContext_Disposed;
         }
 
@@ -87,7 +133,7 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
         public RssItem FindByKey(string rssItemKey)
         {
             RssItemEfEntity rssItemEfEntity = this.FindRssItemEfEntityByKey(rssItemKey);
-            return this.ReconstructionRssItem(rssItemEfEntity);
+            return this.rssItemReconstructor.Reconstruct(rssItemEfEntity);
         }
 
 
@@ -105,9 +151,22 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
+        private void DbContext_SavingChanges(object? sender, SavingChangesEventArgs e)
+        {
+            this.sharedPersistenceCacheLock.EnterWriteLock();
+        }
+
+
         private void DbContext_SavedChanges(object sender, SavedChangesEventArgs e)
         {
-            this.rssItemCacheCoordinator.CommitDraftCacheToPersistenceCache();
+            try { this.rssItemCacheCoordinator.CommitDraftCacheToPersistenceCache(); }
+            finally { this.sharedPersistenceCacheLock.ExitWriteLock(); }
+        }
+
+
+        private void DbContext_SaveChangesFailed(object? sender, SaveChangesFailedEventArgs e)
+        {
+            this.sharedPersistenceCacheLock.ExitWriteLock();
         }
 
 
@@ -138,18 +197,11 @@ namespace Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Class
             List<RssItem> rssItems = new List<RssItem>();
             foreach (RssItemEfEntity rssItemEfEntity in rssItemEfEntities)
             {
-                RssItem rssItem = this.ReconstructionRssItem(rssItemEfEntity);
+                RssItem rssItem = this.rssItemReconstructor.Reconstruct(rssItemEfEntity);
                 if (rssItem != null)
                     rssItems.Add(rssItem);
             }
             return (rssItems.Count > 0) ? rssItems : null;
-        }
-
-
-        private RssItem ReconstructionRssItem(RssItemEfEntity rssItemEfEntity)
-        {
-            byte[,,] imageData = this.imageFileReader.Read8BitImageFromFile(rssItemEfEntity.ImageFullFilePath);
-            return this.efEntityMapper.ToRssItem(rssItemEfEntity, imageData);
         }
 
     }

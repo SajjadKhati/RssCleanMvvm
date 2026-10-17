@@ -1,6 +1,6 @@
-﻿using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.DataModels;
+﻿using Application.InfrastructureContracts.CacheProject.CacheBase.DraftCache.DataModels;
+using Application.OverallDataModels.OverallDto.CompositeDto;
 using Application.OverallDataModels.OverallDto.EntityDto;
-using Application.UseCases.Shared.SaveRssItemToDraftCache.DataModels;
 using Domain.DomainEntities.RssEntity.Class;
 
 namespace Application.UseCases.Shared.RssItemAllSources.Interface
@@ -14,7 +14,13 @@ namespace Application.UseCases.Shared.RssItemAllSources.Interface
 
         RssItemWithDto GetRssItemWithDto(Uri rssItemId);
 
-        bool CommitDraftCacheItemToDatabase(Uri rssItemId, ImageSaveOptions imageSaveOptions);
+        bool TryGetRssItemWithDtoAndDraftEntry(Uri rssItemId, out RssItemWithDto rssItemWithDto, out DraftEntry<RssItem> originalDraftEntry);
+
+        IList<Uri> CommitAllDraftCacheItemsToDatabase();
+
+        bool CommitDraftCacheItemToDatabase(Uri rssItemId);
+
+        IList<Uri> CommitDraftCacheItemBatchToDatabase(IEnumerable<Uri> rssItemIds);
 
     }
 }

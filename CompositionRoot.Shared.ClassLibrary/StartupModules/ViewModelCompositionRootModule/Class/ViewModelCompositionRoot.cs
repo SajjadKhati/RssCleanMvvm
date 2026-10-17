@@ -3,6 +3,7 @@ using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.Draf
 using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.RssItemDraftCacheManager.Interface;
 using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemDtoQuery.Factory.Interface;
+using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemWithDtoQuery.Factory.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssSiteQuery.Factory.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppRepository.RssItemRepository.Factory.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.RssItemDtoFactory.Interface;
@@ -41,12 +42,12 @@ using Application.UseCases.Entry.LoadRssSite.Class;
 using Application.UseCases.Entry.LoadRssSite.Interface;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Class;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
+using Application.UseCases.Shared.DraftRssItemDtoFactoryOrch.Class;
+using Application.UseCases.Shared.DraftRssItemDtoFactoryOrch.Interface;
 using Application.UseCases.Shared.RssItemAllSources.Class;
 using Application.UseCases.Shared.RssItemAllSources.Interface;
 using Application.UseCases.Shared.RssItemDownloaderIntoDraftCache.Class;
 using Application.UseCases.Shared.RssItemDownloaderIntoDraftCache.Interface;
-using Application.UseCases.Shared.RssItemDtoFactory.Class;
-using Application.UseCases.Shared.RssItemDtoFactory.Interface;
 using Application.UseCases.Shared.RssItemsDownLoader.Class;
 using Application.UseCases.Shared.RssItemsDownLoader.Interface;
 using Application.UseCases.Shared.SaveRssItemToDraftCache.Class;
@@ -58,8 +59,10 @@ using Domain.ApplicationServiceContracts.RssItemAllSourcesOrchestrator.Interface
 using Domain.DomainService.RssItemDomainService.Class;
 using Domain.DomainService.RssItemDomainService.Interface;
 using Infra.CacheService.AppDraftCacheManagerService.DraftCacheWriterService.Class;
+using Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManagerService.Class;
 using Infra.CacheService.CacheBaseServices.CacheServices.Class;
 using Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Factory.Class;
+using Infra.DataAccess.AppQueryService.RssItemWithDtoQueryService.Factory.Class;
 using Infra.DataAccess.AppQueryService.RssSiteQueryService.Class.Factory;
 using Infra.DataAccess.AppRepositoryService.RssItemRepositoryService.Factory.Class;
 using Infra.DataAccess.EfEntities.Class;
@@ -67,6 +70,8 @@ using Infra.DataAccess.EfEntityMapperService.Class;
 using Infra.DataAccess.ExpressionFactoryService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Class;
 using Infra.DataAccess.RssItemDtoEfEntityFactoryService.Interface;
+using Infra.DataAccess.RssItemReconstructorService.Class;
+using Infra.DataAccess.RssItemReconstructorService.Interface;
 using Infra.DataAccess.UnitOfWorkFactoryService.Class;
 using Infra.HttpService.HttpRequestService.Factory.Class;
 using Infra.ImageService.ImageDataExtractorService.Class;
@@ -104,9 +109,11 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private readonly AppPaths appPaths;
 
-        private readonly IRssItemDraftCacheManager rssItemDraftCacheManager;
+        private readonly RssItemDraftCacheManager rssItemDraftCacheManager;
 
         private readonly ICache<Uri, RssItemEfEntity> persistenceCache;
+
+        private readonly ReaderWriterLockSlim sharedPersistenceCacheLock;
 
         private readonly ICache<Uri, RssFeedConfig> rssFeedConfigCache;
 
@@ -119,10 +126,16 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IImageSettingsReader imageSettingsReader;
 
+        private IRssItemReconstructor rssItemReconstructor;
+
+        private RssItemDtoEfEntityMapper rssItemDtoEfEntityMapper;
+
         // ====== Factoryهای Stateless ======
         private IRssItemRepositoryFactory rssItemRepositoryFactory;
 
         private IRssItemDtoQueryFactory rssItemDtoQueryFactory;
+
+        private IRssItemWithDtoQueryFactory rssItemWithDtoQueryFactory;
 
         private IRssSiteQueryFactory rssSiteQueryFactory;
 
@@ -147,25 +160,27 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IRssItemEfEntityFactory rssItemEfEntityFactory;
 
-        private IRssItemDtoFactoryOrchestrator rssItemDtoFactoryOrchestrator;
+        private IDraftRssItemDtoFactoryOrchestrator rssItemDtoFactoryOrchestrator;
 
 
         ///////////////////////////////////////////////////////////////////////
 
 
-        public ViewModelCompositionRoot(string connectionString, AppPaths appPaths, IRssItemDraftCacheManager rssItemDraftCacheManager,
-            ICache<Uri, RssItemEfEntity> persistenceCache, ICache<Uri, RssFeedConfig> rssFeedConfigCache, IAppearanceSwitcher appearanceSwitcher)
+        public ViewModelCompositionRoot(string connectionString, AppPaths appPaths, RssItemDraftCacheManager rssItemDraftCacheManager,
+            ICache<Uri, RssItemEfEntity> persistenceCache, ReaderWriterLockSlim sharedPersistenceCacheLock,
+            ICache<Uri, RssFeedConfig> rssFeedConfigCache, IAppearanceSwitcher appearanceSwitcher)
         {
             // ====== تزریق‌ها (فقط ذخیره) ======
             this.connectionString = connectionString;
             this.appPaths = appPaths;
             this.rssItemDraftCacheManager = rssItemDraftCacheManager;
             this.persistenceCache = persistenceCache;
+            this.sharedPersistenceCacheLock = sharedPersistenceCacheLock;
             this.rssFeedConfigCache = rssFeedConfigCache;
             this.appearanceSwitcher = appearanceSwitcher;
 
             // ====== راه‌اندازی (به ترتیب وابستگی) ======
-            this.InitializeImageSettings();
+            this.InitializeSharedServices();
             this.InitializeFactories();
             this.InitializeDependentServices();
             this.InitializeViewModelFactories();
@@ -175,12 +190,14 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         ///////////////////////////////////////////////////////////////////////
 
 
-        // ۱. کش و ImageSettings
-        private void InitializeImageSettings()
+        // ۱. مقداردهی سرویس هایی که مشترک هستند و در چند سرویس استفاده میشوند .
+        private void InitializeSharedServices()
         {
             this.imageSettingsCache = new Cache<Uri, ImageSettings<ImageInfo>>();
             this.imageSettingsWriter = this.CreateImageSettingsWriter();
             this.imageSettingsReader = (IImageSettingsReader)this.imageSettingsWriter;
+            this.rssItemReconstructor = this.CreateRssItemReconstructor();
+            this.rssItemDtoEfEntityMapper = this.CreateRssItemDtoEfEntityMapper();
         }
 
         // ۲. Factoryهای Stateless
@@ -188,6 +205,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         {
             this.rssItemRepositoryFactory = this.CreateRssItemRepositoryFactory();
             this.rssItemDtoQueryFactory = this.CreateRssItemDtoQueryFactory();
+            this.rssItemWithDtoQueryFactory = this.CreateRssItemWithDtoQueryFactory();
             this.rssSiteQueryFactory = this.CreateRssSiteQueryFactory();
             this.unitOfWorkFactory = this.CreateUnitOfWorkFactory();
             this.httpRequestFactory = this.CreateHttpRequestFactory();
@@ -294,8 +312,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IRssItemExistenceChecker CreateRssItemExistenceChecker()
         {
-            return new RssItemAllSourcesOrchestrator(this.rssItemDraftCacheManager, this.rssItemDtoQueryFactory,
-                this.rssItemRepositoryFactory, this.unitOfWorkFactory);
+            return new RssItemAllSourcesOrchestrator(this.rssItemDraftCacheManager, this.rssItemDraftCacheManager, this.rssItemWithDtoQueryFactory, 
+                this.rssItemDtoQueryFactory, this.rssItemRepositoryFactory, this.unitOfWorkFactory, this.imageSettingsReader, this.appPaths);
         }
 
         private IRssItemDataExtractor CreateRssItemDataExtractor()
@@ -350,6 +368,19 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             return new ImageSettingsProvider(this.imageSettingsCache, imageSettingsConverter);
         }
 
+        private IRssItemReconstructor CreateRssItemReconstructor()
+        {
+            IImageDataExtractor imageDataExtractor = new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper());
+            IImageFileReader imageFileReader = new ImageFileReader(imageDataExtractor);
+            RssItemEfEntityMapper rssItemEfEntityMapper = new RssItemEfEntityMapper();
+            return new RssItemReconstructor(imageFileReader, rssItemEfEntityMapper);
+        }
+
+        private RssItemDtoEfEntityMapper CreateRssItemDtoEfEntityMapper()
+        {
+            return new RssItemDtoEfEntityMapper(new PersianCalenderConvertor());
+        }
+
         private IImageInfoToImageSettingsConverter CreateImageInfoToImageSettingsConverter()
         {
             return new ImageInfoToImageSettingsConverter();
@@ -362,10 +393,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private IRssItemRepositoryFactory CreateRssItemRepositoryFactory()
         {
             IDraftCacheWriter draftCacheWriter = new DraftCacheWriter();
-            IImageDataExtractor imageDataExtractor = new ImageDataExtractor(new InfraImageCreator(), new ImageInfoMemberMapper());
-            IImageFileReader imageFileReader = new ImageFileReader(imageDataExtractor);
             IImageFileSaver imageFileSaver = new ImageFileSaver(new ImageUtility(), new ImageFileSettingsMemberMapper(new ImageInfoMemberMapper()));
-
             IImageFileSaverCoordinator imageFileSaverCoordinator = new ImageFileSaverCoordinator(
                 imageFileSaver, new ImageFileExtensionResolver(), new FilePathMaker(new StringHasher()), new ImageSettingsMapper());
             RssItemEfEntityMapper rssItemEfEntityMapper = new RssItemEfEntityMapper();
@@ -373,15 +401,21 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
                 imageFileSaverCoordinator, new RssItemDtoMapper(new PersianCalenderConvertor()), new RssItemEfEntityMapper());
             RssItemEfEntityExpressionFactory expressionFactory = new RssItemEfEntityExpressionFactory();
 
-            return new RssItemRepositoryFactory(rssItemEfEntityMapper, this.persistenceCache, draftCacheWriter,
-                imageFileReader, rssItemEfEntityFactory, expressionFactory);
+            return new RssItemRepositoryFactory(rssItemEfEntityMapper, this.persistenceCache, this.sharedPersistenceCacheLock, draftCacheWriter,
+                this.rssItemReconstructor, rssItemEfEntityFactory, expressionFactory);
         }
 
         private IRssItemDtoQueryFactory CreateRssItemDtoQueryFactory()
         {
-            RssItemDtoEfEntityMapper rssItemDtoEfEntityMapper = new RssItemDtoEfEntityMapper(new PersianCalenderConvertor());
             RssItemEfEntityExpressionFactory expressionFactory = new RssItemEfEntityExpressionFactory();
-            return new RssItemDtoQueryFactory(this.connectionString, this.persistenceCache, rssItemDtoEfEntityMapper, expressionFactory);
+            return new RssItemDtoQueryFactory(this.connectionString, this.persistenceCache, this.sharedPersistenceCacheLock, 
+                this.rssItemDtoEfEntityMapper, expressionFactory);
+        }
+
+        private IRssItemWithDtoQueryFactory CreateRssItemWithDtoQueryFactory()
+        {
+            return new RssItemWithDtoQueryFactory(this.connectionString, this.persistenceCache, this.sharedPersistenceCacheLock, 
+                this.rssItemReconstructor, this.rssItemDtoEfEntityMapper);
         }
 
         private IRssSiteQueryFactory CreateRssSiteQueryFactory()
@@ -414,8 +448,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private ISaveRssItemToDraftCacheOrchestrator CreateSaveRssItemToDraftCacheOrchestrator()
         {
-            return new SaveRssItemToDraftCacheOrchestrator(this.rssItemDraftCacheManager, this.rssItemDtoQueryFactory,
-                this.rssItemExistenceChecker, this.rssItemAllSourcesOrchestrator);
+            return new SaveRssItemToDraftCacheOrchestrator(
+                this.rssItemDraftCacheManager, this.rssItemDtoQueryFactory, this.rssItemAllSourcesOrchestrator);
         }
 
         private IImageChannelCountNormalizerFactory<byte> CreateImageChannelCountNormalizerFactory()
@@ -504,9 +538,9 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             return new RssItemEfEntityMapper();
         }
 
-        private IRssItemDtoFactoryOrchestrator CreateRssItemDtoFactoryOrchestrator()
+        private IDraftRssItemDtoFactoryOrchestrator CreateRssItemDtoFactoryOrchestrator()
         {
-            return new RssItemDtoFactoryOrchestrator(this.rssItemDtoFactory, this.imageSettingsReader, this.appPaths.TempImagesFolderPath);
+            return new DraftRssItemDtoFactoryOrchestrator(this.rssItemDtoFactory, this.imageSettingsReader, this.appPaths);
         }
 
     }

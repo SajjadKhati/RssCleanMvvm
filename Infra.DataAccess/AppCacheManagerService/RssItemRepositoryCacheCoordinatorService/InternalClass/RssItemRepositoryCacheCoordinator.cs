@@ -9,9 +9,32 @@ using Infra.DataAccess.EfEntities.Class;
 namespace Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordinatorService.InternalClass
 {
     /// <summary>
+    /// هماهنگ‌کننده‌ی نوشتن در کش دائم (persistenceCache) و کش موقت (draftCache).
+    /// 
     /// جای اصلی این کلاس ، در پروژه ی Infra.CacheService هست .
     /// منتها چون این کلاس ، مستقیما توسط کلاس RssItemRepository شی اش ساخته میشه (و رابط IRssItemRepositoryCacheCoordinator ، در سازنده ی RssItemRepository تزریق نمیشه) ، 
     /// بنابراین اگر این سرویس را در پروژه ی Infra.CacheService تعریف کنیم ، چرخه ی وابستگی به پروژه ها بوجود میاد و نمیشه .
+    /// 
+    /// ═══════════════════════════════════════════════════════════════════════
+    /// ⚠️ قاعده: این کلاس هیچ قفلی لازم ندارد. دلایل:
+    /// 
+    /// ۱. کش موقت (draftCache):
+    ///    - per-instance است (با هر شی RssItemRepository، یک شی جدید ساخته می‌شود).
+    ///    - RssItemRepository به ازای هر متد/نخ ساخته می‌شود.
+    ///    - پس draftCache بین نخ‌ها به اشتراک گذاشته نمی‌شود → قفل لازم ندارد.
+    /// 
+    /// ۲. کش دائم (persistenceCache):
+    ///    - یک شیء ConcurrentDictionary است (از DI تزریق می‌شود).
+    ///    - تمام عملیات روی آن (AddOrUpdate, TryRemove) تک‌عملیات اتمی هستند.
+    ///    - اتمی بودن برای خواندن/نوشتن همزمان کافی است → قفل لازم ندارد.
+    ///    - مصرف‌کننده‌ها (RssItemDtoQuery) هم فقط تک‌عملیات انجام می‌دهند → نیازی به قفل مشترک نیست.
+    /// 
+    /// ۳. متدهای این کلاس:
+    ///    - MarkAsAdded/Modified/Deleted: تک‌نوشتن در draftCache.
+    ///    - CommitDraftCacheToPersistenceCache: حلقه روی draftCache per-instance + 
+    ///      عملیات‌های اتمی روی persistenceCache.
+    ///    - هیچ invariant چندعملیاتیِ سطح‌بالاتری وجود ندارد که به قفل نیاز داشته باشد.
+    /// ═══════════════════════════════════════════════════════════════════════
     /// </summary>
     internal class RssItemRepositoryCacheCoordinator : IRssItemRepositoryCacheCoordinator
     {
@@ -30,6 +53,12 @@ namespace Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordina
         /// <summary>
         /// این کش ، کش موقت هست . بنابراین با هر شیِ جدید از این کلاس ، شی جدید از این کش لازم هست . بنابراین در سازنده ، تزریق نمیشه و در سازنده ، هر بار شی جدید ازش ساخته میشه .
         /// این کش موقت ، در متدهای Add و Delete و Update ، نوشتته میشه و در متد Save خونده و به persistenceCache منتقل میشه .
+        /// 
+        /// کش موقت — per-instance (با هر شیء از این کلاس، یک شیء جدید).
+        /// 
+        /// ⚠️ قاعده: این فیلد نیازی به قفل ندارد.
+        /// دلیل: چون per-instance است و RssItemRepository (که این کلاس را می‌سازد)
+        ///       به ازای هر متد/نخ ساخته می‌شود، پس هیچ نخ دیگری به این draftCache دسترسی ندارد.
         /// </summary>
         private IDraftCache<Uri, RssItemEfEntity> draftCache;
 
@@ -68,13 +97,24 @@ namespace Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordina
         }
 
 
+        /// <summary>
+        /// انتقال تمام آیتم‌های کش موقت به کش دائم.
+        /// 
+        /// ⚠️ این متد نیازی به قفل ندارد:
+        /// - حلقه روی GetAllValuesCopy() (که خودش snapshot می‌گیرد) → امن.
+        /// - MoveDraftCacheToPersistenceCache: تک‌عملیات اتمی روی persistenceCache.
+        /// - TryRemove روی draftCache per-instance: فقط همان نخ دسترسی دارد.
+        /// 
+        /// کل عملیات، با نخ‌های دیگر روی persistenceCache موازی است — 
+        /// ولی چون هر عملیات اتمی است، هیچ داده‌ی ناهمگونی رخ نمی‌دهد.
+        /// </summary>
         public void CommitDraftCacheToPersistenceCache()
         {
-            foreach (DraftEntry<RssItemEfEntity> draftEntry in this.draftCache.GetAll())
+            foreach (DraftEntry<RssItemEfEntity> draftEntry in this.draftCache.GetAllValuesCopy())
             {
                 Uri key = (Uri)draftEntry.Tag;
                 this.MoveDraftCacheToPersistenceCache(key, draftEntry);
-                this.draftCache.Remove(key);
+                this.draftCache.TryRemove(key);
             }
         }
 
@@ -82,6 +122,16 @@ namespace Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordina
         ////////////////////////////////////////////////////////////////////////////////////////////
 
 
+        /// <summary>
+        /// انتقال یک draftEntry به کش دائم، بر اساس وضعیت آن (Added/Modified/Deleted).
+        /// 
+        /// ⚠️ این متد نیازی به قفل ندارد:
+        /// - AddOrUpdate و TryRemove روی ConcurrentDictionary، تک ‌عملیات اتمی هستند.
+        /// - اتمی بودن برای هماهنگی با نخ‌های خواننده (RssItemDtoQuery) کافی است.
+        /// - هیچ قانون یا invariant چندعملیاتی در این متد وجود ندارد.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="draftEntry"></param>
         private void MoveDraftCacheToPersistenceCache(Uri key, DraftEntry<RssItemEfEntity> draftEntry)
         {
             switch (draftEntry.DraftState)
@@ -94,7 +144,7 @@ namespace Infra.DataAccess.AppCacheManagerService.RssItemRepositoryCacheCoordina
                 }
                 case DraftState.Deleted:
                 {
-                    this.persistenceCache.Remove(key);
+                    this.persistenceCache.TryRemove(key);
                     break;
                 }
             }
