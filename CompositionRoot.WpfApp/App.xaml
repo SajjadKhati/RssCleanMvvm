@@ -6,7 +6,8 @@
     <Application.Resources>
          <ResourceDictionary>
              <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/BindingConverters/BindingConverterResource.xaml"/>
+                 <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/AppResource/LanguageResource/PersianLanguageResource.xaml"/>
+                <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/BindingConverters/BindingConverterResource.xaml"/>
                 <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/CommonResource/DefaultCommonResource.xaml"/>
                 <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/Theme/DarkThemeResource.xaml"/>
                 <ResourceDictionary Source="/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/ControlTemplates/DefaultTemplate/DefaultTemplateMergedResources.xaml"/>

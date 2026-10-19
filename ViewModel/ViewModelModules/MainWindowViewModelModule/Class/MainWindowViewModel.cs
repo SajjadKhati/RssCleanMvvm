@@ -1,16 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;
-using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
+using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.DataModel;
+using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.Interface;
+using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.DataModel;
+using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.Interface;
 using ViewModel.Services.SharedMessengerKeyService.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
 {
@@ -18,6 +14,8 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
     {
 
         private IAppearanceSwitcher appearanceSwitcher;
+
+        protected ILanguageSwitcher languageSwitcher;
 
 
         /////////////////////////////////////////////////////////////////////////////
@@ -45,20 +43,29 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
         }
 
 
+        /////////////////////////////////////////////////////////////////////////////
+
+
         public IAsyncRelayCommand ExitCommand { get; }
 
-        public IAsyncRelayCommand ChangeThemeCommand { get; }
+        public IRelayCommand ChangeThemeCommand { get; }
+
+        public IRelayCommand ChangeLanguageCommand { get; }
 
 
         /////////////////////////////////////////////////////////////////////////////
 
 
-        public MainWindowViewModel(RssUserControlViewModel rssUserControlViewModel, IAppearanceSwitcher appearanceSwitcher)
+        public MainWindowViewModel(RssUserControlViewModel rssUserControlViewModel, IAppearanceSwitcher appearanceSwitcher, 
+            ILanguageSwitcher languageSwitcher)
         {
             this.RssUserControlViewModel = rssUserControlViewModel;
             this.appearanceSwitcher = appearanceSwitcher;
+            this.languageSwitcher = languageSwitcher;
+
             this.ExitCommand = new AsyncRelayCommand(this.Exit);
-            this.ChangeThemeCommand = new AsyncRelayCommand<ThemeName>(this.ChangeTheme, this.CanChangeTheme);
+            this.ChangeThemeCommand = new RelayCommand<ThemeName>(this.ChangeTheme, this.CanChangeTheme);
+            this.ChangeLanguageCommand = new RelayCommand<LanguageName>(this.ChangeLanguage, this.CanChangeLanguage);
             this.RegisterMessageHandler();
         }
 
@@ -93,7 +100,7 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
         }
 
 
-        private async Task ChangeTheme(ThemeName themeName)
+        private void ChangeTheme(ThemeName themeName)
         {
             this.appearanceSwitcher.ChangeTheme(themeName);
             /// پس از تغییر تم، وضعیت CanExecute کامند را بهروزرسانی میکنیم
@@ -102,8 +109,19 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
         }
 
 
-        /////////////////////////////////////////////////////////////////////////////
+        private bool CanChangeLanguage(LanguageName languageName)
+        {
+            return this.languageSwitcher.GetCurrentLanguage() != languageName;
+        }
 
+
+        private void ChangeLanguage(LanguageName languageName)
+        {
+            this.languageSwitcher.ChangeLanguage(languageName);
+            /// پس از تغییر زبان ، وضعیت CanExecute کامند را بهروزرسانی میکنیم
+            /// تا المنت و کنترل هایی که به این Command مون Binding هستند ، وضعیت فعال یا غیر فعال بودن شون را به روزرسانی کنند ..
+            this.ChangeLanguageCommand.NotifyCanExecuteChanged();
+        }
 
     }
 }

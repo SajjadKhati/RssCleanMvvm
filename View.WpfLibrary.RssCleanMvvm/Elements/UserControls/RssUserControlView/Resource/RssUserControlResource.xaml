@@ -12,7 +12,8 @@
 
     <filePathToBitmapImageConverterModule:FilePathToBitmapImageConverter x:Key="FilePathToBitmapImageConverterKey"/>
 
-    <isInEditModeToStringConverterModule:IsInEditModeToStringConverter x:Key="IsInEditModeToStringConverterKey"/>
+    <isInEditModeToStringConverterModule:IsInEditModeToStringConverter x:Key="IsInEditModeToStringConverterKey"
+            EditModeKey="EditModeKey" ReadModeKey="ReadModeKey"/>
 
     <isInEditModeToVisibilityConverterModule:IsInEditModeToVisibilityConverter x:Key="IsInEditModeToVisibilityConverterKey"/>
 

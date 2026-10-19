@@ -39,19 +39,20 @@
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Margin="0, 5">
-                <TextBlock HorizontalAlignment="Left" Text="سایت خبری : " Style="{StaticResource TextBlockStyleKey}"/>
+                <TextBlock HorizontalAlignment="Left" Text="{DynamicResource NewsSiteKey}" Style="{StaticResource TextBlockStyleKey}"/>
 
                 <ComboBox  x:Name="SiteNameComboBox"  HorizontalAlignment="Right" HorizontalContentAlignment="Center" MinWidth="250" IsReadOnly="True"
-                       Text="خبرگزاری را انتخاب کنید" IsSynchronizedWithCurrentItem="True"
+                       Text="{DynamicResource SelectNewsAgencyKey}" IsSynchronizedWithCurrentItem="True"
                        ItemsSource="{Binding Path=RssSiteViewModels }"
                        DisplayMemberPath="SiteName"
                        SelectedItem="{Binding Mode=OneWayToSource, Path=SelectedRssSiteViewModel}"/>
             </Grid>
 
             <Grid Grid.Row="1" Margin="0, 5">
-                <TextBlock HorizontalAlignment="Left" Text="دسته ی خبری : " Style="{StaticResource TextBlockStyleKey}"/>
+                <TextBlock HorizontalAlignment="Left" Text="{DynamicResource NewsCategoryKey}" Style="{StaticResource TextBlockStyleKey}"/>
 
-                <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center"  MinWidth="250" IsReadOnly="True" Text="موضوع خبری را انتخاب کنید"
+                <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center"  MinWidth="250" IsReadOnly="True" 
+                          Text="{DynamicResource SelectNewsCategoryKey}"
                       IsSynchronizedWithCurrentItem="True"
                       ItemsSource="{Binding  Path=RssSiteViewModels/RssFeedViewModels}"
                       DisplayMemberPath="Title"
@@ -266,8 +267,11 @@
                                             Content="{Binding Mode=OneWay, Path=IsInEditMode, 
                                                 Converter={StaticResource IsInEditModeToStringConverterKey}}"
                                             Style="{StaticResource RssBorderedToggleButtonStyleKey}"/>
-                                    <Button Margin="0, 13" Content="تبدیل به سیاه و سفید" Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
-                                    <Button Content="ذخیره" Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
+
+                                    <Button Margin="0, 13" Content="{DynamicResource ConvertToGrayScaleKey}" 
+                                            Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
+
+                                    <Button Content="{DynamicResource SaveKey}" Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
                                 </StackPanel>
 
                             </Grid>

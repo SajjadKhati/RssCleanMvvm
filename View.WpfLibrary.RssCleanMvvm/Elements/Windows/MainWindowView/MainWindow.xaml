@@ -7,7 +7,8 @@
         xmlns:interaction="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:rssusercontrolview="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView"
         xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.MainWindowViewModelModule.Class;assembly=ViewModel"
-        xmlns:appearanceSwitcherDataModel="clr-namespace:ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;assembly=ViewModel"
+        xmlns:appearanceSwitcherData="clr-namespace:ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.DataModel;assembly=ViewModel"
+        xmlns:languageSwitcherData="clr-namespace:ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.DataModel;assembly=ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance d:Type=viewModelModules:MainWindowViewModel, IsDesignTimeCreatable=False}"
         WindowStartupLocation="CenterScreen">
@@ -26,7 +27,7 @@
         </interaction:EventTrigger>
     </interaction:Interaction.Triggers>
 
-    <Grid FlowDirection="RightToLeft">
+    <Grid FlowDirection="{DynamicResource FlowDirectionKey}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -34,11 +35,7 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <MenuItem Header="پرونده">
-                <MenuItem Header="خروج" ToolTip="خروج از برنامه" Click="ExitMenuItem_Click"/>
-            </MenuItem>
-
-            <MenuItem DataContext="{Binding Path=RssUserControlViewModel}" Header="خبر خوان">
+            <MenuItem DataContext="{Binding Path=RssUserControlViewModel}" Header="{DynamicResource NewsFeedKey}">
                 <!-- FallbackValue=False برای وقتی است که مسیر Binding قابل حل نباشد.
                     مثلاً وقتی SelectedRssSiteViewModel برابر null باشد، WPF مقدار UnsetValue
                     برمی‌گرداند (نه null). در این حالت Converter اصلاً صدا زده نمی‌شود و
@@ -47,17 +44,24 @@
                     بدون FallbackValue: UnsetValue به Converter می‌رود و چون null نیست،
                     نتیجه true برمی‌گردد و MenuItem اشتباهاً فعال می‌ماند.
                 -->
-                <MenuItem Header="دریافت اخبار جدید" ToolTip="به روزرسانی اخبار جدید از وب"
+                <MenuItem Header="{DynamicResource GetNewNewsKey}" ToolTip="{DynamicResource NewNewsUpdateToolTipKey}"
                           Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.DownLoadRssItemsCommand}"
                           IsEnabled="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel, 
                                 Converter={StaticResource NullableToBoolValueConverterKey}, 
                                     FallbackValue=false}"/>
 
-                <MenuItem Header="ذخیره همه" ToolTip="ذخیره همه ی آیتم های ذخیره نشده"/>
+                <Separator/>
+
+                <MenuItem Header="{DynamicResource SaveAllKey}" ToolTip="{DynamicResource SaveAllToolTipKey}"/>
+
+                <Separator/>
+
+                <MenuItem Header="{DynamicResource CancelCurrentOperationKey}" 
+                          ToolTip="{DynamicResource CancelOperationToolTipKey}"/>
             </MenuItem>
 
-            <MenuItem Header="تنظیمات">
-                <MenuItem Header="حالت رنگی">
+            <MenuItem Header="{DynamicResource SettingsKey}">
+                <MenuItem Header="{DynamicResource ThemeKey}">
                     <!-- x:Static برای دسترسی به اعضای static یک کلاس استفاده میشود.
                         اعضای enum در C# همیشه static هستند (مثلاً ThemeName.Dark).
                         بنابراین برای فرستادن مقدار enum به عنوان CommandParameter،
@@ -66,13 +70,25 @@
 
                         نکته: خود enum یک نوع است، ولی هر عضو آن یک مقدار ثابت (static) است.
                         پس x:Static اینجا یعنی "مقدار ثابت Dark از نوع ThemeName". -->
-                    <MenuItem Header="تاریک" ToolTip="تم تاریک" 
+                    <MenuItem Header="{DynamicResource DarkKey}" ToolTip="{DynamicResource DarkThemeKey}" 
                               Command="{Binding Path=ChangeThemeCommand}"
-                              CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Dark}"/>
+                              CommandParameter="{x:Static appearanceSwitcherData:ThemeName.Dark}"/>
 
-                    <MenuItem Header="روشن" ToolTip="تم روشن"
+                    <MenuItem Header="{DynamicResource LightKey}" ToolTip="{DynamicResource LightThemeKey}"
                           Command="{Binding Path=ChangeThemeCommand}"
-                          CommandParameter="{x:Static appearanceSwitcherDataModel:ThemeName.Light}"/>
+                          CommandParameter="{x:Static appearanceSwitcherData:ThemeName.Light}"/>
+                </MenuItem>
+
+                <Separator/>
+
+                <MenuItem Header="{DynamicResource LanguageKey}">
+                    <MenuItem Header="{DynamicResource PersianKey}" 
+                              Command="{Binding Path=ChangeLanguageCommand}"
+                              CommandParameter="{x:Static languageSwitcherData:LanguageName.Persian}"/>
+
+                    <MenuItem Header="{DynamicResource EnglishKey}"
+                              Command="{Binding Path=ChangeLanguageCommand}"
+                              CommandParameter="{x:Static languageSwitcherData:LanguageName.English}"/>
                 </MenuItem>
             </MenuItem>
         </Menu>

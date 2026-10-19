@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
-using System.Windows.Data;
 using System.Windows;
+using System.Windows.Data;
 
-namespace View.WpfLibrary.RssCleanMvvm.GlobalResource.XamlResource.BindingConverters.Class
+namespace View.WpfLibrary.RssCleanMvvm.GlobalResource.BindingConverters.Class
 {
     internal class ToolTipsTrianglePointValueConverter : IValueConverter
     {

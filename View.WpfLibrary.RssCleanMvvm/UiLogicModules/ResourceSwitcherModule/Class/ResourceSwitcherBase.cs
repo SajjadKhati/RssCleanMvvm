@@ -1,29 +1,28 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;
-using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
 
-namespace View.WpfLibrary.RssCleanMvvm.UiLogicModules.AppearanceSwitcherModule.Class
+namespace View.WpfLibrary.RssCleanMvvm.UiLogicModules.ResourceSwitcherModule.Class
 {
-    public class AppearanceSwitcher : IAppearanceSwitcher
+    public abstract class ResourceSwitcherBase<TSwitchTarget> where TSwitchTarget : struct, Enum
     {
 
         private readonly Collection<ResourceDictionary> applicationMergedDictionary;
 
         private readonly SwitchableResourceInfo themeResourceInfo;
 
-        private ThemeName currentTheme;
+        private TSwitchTarget currentSwitchTarget;
 
 
         ////////////////////////////////////////////////////////////////////
 
 
-        public AppearanceSwitcher(Collection<ResourceDictionary> applicationMergedDictionary,
-            SwitchableResourceInfo themeResourceInfo, ThemeName defaultTheme)
+        public ResourceSwitcherBase(Collection<ResourceDictionary> applicationMergedDictionary,
+            SwitchableResourceInfo themeResourceInfo, TSwitchTarget defaultSwitchTarget)
         {
             this.applicationMergedDictionary = applicationMergedDictionary;
             this.themeResourceInfo = themeResourceInfo;
-            this.currentTheme = defaultTheme;
+            this.currentSwitchTarget = defaultSwitchTarget;
             this.Validate();
         }
 
@@ -31,22 +30,22 @@ namespace View.WpfLibrary.RssCleanMvvm.UiLogicModules.AppearanceSwitcherModule.C
         ////////////////////////////////////////////////////////////////////
 
 
-        public void ChangeTheme(ThemeName themeName)
+        protected void SwitchTo(TSwitchTarget newSwitchTarget)
         {
-            if(themeName == this.currentTheme)
+            if (EqualityComparer<TSwitchTarget>.Default.Equals(newSwitchTarget, this.currentSwitchTarget))
                 return;
 
             this.applicationMergedDictionary[this.themeResourceInfo.Index] = new ResourceDictionary
             {
-                Source = new Uri($"{this.themeResourceInfo.BasePath}{themeName}{this.themeResourceInfo.FileSuffix}", UriKind.RelativeOrAbsolute),
+                Source = new Uri($"{this.themeResourceInfo.BasePath}{newSwitchTarget}{this.themeResourceInfo.FileSuffix}", UriKind.RelativeOrAbsolute),
             };
-            this.currentTheme = themeName;
+            this.currentSwitchTarget = newSwitchTarget;
         }
 
 
-        public ThemeName GetCurrentTheme()
+        public TSwitchTarget GetCurrent()
         {
-            return this.currentTheme;
+            return this.currentSwitchTarget;
         }
 
 

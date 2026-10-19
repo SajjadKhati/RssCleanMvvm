@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows.Data;
 
-namespace View.WpfLibrary.RssCleanMvvm.GlobalResource.XamlResource.BindingConverters.Class
+namespace View.WpfLibrary.RssCleanMvvm.GlobalResource.BindingConverters.Class
 {
     public class NullableToBoolValueConverter : IValueConverter
     {

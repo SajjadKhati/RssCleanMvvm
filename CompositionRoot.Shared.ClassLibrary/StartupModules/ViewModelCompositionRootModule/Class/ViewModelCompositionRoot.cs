@@ -92,7 +92,8 @@ using Shared.ImageServices.ImageUtilityService.Class;
 using Shared.ImageServices.ImageUtilityService.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssFeedViewModelFactory.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
-using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
+using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.Interface;
+using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.Interface;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
@@ -118,6 +119,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private readonly ICache<Uri, RssFeedConfig> rssFeedConfigCache;
 
         private readonly IAppearanceSwitcher appearanceSwitcher;
+
+        private readonly ILanguageSwitcher languageSwitcher;
 
         // ====== کش و ImageSettings (داخلی) ======
         private ICache<Uri, ImageSettings<ImageInfo>> imageSettingsCache;
@@ -168,7 +171,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         public ViewModelCompositionRoot(string connectionString, AppPaths appPaths, RssItemDraftCacheManager rssItemDraftCacheManager,
             ICache<Uri, RssItemEfEntity> persistenceCache, ReaderWriterLockSlim sharedPersistenceCacheLock,
-            ICache<Uri, RssFeedConfig> rssFeedConfigCache, IAppearanceSwitcher appearanceSwitcher)
+            ICache<Uri, RssFeedConfig> rssFeedConfigCache, IAppearanceSwitcher appearanceSwitcher, ILanguageSwitcher languageSwitcher)
         {
             // ====== تزریق‌ها (فقط ذخیره) ======
             this.connectionString = connectionString;
@@ -178,6 +181,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             this.sharedPersistenceCacheLock = sharedPersistenceCacheLock;
             this.rssFeedConfigCache = rssFeedConfigCache;
             this.appearanceSwitcher = appearanceSwitcher;
+            this.languageSwitcher = languageSwitcher;
 
             // ====== راه‌اندازی (به ترتیب وابستگی) ======
             this.InitializeSharedServices();
@@ -238,7 +242,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         public MainWindowViewModel CreateMainWindowViewModel()
         {
             RssUserControlViewModel rssUserControlViewModel = this.CreateRssUserControlViewModel();
-            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(rssUserControlViewModel, this.appearanceSwitcher);
+            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(rssUserControlViewModel, this.appearanceSwitcher, this.languageSwitcher);
             return mainWindowViewModel;
         }
 

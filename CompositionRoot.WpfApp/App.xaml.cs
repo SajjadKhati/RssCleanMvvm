@@ -7,9 +7,12 @@ using CompositionRoot.WpfApp.ViewModules;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
-using View.WpfLibrary.RssCleanMvvm.UiLogicModules.AppearanceSwitcherModule.Class;
+using View.WpfLibrary.RssCleanMvvm.UiLogicModules.ResourceSwitcherModule.Class;
 using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;
-using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.Interface;
+using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.DataModel;
+using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.Interface;
+using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.DataModel;
+using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.Interface;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 
 
@@ -156,8 +159,9 @@ namespace CompositionRoot.WpfApp
                 this.appFinalizer = new AppFinalizer(new List<IDisposable> { singletonProvider.RssItemDraftCacheManager });
                 ///
                 IAppearanceSwitcher appearanceSwitcher = this.CreateAppearanceSwitcher();
+                ILanguageSwitcher languageSwitcher = this.CreateLanguageSwitcher();
                 ViewModelCompositionRoot viewModelCompositionRoot = this.GetViewModelCompositionRoot(
-                    connectionString, this.appPaths, singletonProvider, appearanceSwitcher);
+                    connectionString, this.appPaths, singletonProvider, appearanceSwitcher, languageSwitcher);
                 MainWindowViewModel mainWindowViewModel = viewModelCompositionRoot.CreateMainWindowViewModel();
                 ///
                 this.viewDisplayer.ShowMainWindowAndSetupApp(mainWindowViewModel, App.Current);
@@ -187,7 +191,7 @@ namespace CompositionRoot.WpfApp
 
 
         private ViewModelCompositionRoot GetViewModelCompositionRoot(string connectionString, AppPaths appPaths, 
-            SingletonProvider singletonProvider, IAppearanceSwitcher appearanceSwitcher)
+            SingletonProvider singletonProvider, IAppearanceSwitcher appearanceSwitcher, ILanguageSwitcher languageSwitcher)
         {
             return new ViewModelCompositionRoot(
                 connectionString, 
@@ -196,7 +200,8 @@ namespace CompositionRoot.WpfApp
                 singletonProvider.PersistenceCache,
                 singletonProvider.SharedPersistenceCacheLock,
                 singletonProvider.RssFeedConfigCache,
-                appearanceSwitcher);
+                appearanceSwitcher,
+                languageSwitcher);
         }
 
 
@@ -206,10 +211,23 @@ namespace CompositionRoot.WpfApp
             {
                 BasePath = "/View.WpfLibrary.RssCleanMvvm;component/GlobalResource/XamlResource/Theme/",
                 FileSuffix = "ThemeResource.xaml",
-                Index = 2
+                Index = 3
             };
             ThemeName defaultThemeName = ThemeName.Dark;
             return new AppearanceSwitcher(App.Current.Resources.MergedDictionaries, themeResourceInfo, defaultThemeName);
+        }
+
+
+        private ILanguageSwitcher CreateLanguageSwitcher()
+        {
+            SwitchableResourceInfo languageResourceInfo = new SwitchableResourceInfo
+            {
+                BasePath = "/View.WpfLibrary.RssCleanMvvm;component/AppResource/LanguageResource/",
+                FileSuffix = "LanguageResource.xaml",
+                Index = 0
+            };
+            LanguageName defaultLanguageName = LanguageName.Persian;
+            return new LanguageSwitcher(App.Current.Resources.MergedDictionaries, languageResourceInfo, defaultLanguageName);
         }
 
     }

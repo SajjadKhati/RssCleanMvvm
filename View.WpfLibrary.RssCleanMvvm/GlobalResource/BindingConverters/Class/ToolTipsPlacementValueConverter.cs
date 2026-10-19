@@ -2,7 +2,7 @@
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 
-namespace View.WpfLibrary.RssCleanMvvm.GlobalResource.XamlResource.BindingConverters.Class
+namespace View.WpfLibrary.RssCleanMvvm.GlobalResource.BindingConverters.Class
 {
     internal class ToolTipsPlacementValueConverter : IValueConverter
     {
