@@ -11,7 +11,7 @@ namespace Application.Services.RssItemCreationServices.RssItemDataExtractorServi
 
         DateTime GetPublishDate(string publishDateData);
 
-        Task<ImageData<byte>> GetArgb8BitImageDataAsync(string imageLinkData);
+        Task<ImageData<byte>> GetArgb8BitImageDataAsync(string imageLinkData, CancellationToken cancellationToken = default);
 
     }
 }

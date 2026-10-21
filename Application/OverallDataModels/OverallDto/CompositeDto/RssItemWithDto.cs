@@ -16,7 +16,6 @@ namespace Application.OverallDataModels.OverallDto.CompositeDto
 
         public RssItemWithDto()
         {
-
         }
 
         public RssItemWithDto(RssItem rssItem, RssItemDto rssItemDto)

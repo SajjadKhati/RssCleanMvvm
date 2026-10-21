@@ -1,5 +1,4 @@
 ﻿using Shared.CollectionService.Class;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 

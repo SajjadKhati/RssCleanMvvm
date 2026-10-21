@@ -16,7 +16,7 @@
 
     <system:String x:Key="SaveAllToolTipKey">Save all unsaved items for all news topics</system:String>
 
-    <system:String x:Key="CancelCurrentOperationKey">Cancel Operation</system:String>
+    <system:String x:Key="CancelCurrentDownloadKey">Cancel Current Download</system:String>
 
     <system:String x:Key="CancelOperationToolTipKey">Cancel download operation for the selected news topic</system:String>
 

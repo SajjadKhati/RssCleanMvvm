@@ -16,7 +16,7 @@
 
     <system:String x:Key="SaveAllToolTipKey">ذخیره همه ی آیتم های ذخیره نشده برای تمام موضوعات خبری</system:String>
 
-    <system:String x:Key="CancelCurrentOperationKey">لغو عملیات جاری</system:String>
+    <system:String x:Key="CancelCurrentDownloadKey">لغو دانلود جاری</system:String>
 
     <system:String x:Key="CancelOperationToolTipKey">لغو عملیات دانلود برای موضوع خبری انتخاب شده</system:String>
 

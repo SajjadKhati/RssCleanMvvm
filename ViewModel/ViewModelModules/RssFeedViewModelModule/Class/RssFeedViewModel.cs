@@ -3,6 +3,7 @@ using Application.UseCases.Entry.DownLoadRssItems.DataModels;
 using Application.UseCases.Entry.DownLoadRssItems.Interface;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using System.ComponentModel;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
 using ViewModel.Services.RangeObservableCollectionService.Class;
 using ViewModel.Services.SharedMessengerKeyService.Class;
@@ -31,7 +32,11 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
         /////////////////////////////////////////////////////////////////////////////
 
 
+        public IAsyncRelayCommand LoadRssItemsCommand { get; }
+
         public IAsyncRelayCommand DownLoadRssItemsCommand { get; }
+
+        public IRelayCommand CancelCurrentOperationCommand { get; }
 
 
         /////////////////////////////////////////////////////////////////////////////
@@ -45,36 +50,84 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
             /// اطلاعات آیتم های RssItemViewModels چون بعدا باید یا دانلود شوند و یا از دیتابیس گرفته شوند ، پس در سازنده نیاز به این اطلاعات نیست . 
             /// در اینجا فقط کالکشن خالی میسازیم .
             this.RssItemViewModels = new RangeObservableCollection<RssItemViewModel>();
-
             this.downLoadRssItemsUseCase = downLoadRssItemsUseCase;
             this.rssItemViewModelFactory = rssItemViewModelFactory;
+
+            this.LoadRssItemsCommand = new AsyncRelayCommand(this.LoadRssItems, this.CanLoadRssItems);
+            this.LoadRssItemsCommand.PropertyChanged += this.OnOperationCommandPropertyChanged;
             this.DownLoadRssItemsCommand = new AsyncRelayCommand(this.DownLoadRssItems);
+            this.DownLoadRssItemsCommand.PropertyChanged += this.OnOperationCommandPropertyChanged;
+            this.CancelCurrentOperationCommand = new RelayCommand(this.CancelCurrentOperation, this.CanCancelCurrentOperation);
         }
 
 
         /////////////////////////////////////////////////////////////////////////////
 
+        private bool CanLoadRssItems()
+        {
+            throw new NotImplementedException();
+        }
 
-        private async Task DownLoadRssItems()
+
+        private async Task LoadRssItems(CancellationToken cancellationToken)
+        {
+            /// ابتدا و انتهای این متد ، متد this.CancelCurrentOperationCommand.NotifyCanExecuteChanged(); را فراخوانی کن .
+            throw new NotImplementedException();
+        }
+
+
+        private async Task DownLoadRssItems(CancellationToken cancellationToken)
         {
             try
             {
-                RssItemDtosResult rssItemDtosResult = await this.downLoadRssItemsUseCase.ExecuteAsync(new Uri(this.Id));
-                if (rssItemDtosResult == null)
-                    return;
-
-                ICollection<RssItemViewModel> rssItemViewModels = this.ConvertToRssItemViewModels(rssItemDtosResult.CreatedRssItemDtos);
-                this.InsertToBeginningIndexOfRssItemViewModels(rssItemViewModels);
+                RssItemDtosResult rssItemDtosResult = await this.downLoadRssItemsUseCase.ExecuteAsync(new Uri(this.Id), cancellationToken);
+                if (rssItemDtosResult.CreatedRssItemDtos != null)
+                {
+                    ICollection<RssItemViewModel> rssItemViewModels = this.ConvertToRssItemViewModels(rssItemDtosResult.CreatedRssItemDtos);
+                    this.InsertToBeginningIndexOfRssItemViewModels(rssItemViewModels);
+                }
                 this.SendMessages(rssItemDtosResult);
             }
             catch (Exception exception)
             {
+                /// خطاهای XML/شبکه (که در Orchestrator گرفته نشدن) اینجا گرفته می‌شن
                 WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
             }
         }
 
 
+        private bool CanCancelCurrentOperation()
+        {
+            ///CanBeCanceled در IAsyncRelayCommand خودش دو چیز رو چک می‌کنه:
+            ///آیا کامند در حال اجراست؟ (IsRunning)
+            ///    آیا delegate ـش CancellationToken می‌گیره؟ (پس Cancel() معنی داره)
+            return (this.LoadRssItemsCommand.CanBeCanceled == true && this.LoadRssItemsCommand.IsCancellationRequested == false) || 
+                (this.DownLoadRssItemsCommand.CanBeCanceled == true && this.DownLoadRssItemsCommand.IsCancellationRequested == false);
+        }
+
+
+        private void CancelCurrentOperation()
+        {
+            if (this.LoadRssItemsCommand.CanBeCanceled == true)      // ✅ true → Cancel
+                this.LoadRssItemsCommand.Cancel();
+
+            if (this.DownLoadRssItemsCommand.CanBeCanceled == true)  // ✅ false → skip
+                this.DownLoadRssItemsCommand.Cancel();
+        }
+
+
         /////////////////////////////////////////////////////////////////////////////
+
+
+        private void OnOperationCommandPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IAsyncRelayCommand.IsRunning) ||
+                e.PropertyName == nameof(IAsyncRelayCommand.IsCancellationRequested) ||
+                e.PropertyName == nameof(IAsyncRelayCommand.CanBeCanceled))
+            {
+                this.CancelCurrentOperationCommand.NotifyCanExecuteChanged();
+            }
+        }
 
 
         private ICollection<RssItemViewModel> ConvertToRssItemViewModels(ICollection<RssItemDto> rssItemDtos)
@@ -104,25 +157,36 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
 
         private void SendMessages(RssItemDtosResult rssItemDtosResult)
         {
-            if (rssItemDtosResult == null)
+            /// ۱. لغو کاربر — بالاترین اولویت
+            /// چون اگه کاربر لغو کرده، پیام «هیچ خبری نیست» یا «خطا» گمراه‌کننده‌ست.
+            if (rssItemDtosResult.WasUserCancelled == true)
+            {
+                string cancelMessage = (rssItemDtosResult.CreatedRssItemDtos.Count > 0)
+                    ? $"عملیات لغو شد. {rssItemDtosResult.CreatedRssItemDtos.Count} خبر در کش موقت ذخیره شد ."
+                    : "عملیات لغو شد.";
+                WeakReferenceMessenger.Default.Send(cancelMessage, SharedMessengerKey.String_GeneralMessageKey);
                 return;
-            string message = "";
-            if (rssItemDtosResult.CreatedRssItemDtos == null || rssItemDtosResult.CreatedRssItemDtos.Count < 1)
-            {
-                message = "هیچ خبر جدیدی وجود ندارد .";
             }
-            else
+            /// ۲. پیام موفقیت یا خالی
+            if (rssItemDtosResult.CreatedRssItemDtos.Count > 0)
             {
-                message = $"تعداد  {rssItemDtosResult.CreatedRssItemDtos.Count}  خبر جدید دریافت شد .";
+                string message = $"تعداد {rssItemDtosResult.CreatedRssItemDtos.Count} خبر جدید دریافت شد .";
+                WeakReferenceMessenger.Default.Send(message, SharedMessengerKey.String_GeneralMessageKey);
             }
-            WeakReferenceMessenger.Default.Send(message, SharedMessengerKey.String_GeneralMessageKey);
+            else if (rssItemDtosResult.CreationErrors.Count == 0)
+            {
+                // نه آیتم جدید، نه خطا → واقعاً هیچ خبر جدیدی نیست
+                WeakReferenceMessenger.Default.Send("هیچ خبر جدیدی وجود ندارد .", SharedMessengerKey.String_GeneralMessageKey);
+            }
 
-            if (rssItemDtosResult.CreationErrors != null && rssItemDtosResult.CreationErrors.Count > 0)
+            /// ۳. خطاها (فقط اولی برای نمایش)
+            /// InnerException پاس داده می‌شه تا stack trace اصلی حفظ بشه.
+            if (rssItemDtosResult.CreationErrors.Count > 0)
             {
-                Exception rssItemException = new Exception(
-                    $"به دلایل مختلف از جمله تکراری بودن خبر که از قبل در حافظه یا دیتابیس وجود داشته ، یا سازگار نبودن تصویرِ خبر ، یا هر دلایل دیگری ، دریافت " +
-                    $"{rssItemDtosResult.CreationErrors.Count} خبر ، انجام نشد . دلیل خطای اول :\n\n{rssItemDtosResult.CreationErrors[0].Message}");
-                WeakReferenceMessenger.Default.Send(rssItemException, SharedMessengerKey.Exception_ErrorKey);
+                string errorMessage = $"دریافت {rssItemDtosResult.CreationErrors.Count} خبر انجام نشد . " +
+                    $"دلیل خطای اول :\n\n{rssItemDtosResult.CreationErrors[0].Message}";
+                Exception firstError = new Exception(errorMessage, rssItemDtosResult.CreationErrors[0]);
+                WeakReferenceMessenger.Default.Send(firstError, SharedMessengerKey.Exception_ErrorKey);
             }
         }
 

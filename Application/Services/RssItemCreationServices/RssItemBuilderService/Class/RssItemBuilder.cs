@@ -76,14 +76,17 @@ namespace Application.Services.RssItemCreationServices.RssItemBuilderService.Cla
         ///   است استثنا log شود.)
         /// </summary>
         public async Task<RssItem> CreateRssItemAsync(IDictionary<string, string> rssItemDictionary, 
-            RssItemWithFeedIdFieldKeyConfig rssItemWithFeedIdFieldKeyConfig)
+            RssItemWithFeedIdFieldKeyConfig rssItemWithFeedIdFieldKeyConfig, CancellationToken cancellationToken = default)
         {
             RssItemFieldKeyConfig rssItemFieldKeyConfig = rssItemWithFeedIdFieldKeyConfig.RssItemFieldKeyConfig;
             Uri rssFeedId = rssItemWithFeedIdFieldKeyConfig.RssFeedId;
 
+            // ۱. اعتبارسنجی همه‌ی فیلدهای اجباری، اول متد
+            this.ValidateRequiredFields(rssItemDictionary, rssItemFieldKeyConfig);
+
             Uri id = this.rssItemDataExtractor.GetId(rssItemDictionary[rssItemFieldKeyConfig.IdKey]);
             if (this.rssItemDomainService.IsRssItemValid(id) == false)
-                throw new InvalidDataException("این شیِ RssItem ، قبلا ساخته شد و شناسه اش موجود است .");
+                return null;
 
             Uri link = this.rssItemDataExtractor.GetLink(rssItemDictionary[rssItemFieldKeyConfig.LinkKey]);
             string category = (string.IsNullOrWhiteSpace(rssItemFieldKeyConfig.CategoryKey) == false)? 
@@ -92,7 +95,7 @@ namespace Application.Services.RssItemCreationServices.RssItemBuilderService.Cla
             string description = rssItemDictionary[rssItemFieldKeyConfig.DescriptionKey];
             DateTime publishDate = this.rssItemDataExtractor.GetPublishDate(rssItemDictionary[rssItemFieldKeyConfig.PublishDateKey]);
             ImageData<byte> argb8BitImageData = await this.rssItemDataExtractor.GetArgb8BitImageDataAsync(
-                rssItemDictionary[rssItemFieldKeyConfig.Argb8BitImageKey]);
+                rssItemDictionary[rssItemFieldKeyConfig.Argb8BitImageKey], cancellationToken);
             try
             {
                 this.imageSettingsWriter.Store(id, argb8BitImageData);
@@ -101,6 +104,34 @@ namespace Application.Services.RssItemCreationServices.RssItemBuilderService.Cla
             {
             }
             return new RssItem(id, rssFeedId, link, argb8BitImageData.Data, category, title, description, publishDate);
+        }
+
+
+        /// <summary>
+        /// همه‌ی فیلدهای اجباری رو اول متد بررسی می‌کنه (fail-fast).
+        /// اگه کلیدی نباشه، قبل از هر عملیات سنگین (DB یا دانلود تصویر) خطا می‌ده.
+        /// </summary>
+        private void ValidateRequiredFields(IDictionary<string, string> dictionary, RssItemFieldKeyConfig fieldKeyConfig)
+        {
+            this.GetRequiredFieldWithValidate(dictionary, fieldKeyConfig.IdKey, "شناسه‌ی خبر");
+            this.GetRequiredFieldWithValidate(dictionary, fieldKeyConfig.LinkKey, "لینک خبر");
+            this.GetRequiredFieldWithValidate(dictionary, fieldKeyConfig.TitleKey, "عنوان خبر");
+            this.GetRequiredFieldWithValidate(dictionary, fieldKeyConfig.DescriptionKey, "توضیحات خبر");
+            this.GetRequiredFieldWithValidate(dictionary, fieldKeyConfig.PublishDateKey, "تاریخ انتشار");
+            this.GetRequiredFieldWithValidate(dictionary, fieldKeyConfig.Argb8BitImageKey, "تصویر خبر");
+        }
+
+
+        /// <summary>
+        /// مقدار یک فیلد اجباری را از دیکشنری XML برمی‌گرداند.
+        /// اگر کلید در دیکشنری نباشد، KeyNotFoundException با پیام دقیق پرتاب می‌کند
+        /// (شامل کلید واقعی و توضیح فارسی) تا دیباگ فیدهای خراب آسان شود.
+        /// </summary>
+        private string GetRequiredFieldWithValidate(IDictionary<string, string> dictionary, string key, string fieldDescription)
+        {
+            if (dictionary.TryGetValue(key, out string? value) == false)
+                throw new KeyNotFoundException($"کلید «{key}» ({fieldDescription}) در داده‌ی XML این فید پیدا نشد.");
+            return value;
         }
 
     }

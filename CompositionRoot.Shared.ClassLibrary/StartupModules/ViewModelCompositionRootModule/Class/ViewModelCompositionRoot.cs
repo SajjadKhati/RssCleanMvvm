@@ -1,6 +1,5 @@
 ﻿#region فضای نام
 using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.DraftCacheWriter.Interface;
-using Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.RssItemDraftCacheManager.Interface;
 using Application.InfrastructureContracts.CacheProject.CacheBase.Cache.Interfaces;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemDtoQuery.Factory.Interface;
 using Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItemWithDtoQuery.Factory.Interface;
@@ -31,7 +30,8 @@ using Application.Services.ImageNormalizerServices._1_ImageChannelCountNormalize
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Class;
 using Application.Services.ImageNormalizerServices._2_ImageChannelSequenceNormalizerService.Factory.Interface;
 using Application.Services.ImageNormalizerServices.ImageInfoValidatorService.Class;
-using Application.Services.Mapper;
+using Application.Services.Mapper.RssItemDtoMapperService.Class;
+using Application.Services.Mapper.RssItemDtosResultMapperService.Class;
 using Application.Services.RssItemCreationServices.RssItemBuilderService.Class;
 using Application.Services.RssItemCreationServices.RssItemBuilderService.Interface;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Class;
@@ -97,7 +97,6 @@ using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.Interface;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
-
 #endregion
 
 namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositionRootModule.Class
@@ -132,6 +131,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private IRssItemReconstructor rssItemReconstructor;
 
         private RssItemDtoEfEntityMapper rssItemDtoEfEntityMapper;
+
+        private RssItemDtosResultMapper rssItemDtosResultMapper;
 
         // ====== Factoryهای Stateless ======
         private IRssItemRepositoryFactory rssItemRepositoryFactory;
@@ -202,6 +203,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             this.imageSettingsReader = (IImageSettingsReader)this.imageSettingsWriter;
             this.rssItemReconstructor = this.CreateRssItemReconstructor();
             this.rssItemDtoEfEntityMapper = this.CreateRssItemDtoEfEntityMapper();
+            this.rssItemDtosResultMapper = this.CreateRssItemDtosResultMapper();
         }
 
         // ۲. Factoryهای Stateless
@@ -280,7 +282,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private IDownLoadRssItemsUseCase CreateDownLoadRssItemsUseCase()
         {
             IRssItemDownloaderIntoDraftCacheOrchestrator rssItemDownloaderIntoDraftCacheOrchestrator = this.CreateRssItemDownloaderIntoDraftCacheOrchestrator();
-            return new DownLoadRssItemsUseCase(rssItemDownloaderIntoDraftCacheOrchestrator, this.rssFeedConfigCache);
+            return new DownLoadRssItemsUseCase(rssItemDownloaderIntoDraftCacheOrchestrator, this.rssItemDtosResultMapper, this.rssFeedConfigCache);
         }
 
         private IRssItemDownloaderIntoDraftCacheOrchestrator CreateRssItemDownloaderIntoDraftCacheOrchestrator()
@@ -383,6 +385,11 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private RssItemDtoEfEntityMapper CreateRssItemDtoEfEntityMapper()
         {
             return new RssItemDtoEfEntityMapper(new PersianCalenderConvertor());
+        }
+
+        private RssItemDtosResultMapper CreateRssItemDtosResultMapper()
+        {
+            return new RssItemDtosResultMapper();
         }
 
         private IImageInfoToImageSettingsConverter CreateImageInfoToImageSettingsConverter()

@@ -54,29 +54,29 @@ namespace Application.Services.RssItemCreationServices.RssItemDataExtractorServi
         }
 
 
-        public async Task<ImageData<byte>> GetArgb8BitImageDataAsync(string imageLinkData)
+        public async Task<ImageData<byte>> GetArgb8BitImageDataAsync(string imageLinkData, CancellationToken cancellationToken = default)
         {
-            return await Task.Run(() => this.GetArgb8BitImageData(imageLinkData));
+            return await Task.Run(() => this.GetArgb8BitImageData(imageLinkData, cancellationToken), cancellationToken);
         }
 
 
         ///////////////////////////////////////////////////////////////////
 
 
-        private async Task<ImageData<byte>> GetArgb8BitImageData(string imageLinkData)
+        private async Task<ImageData<byte>> GetArgb8BitImageData(string imageLinkData, CancellationToken cancellationToken = default)
         {
             Uri imageLink = new Uri(imageLinkData);
-            byte[] rawImage = await this.DownloadRawImage(imageLink);
+            byte[] rawImage = await this.DownloadRawImage(imageLink, cancellationToken);
             ImageData<byte> imageData = this.imageDataExtractor.Get8BitImageData(rawImage);
             ImageData<byte> normalizedImageData = this.imageNormalizer.NormalizeImage(imageData);
             return normalizedImageData;
         }
 
 
-        private async Task<byte[]> DownloadRawImage(Uri imageLink)
+        private async Task<byte[]> DownloadRawImage(Uri imageLink, CancellationToken cancellationToken = default)
         {
             using IHttpRequest httpRequest = this.httpRequestFactory.Create();
-            return await httpRequest.GetByteArrayAsync(imageLink);
+            return await httpRequest.GetByteArrayAsync(imageLink, cancellationToken);
         }
 
     }

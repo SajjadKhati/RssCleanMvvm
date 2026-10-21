@@ -5,6 +5,7 @@ namespace Application.Services.RssItemCreationServices.RssItemBuilderService.Int
 {
     public interface IRssItemBuilder
     {
-        Task<RssItem> CreateRssItemAsync(IDictionary<string, string> rssItemDictionary, RssItemWithFeedIdFieldKeyConfig rssItemWithFeedIdFieldKeyConfig);
+        Task<RssItem> CreateRssItemAsync(IDictionary<string, string> rssItemDictionary, 
+            RssItemWithFeedIdFieldKeyConfig rssItemWithFeedIdFieldKeyConfig, CancellationToken cancellationToken = default);
     }
 }

@@ -56,8 +56,20 @@
 
                 <Separator/>
 
-                <MenuItem Header="{DynamicResource CancelCurrentOperationKey}" 
-                          ToolTip="{DynamicResource CancelOperationToolTipKey}"/>
+                <!-- FallbackValue=False برای وقتی است که مسیر Binding قابل حل نباشد.
+                    مثلاً وقتی SelectedRssSiteViewModel برابر null باشد، WPF مقدار UnsetValue
+                    برمی‌گرداند (نه null). در این حالت Converter اصلاً صدا زده نمی‌شود و
+                    مقدار FallbackValue استفاده می‌شود.
+
+                    بدون FallbackValue: UnsetValue به Converter می‌رود و چون null نیست،
+                    نتیجه true برمی‌گردد و MenuItem اشتباهاً فعال می‌ماند.
+                -->
+                <MenuItem Header="{DynamicResource CancelCurrentDownloadKey}" 
+                          ToolTip="{DynamicResource CancelOperationToolTipKey}"
+                          Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.CancelCurrentOperationCommand}"
+                          IsEnabled="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel, 
+                              Converter={StaticResource NullableToBoolValueConverterKey}, 
+                                  FallbackValue=false}"/>
             </MenuItem>
 
             <MenuItem Header="{DynamicResource SettingsKey}">

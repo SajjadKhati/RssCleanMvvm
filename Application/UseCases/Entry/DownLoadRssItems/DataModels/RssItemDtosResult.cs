@@ -1,13 +1,12 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using Application.UseCases.Shared.SharedDataModels.Class;
 
 namespace Application.UseCases.Entry.DownLoadRssItems.DataModels
 {
-    public class RssItemDtosResult
+    public class RssItemDtosResult : OperationResultBase
     {
 
         public IList<RssItemDto> CreatedRssItemDtos { get; init; }
-
-        public IList<Exception> CreationErrors { get; init; }
 
 
         ////////////////////////////////////////////////////////////////
@@ -19,9 +18,10 @@ namespace Application.UseCases.Entry.DownLoadRssItems.DataModels
         }
 
 
-        public RssItemDtosResult(IList<RssItemDto> createdRssItemDtos, IList<Exception> creationErrors) : this(createdRssItemDtos)
+        public RssItemDtosResult(IList<RssItemDto> createdRssItemDtos, IList<Exception> creationErrors, bool wasUserCancelled) : 
+            base(creationErrors, wasUserCancelled)
         {
-            this.CreationErrors = creationErrors;
+            this.CreatedRssItemDtos = createdRssItemDtos;
         }
 
     }

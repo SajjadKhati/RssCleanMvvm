@@ -3,7 +3,7 @@ using Application.InfrastructureContracts.SharedProject.SharedMapper.RssItemDtoM
 using Application.OverallDataModels.OverallDto.EntityDto;
 using Domain.DomainEntities.RssEntity.Class;
 
-namespace Application.Services.Mapper
+namespace Application.Services.Mapper.RssItemDtoMapperService.Class
 {
     public class RssItemDtoMapper : IRssItemDtoMapper
     {

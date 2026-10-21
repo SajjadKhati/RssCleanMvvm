@@ -1,10 +1,10 @@
 ﻿using Application.InfrastructureContracts.XmlProject.SharedDataModels.Class;
-using Application.UseCases.Shared.SharedDataModels.Class;
+using Domain.DomainEntities.RssEntity.Class;
 
 namespace Application.UseCases.Shared.RssItemsDownLoader.Interface
 {
     public interface IRssItemsDownLoaderOrchestrator
     {
-        Task<RssItemsReport> DownLoadRssItemsAsync(RssFeedConfig rssFeedConfig);
+        IAsyncEnumerable<RssItem> DownLoadRssItemsAsync(RssFeedConfig rssFeedConfig, CancellationToken cancellationToken = default);
     }
 }
