@@ -35,11 +35,11 @@ namespace Application.UseCases.Shared.DraftRssItemDtoFactoryOrch.Class
         /////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemDto CreateRssItemDtoWithSaveImage(RssItem rssItem)
+        public RssItemDto CreateRssItemDtoWithSaveImage(RssItem rssItem, bool isUnsaved)
         {
             ImageSettings<ImageInfo> imageSettings = this.imageSettingsReader.GetOrDefault(rssItem.Id, rssItem.Argb8BitImage);
             ImageSaveOptions imageSaveOptions = new ImageSaveOptions(imageSettings, this.tempImageFolderPath.FolderPath);
-            return this.rssItemDtoFactory.CreateRssItemDto(rssItem, imageSaveOptions);
+            return this.rssItemDtoFactory.CreateRssItemDto(rssItem, imageSaveOptions, isUnsaved);
         }
 
     }

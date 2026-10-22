@@ -38,11 +38,11 @@ namespace Infra.DataAccess.RssItemDtoEfEntityFactoryService.Class
         ////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemDto CreateRssItemDto(RssItem rssItem, ImageSaveOptions imageSaveOptions)
+        public RssItemDto CreateRssItemDto(RssItem rssItem, ImageSaveOptions imageSaveOptions, bool isUnsaved)
         {
             DestinationPath draftImageDestinationPath = this.SaveImageToFile(rssItem.Argb8BitImage, imageSaveOptions.FolderPath,
                 rssItem.Id.AbsoluteUri, imageSaveOptions.ImageInfoSettings);
-            return this.rssItemDtoMapper.ToRssItemDto(rssItem, draftImageDestinationPath.FullFilePath);
+            return this.rssItemDtoMapper.ToRssItemDto(rssItem, draftImageDestinationPath.FullFilePath, isUnsaved);
         }
 
 

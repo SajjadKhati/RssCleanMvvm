@@ -25,7 +25,7 @@ namespace Application.UseCases.Entry.SaveRssItemDataToDraftCache.Class
         /////////////////////////////////////////////////////////////////////
 
 
-        public async Task<bool> ExecuteAsync(RssItemDataEditableInput rssItemDataEditableInput)
+        public async Task<RssItemDto> ExecuteAsync(RssItemDataEditableInput rssItemDataEditableInput)
         {
             return await Task.Run(() => this.Execute(rssItemDataEditableInput));
         }
@@ -34,20 +34,30 @@ namespace Application.UseCases.Entry.SaveRssItemDataToDraftCache.Class
         /////////////////////////////////////////////////////////////////////
 
 
-        private bool Execute(RssItemDataEditableInput rssItemDataEditableInput)
+        private RssItemDto Execute(RssItemDataEditableInput rssItemDataEditableInput)
         {
-            return this.saveRssItemToDraftCacheOrchestrator.SaveToDraftCache(rssItemDataEditableInput.Id,
-                (RssItemWithDto currentRssItemWithDto) =>
-                {
-                    if (currentRssItemWithDto ==null || currentRssItemWithDto.RssItem == null || currentRssItemWithDto.RssItemDto == null)
-                        throw new ArgumentNullException($"مقدار {nameof(currentRssItemWithDto)} یا اعضاهایش نباید خالی باشد .");
+            return this.saveRssItemToDraftCacheOrchestrator.SaveToDraftCache(
+                rssItemDataEditableInput.Id,
+                (RssItemWithDto currentRssItemWithDto) => this.BuildRssItemWithUpdatedDescription(rssItemDataEditableInput, currentRssItemWithDto));
+        }
 
-                    RssItem updatedRssItem = new RssItem(currentRssItemWithDto.RssItem);
-                    updatedRssItem.Description = rssItemDataEditableInput.Description;
-                    RssItemDto updatedRssItemDto = new RssItemDto(currentRssItemWithDto.RssItemDto);
-                    updatedRssItemDto.Description = rssItemDataEditableInput.Description;
-                    return new RssItemWithDto(updatedRssItem, updatedRssItemDto);
-                });
+
+        /////////////////////////////////////////////////////////////////////
+
+
+        private RssItemWithDto BuildRssItemWithUpdatedDescription(
+            RssItemDataEditableInput rssItemDataEditableInput, RssItemWithDto currentRssItemWithDto)
+        {
+            if (currentRssItemWithDto == null || currentRssItemWithDto.RssItem == null || currentRssItemWithDto.RssItemDto == null)
+                throw new ArgumentNullException($"مقدار {nameof(currentRssItemWithDto)} یا اعضاهایش نباید خالی باشد .");
+
+            RssItem updatedRssItem = new RssItem(currentRssItemWithDto.RssItem);
+            updatedRssItem.Description = rssItemDataEditableInput.Description;
+
+            RssItemDto updatedRssItemDto = new RssItemDto(currentRssItemWithDto.RssItemDto, isUnsaved: true);
+            updatedRssItemDto.Description = rssItemDataEditableInput.Description;
+
+            return new RssItemWithDto(updatedRssItem, updatedRssItemDto);
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using Application.UseCases.Entry.SaveRssItemDataToDraftCache.DataModels;
+﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using Application.UseCases.Entry.SaveRssItemDataToDraftCache.DataModels;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -27,6 +28,8 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
 
         private bool _isInEditMode;
 
+        private bool _isUnsaved;
+
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -42,10 +45,7 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         public string Description
         {
             get => this._description;
-            set
-            {
-                this.SetProperty(ref this._description, value);
-            }
+            set => this.SetProperty(ref this._description, value);
         }
 
         public string PersianPublishDate { get; }
@@ -62,6 +62,13 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
                 this.OnPropertyChanged();
             }
         }
+
+        public bool IsUnsaved
+        {
+            get => this._isUnsaved;
+            set => this.SetProperty(ref this._isUnsaved, value);
+        }
+
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -88,7 +95,7 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
 
 
         public RssItemViewModel(string id, string link, string category, string title, string description, string persianPublishDate, string imageFullFilePath,
-            ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase)
+            bool isUnsaved , ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase)
         {
             this.Id = id;
             this.Link = link;
@@ -97,6 +104,7 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
             this.Description = description;
             this.PersianPublishDate = persianPublishDate;
             this.ImageFullFilePath = imageFullFilePath;
+            this.IsUnsaved = isUnsaved;
 
             this.IsInEditMode = false;
             this.saveRssItemDataToDraftCacheUseCase = saveRssItemDataToDraftCacheUseCase;
@@ -113,10 +121,12 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         {
             try
             {
-                bool isSavedToDraftCache = await this.saveRssItemDataToDraftCacheUseCase.ExecuteAsync(
+                RssItemDto draftCacheRssItemDto = await this.saveRssItemDataToDraftCacheUseCase.ExecuteAsync(
                     new RssItemDataEditableInput(new Uri(this.Id), this.Description));
-                if (isSavedToDraftCache == false)
-                    throw new InvalidOperationException("آیتم مورد نظر ، در کش موقت ذخیره نشد چون نخ دیگری این آیتم را در حین انجام کار ، تغییر داد. لطفا دوباره تلاش کنید.");
+                if (draftCacheRssItemDto == null)
+                    throw new InvalidOperationException("آیتم مورد نظر ، در کش موقت ذخیره نشد.");
+
+                this.UpdateDataFromDto(draftCacheRssItemDto);
                 this.CommitRssItemCommand.NotifyCanExecuteChanged();
             }
             catch (Exception exception)
@@ -136,6 +146,36 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         private Task CommitRssItem()
         {
             throw new NotImplementedException();
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////
+
+
+        /// <summary>
+        /// داده‌های ViewModel را با مقادیر DTO هم‌گام می‌کند (به‌جز تصویر، که متد جدا دارد).
+        /// </summary>
+        public void UpdateDataFromDto(RssItemDto rssItemDto)
+        {
+            /// چرا Description را هم دوباره set می‌کنیم، با اینکه در ۹۹.۹٪ موارد یکسان است؟
+            ///
+            /// در حالت عادی، Description همان است که کاربر ویرایش کرده (نخ VM آن را
+            /// قبلاً نوشته) — پس SetProperty هیچ کاری نمی‌کند و PropertyChanged هم
+            /// fire نمی‌شود (بدون overhead، بدون تغییر UI).
+            ///
+            /// اما در سناریوی نادر conflict (اگر نخ دیگری زودتر در DraftCache نوشته
+            /// باشد)، DTO برگشتی نسخه‌ی cache را حمل می‌کند. در آن حالت نادر، این
+            /// set کردن باعث می‌شود VM با واقعیت cache هم‌گام بماند و کاربر متوجه
+            /// تفاوت شود — در غیر این صورت، UI متنی را نشان می‌داد که در cache نیست
+            /// (ناهم‌گامی خاموش).
+            ///
+            /// این سناریو در این اپ تقریباً غیرممکن است (چون AsyncRelayCommand جلوی
+            /// double-execution را می‌گیرد و برای هر آیتم یک VM وجود دارد)، ولی
+            /// هزینه‌ی این دفاع صفر است و در آینده از data loss خاموش جلوگیری می‌کند.
+            /// 
+            /// SetProperty خودش no-op می‌کنه اگه یکسان باشه
+            this.Description = rssItemDto.Description;
+            this.IsUnsaved = rssItemDto.IsUnsaved;
         }
 
     }

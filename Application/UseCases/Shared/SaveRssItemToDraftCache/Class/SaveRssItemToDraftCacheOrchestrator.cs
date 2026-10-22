@@ -15,6 +15,8 @@ namespace Application.UseCases.Shared.SaveRssItemToDraftCache.Class
 
         private IRssItemDraftCacheWriter rssItemDraftCacheWriter;
 
+        private IRssItemDraftCacheReader rssItemDraftCacheReader;
+
         private IRssItemDtoQueryFactory rssItemDtoQueryFactory;
 
         private IRssItemAllSourcesOrchestrator rssItemAllSourcesOrchestrator;
@@ -24,7 +26,8 @@ namespace Application.UseCases.Shared.SaveRssItemToDraftCache.Class
         /////////////////////////////////////////////////////////////////////////
 
 
-        public SaveRssItemToDraftCacheOrchestrator(IRssItemDraftCacheWriter rssItemDraftCacheWriter, 
+        public SaveRssItemToDraftCacheOrchestrator(
+            IRssItemDraftCacheWriter rssItemDraftCacheWriter, IRssItemDraftCacheReader rssItemDraftCacheReader,
             IRssItemDtoQueryFactory rssItemDtoQueryFactory, IRssItemAllSourcesOrchestrator rssItemAllSourcesOrchestrator)
         {
             this.rssItemDraftCacheWriter = rssItemDraftCacheWriter;
@@ -36,7 +39,7 @@ namespace Application.UseCases.Shared.SaveRssItemToDraftCache.Class
         /////////////////////////////////////////////////////////////////////////
 
 
-        public bool SaveToDraftCache(Uri rssItemId, Func<RssItemWithDto, RssItemWithDto> updateFunc)
+        public RssItemDto SaveToDraftCache(Uri rssItemId, Func<RssItemWithDto, RssItemWithDto> updateFunc)
         {
             /// snapshot اتمی از cache: هم DTO فعلی را می‌گیریم، هم DraftEntry را.
             /// این دو باید از یک لحظه‌ی سازگار باشند — وگرنه optimistic check بعدی 
@@ -64,7 +67,11 @@ namespace Application.UseCases.Shared.SaveRssItemToDraftCache.Class
             /// TryMarkInDraftCache مقدار false برمی‌گرداند — تا نسخه‌ی جدیدترِ 
             /// نخ دیگری overwrite نشود. در آن صورت، کاربر باید دوباره تلاش کند.
             bool isMarkedInDraftCache = this.TryMarkInDraftCache(rssItemId, updatedRssItemWithDto, existsInDatabase, originalDraftEntry);
-            return isMarkedInDraftCache;
+            if (isMarkedInDraftCache == true)
+                return updatedRssItemWithDto.RssItemDto;
+
+            this.rssItemDraftCacheReader.TryGetRssItemDto(rssItemId, out RssItemDto rssItemDto);
+            return rssItemDto;
         }
 
 
@@ -103,10 +110,9 @@ namespace Application.UseCases.Shared.SaveRssItemToDraftCache.Class
         private bool TryMarkInDraftCache(Uri rssItemId, RssItemWithDto updatedRssItemWithDto, 
             bool existsInDatabase, DraftEntry<RssItem> originalDraftEntry)
         {
-            if (existsInDatabase == true)
-                return this.rssItemDraftCacheWriter.TryMarkAsModifiedIfDraftEntryUnchanged(rssItemId, updatedRssItemWithDto, originalDraftEntry);
-            else
-                return this.rssItemDraftCacheWriter.TryMarkAsAddedIfDraftEntryUnchanged(rssItemId, updatedRssItemWithDto, originalDraftEntry);
+            return (existsInDatabase == true) ?
+                 this.rssItemDraftCacheWriter.TryMarkAsModifiedIfDraftEntryUnchanged(rssItemId, updatedRssItemWithDto, originalDraftEntry) :
+             this.rssItemDraftCacheWriter.TryMarkAsAddedIfDraftEntryUnchanged(rssItemId, updatedRssItemWithDto, originalDraftEntry);
         }
 
     }

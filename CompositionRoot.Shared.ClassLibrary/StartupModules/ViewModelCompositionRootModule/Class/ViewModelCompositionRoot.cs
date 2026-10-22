@@ -289,7 +289,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         {
             IRssItemsDownLoaderOrchestrator rssItemsDownLoaderOrchestrator = this.CreateRssItemsDownLoaderOrchestrator();
             return new RssItemDownloaderIntoDraftCacheOrchestrator(
-                rssItemsDownLoaderOrchestrator, this.rssItemDtoFactoryOrchestrator, this.rssItemDraftCacheManager);
+                rssItemsDownLoaderOrchestrator, this.rssItemDtoFactoryOrchestrator, this.rssItemDraftCacheManager, this.rssItemDraftCacheManager);
         }
 
         private IRssItemsDownLoaderOrchestrator CreateRssItemsDownLoaderOrchestrator()
@@ -460,7 +460,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private ISaveRssItemToDraftCacheOrchestrator CreateSaveRssItemToDraftCacheOrchestrator()
         {
             return new SaveRssItemToDraftCacheOrchestrator(
-                this.rssItemDraftCacheManager, this.rssItemDtoQueryFactory, this.rssItemAllSourcesOrchestrator);
+                this.rssItemDraftCacheManager, this.rssItemDraftCacheManager, this.rssItemDtoQueryFactory, this.rssItemAllSourcesOrchestrator);
         }
 
         private IImageChannelCountNormalizerFactory<byte> CreateImageChannelCountNormalizerFactory()

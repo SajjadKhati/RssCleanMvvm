@@ -5,6 +5,6 @@ namespace Application.UseCases.Shared.DraftRssItemDtoFactoryOrch.Interface
 {
     public interface IDraftRssItemDtoFactoryOrchestrator
     {
-        RssItemDto CreateRssItemDtoWithSaveImage(RssItem rssItem);
+        RssItemDto CreateRssItemDtoWithSaveImage(RssItem rssItem, bool isUnsaved);
     }
 }

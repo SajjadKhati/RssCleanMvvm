@@ -6,6 +6,6 @@ namespace Application.InfrastructureContracts.DataAccessProject.RssItemDtoFactor
 {
     public interface IRssItemDtoFactory
     {
-        RssItemDto CreateRssItemDto(RssItem rssItem, ImageSaveOptions imageSaveOptions);
+        RssItemDto CreateRssItemDto(RssItem rssItem, ImageSaveOptions imageSaveOptions, bool isUnsaved);
     }
 }

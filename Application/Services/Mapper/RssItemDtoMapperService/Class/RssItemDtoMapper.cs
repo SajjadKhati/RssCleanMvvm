@@ -23,7 +23,7 @@ namespace Application.Services.Mapper.RssItemDtoMapperService.Class
         ///////////////////////////////////////////////////////////////////
 
 
-        public RssItemDto ToRssItemDto(RssItem rssItem, string imageFullFilePath)
+        public RssItemDto ToRssItemDto(RssItem rssItem, string imageFullFilePath, bool isUnsaved)
         {
             return new RssItemDto
             {
@@ -34,7 +34,8 @@ namespace Application.Services.Mapper.RssItemDtoMapperService.Class
                 Description = rssItem.Description,
                 PublishDate = rssItem.PublishDate,
                 PersianPublishDate = this.persianCalenderConvertor.ToPersianDateString(rssItem.PublishDate),
-                ImageFullFilePath = imageFullFilePath
+                ImageFullFilePath = imageFullFilePath,
+                IsUnsaved = isUnsaved
             };
         }
 

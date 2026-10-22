@@ -26,10 +26,7 @@ namespace ViewModel.ViewModelModules.RssSiteViewModelModule.Class
         public RssFeedViewModel SelectedRssFeedViewModel
         {
             get => this._selectedRssFeedViewModel;
-            set
-            {
-                this.SetProperty(ref this._selectedRssFeedViewModel, value);
-            }
+            set => this.SetProperty(ref this._selectedRssFeedViewModel, value);
         }
 
 

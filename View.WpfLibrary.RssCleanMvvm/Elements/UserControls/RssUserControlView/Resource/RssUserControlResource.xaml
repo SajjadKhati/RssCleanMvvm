@@ -3,7 +3,8 @@
                     xmlns:filePathToBitmapImageConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.FilePathToBitmapImageConverterModule"
                     xmlns:system="clr-namespace:System;assembly=System.Runtime"
                     xmlns:isInEditModeToStringConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.IsInEditModeToStringConverterModule"
-                    xmlns:isInEditModeToVisibilityConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.IsInEditModeToVisibility">
+                    xmlns:isInEditModeToVisibilityConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.IsInEditModeToVisibility"
+                    xmlns:isUnsavedToBrushConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.IsUnsavedToBrushConverterModule">
 
 
     <system:Double x:Key="ImageWidthKey">192</system:Double>
@@ -12,10 +13,9 @@
 
     <filePathToBitmapImageConverterModule:FilePathToBitmapImageConverter x:Key="FilePathToBitmapImageConverterKey"/>
 
-    <isInEditModeToStringConverterModule:IsInEditModeToStringConverter x:Key="IsInEditModeToStringConverterKey"
-            EditModeKey="EditModeKey" ReadModeKey="ReadModeKey"/>
-
     <isInEditModeToVisibilityConverterModule:IsInEditModeToVisibilityConverter x:Key="IsInEditModeToVisibilityConverterKey"/>
+
+    <isUnsavedToBrushConverterModule:IsUnsavedToBrushConverter x:Key="IsUnsavedToBrushConverterKey"/>
 
 
     <Style x:Key="RssBorderedButtonBaseStyleKey" TargetType="{x:Type ButtonBase}" 
@@ -29,7 +29,15 @@
                 BasedOn="{StaticResource BorderedToggleButtonStyleKey}">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="MinHeight" Value="26"/>
+        <Setter Property="Content" Value="{DynamicResource EditModeKey}"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
+                <!-- در حالت ویرایش هستیم → متن «حالت خواندن» -->
+                <Setter Property="Content" Value="{DynamicResource ReadModeKey}"/>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
+
 
 
 </ResourceDictionary>

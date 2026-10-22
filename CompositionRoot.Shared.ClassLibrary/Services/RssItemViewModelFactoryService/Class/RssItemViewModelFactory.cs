@@ -32,7 +32,8 @@ namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactorySe
                 rssItemDto.Title,
                 rssItemDto.Description,
                 rssItemDto.PersianPublishDate,
-                rssItemDto.ImageFullFilePath, 
+                rssItemDto.ImageFullFilePath,
+                rssItemDto.IsUnsaved,
                 this.saveRssItemDataToDraftCacheUseCase);
         }
 

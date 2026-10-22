@@ -44,17 +44,11 @@
                     بدون FallbackValue: UnsetValue به Converter می‌رود و چون null نیست،
                     نتیجه true برمی‌گردد و MenuItem اشتباهاً فعال می‌ماند.
                 -->
-                <MenuItem Header="{DynamicResource GetNewNewsKey}" ToolTip="{DynamicResource NewNewsUpdateToolTipKey}"
+                <MenuItem Header="{DynamicResource GetNewNewsKey}" ToolTip="{DynamicResource UpdateNewNewsToolTipKey}"
                           Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.DownLoadRssItemsCommand}"
                           IsEnabled="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel, 
                                 Converter={StaticResource NullableToBoolValueConverterKey}, 
                                     FallbackValue=false}"/>
-
-                <Separator/>
-
-                <MenuItem Header="{DynamicResource SaveAllKey}" ToolTip="{DynamicResource SaveAllToolTipKey}"/>
-
-                <Separator/>
 
                 <!-- FallbackValue=False برای وقتی است که مسیر Binding قابل حل نباشد.
                     مثلاً وقتی SelectedRssSiteViewModel برابر null باشد، WPF مقدار UnsetValue
@@ -70,6 +64,10 @@
                           IsEnabled="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel, 
                               Converter={StaticResource NullableToBoolValueConverterKey}, 
                                   FallbackValue=false}"/>
+
+                <Separator/>
+
+                <MenuItem Header="{DynamicResource SaveAllKey}" ToolTip="{DynamicResource SaveAllToolTipKey}"/>
             </MenuItem>
 
             <MenuItem Header="{DynamicResource SettingsKey}">

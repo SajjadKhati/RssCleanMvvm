@@ -5,6 +5,6 @@ namespace Application.InfrastructureContracts.SharedProject.SharedMapper.RssItem
 {
     public interface IRssItemDtoMapper
     {
-        RssItemDto ToRssItemDto(RssItem rssItem, string imageFullFilePath);
+        RssItemDto ToRssItemDto(RssItem rssItem, string imageFullFilePath, bool isUnsaved);
     }
 }

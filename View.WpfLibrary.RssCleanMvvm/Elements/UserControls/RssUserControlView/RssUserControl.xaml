@@ -52,8 +52,7 @@
                 <TextBlock HorizontalAlignment="Left" Text="{DynamicResource NewsCategoryKey}" Style="{StaticResource TextBlockStyleKey}"/>
 
                 <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Center"  MinWidth="250" IsReadOnly="True" 
-                          Text="{DynamicResource SelectNewsCategoryKey}"
-                      IsSynchronizedWithCurrentItem="True"
+                        Text="{DynamicResource SelectNewsCategoryKey}"
                       ItemsSource="{Binding  Path=RssSiteViewModels/RssFeedViewModels}"
                       DisplayMemberPath="Title"
                       SelectedItem="{Binding Mode=OneWayToSource, Path=RssSiteViewModels/SelectedRssFeedViewModel}"
@@ -72,7 +71,8 @@
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="Transparent" Margin="0, 2" Padding="6, 4" BorderBrush="Gray" BorderThickness="0, 0, 0, 1">
+                        <Border Background="Transparent" Margin="0, 2" Padding="6, 4" BorderThickness="0, 0, 0, 1"
+                                BorderBrush="{Binding Path=IsUnsaved, Converter={StaticResource IsUnsavedToBrushConverterKey}}" >
                             <Grid Background="Transparent">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Name="NewsColumn" Width="*"/>
@@ -264,8 +264,6 @@
 
                                 <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent">
                                     <ToggleButton IsChecked="{Binding Mode=TwoWay, Path=IsInEditMode}"
-                                            Content="{Binding Mode=OneWay, Path=IsInEditMode, 
-                                                Converter={StaticResource IsInEditModeToStringConverterKey}}"
                                             Style="{StaticResource RssBorderedToggleButtonStyleKey}"/>
 
                                     <Button Margin="0, 13" Content="{DynamicResource ConvertToGrayScaleKey}" 

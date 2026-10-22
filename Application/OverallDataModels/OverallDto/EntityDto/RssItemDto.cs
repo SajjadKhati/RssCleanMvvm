@@ -19,12 +19,13 @@
 
         public string ImageFullFilePath { get; set; }
 
+        public bool IsUnsaved { get; set; }
+
 
         /////////////////////////////////////////////////////////////////////////
 
         public RssItemDto()
         {
-
         }
 
         public RssItemDto(RssItemDto rssItemDto)
@@ -37,6 +38,12 @@
             this.PublishDate = rssItemDto.PublishDate;
             this.PersianPublishDate = rssItemDto.PersianPublishDate;
             this.ImageFullFilePath = rssItemDto.ImageFullFilePath;
+            this.IsUnsaved = rssItemDto.IsUnsaved;
+        }
+
+        public RssItemDto(RssItemDto rssItemDto, bool isUnsaved) : this(rssItemDto)
+        {
+            this.IsUnsaved = isUnsaved;
         }
 
     }

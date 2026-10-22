@@ -19,16 +19,20 @@ namespace Application.UseCases.Shared.RssItemDownloaderIntoDraftCache.Class
 
         private IRssItemDraftCacheWriter rssItemDraftCacheWriter;
 
+        private IRssItemDraftCacheReader rssItemDraftCacheReader;
+
 
         //////////////////////////////////////////////////////////////////////////////
 
 
         public RssItemDownloaderIntoDraftCacheOrchestrator(IRssItemsDownLoaderOrchestrator rssItemsDownLoaderOrchestrator,
-            IDraftRssItemDtoFactoryOrchestrator draftRssItemDtoFactoryOrchestrator, IRssItemDraftCacheWriter rssItemDraftCacheWriter)
+            IDraftRssItemDtoFactoryOrchestrator draftRssItemDtoFactoryOrchestrator, IRssItemDraftCacheWriter rssItemDraftCacheWriter,
+            IRssItemDraftCacheReader rssItemDraftCacheReader)
         {
             this.rssItemsDownLoaderOrchestrator = rssItemsDownLoaderOrchestrator;
             this.draftRssItemDtoFactoryOrchestrator = draftRssItemDtoFactoryOrchestrator;
             this.rssItemDraftCacheWriter = rssItemDraftCacheWriter;
+            this.rssItemDraftCacheReader = rssItemDraftCacheReader;
         }
 
 
@@ -141,36 +145,64 @@ namespace Application.UseCases.Shared.RssItemDownloaderIntoDraftCache.Class
 
 
         /// <summary>
-        /// ساخت DTOها برای آیتم‌های دانلودشده و ذخیره در کش موقت.
-        /// 
-        /// ⚠️ چرا قفل ندارد؟
-        /// 
-        /// دلیل اول: عملیات کند (CreateRssItemDto) قبل از دسترسی به داده‌ی مشترک 
-        /// انجام می‌شود، نه بین دو دسترسی. قفل فقط وقتی لازم است که یک عملیات کند، 
-        /// وسط دو دسترسی به همان داده باشد.
-        /// 
-        /// دلیل دوم: هر فراخوانی MarkAsAddedInDraftCache خودش اتمی است (write lock 
-        /// داخلی‌اش). پس نیازی به قفل بیرونی ندارد.
-        /// 
-        /// دلیل سوم: هیچ قانونی بین آیتم‌های حلقه نیست — هر RssItem با Id خودش 
-        /// مستقل است. پس حتی اگر بین iterateها، نخ دیگری چیزی را تغییر دهد، 
-        /// هیچ چیزی در این حلقه خراب نمی‌شود.
+        /// ساخت DTO برای یک آیتم دانلودشده و ذخیره‌ی آن در کش موقت.
+        ///
+        /// چرا این متد قفل ندارد؟
+        ///   دلیل اول: عملیات کند (CreateRssItemDtoWithSaveImage) قبل از دسترسی
+        ///   به داده‌ی مشترک انجام می‌شود، نه بین دو دسترسی. قفل فقط وقتی لازم است
+        ///   که یک عملیات کند، وسط دو دسترسی به همان داده باشد.
+        ///   دلیل دوم: هر فراخوانی TryMarkAsAddedIfDraftEntryUnchanged خودش اتمی است
+        ///   (write lock داخلی‌اش). پس نیازی به قفل بیرونی ندارد.
+        ///   دلیل سوم: هیچ قانونی بین آیتم‌های حلقه نیست — هر RssItem با Id خودش
+        ///   مستقل است. پس حتی اگر بین iterateها، نخ دیگری چیزی را تغییر دهد،
+        ///   هیچ چیزی در این حلقه خراب نمی‌شود.
         /// </summary>
-        /// <param name="rssItem"></param>
-        /// <returns></returns>
         private RssItemWithDto CreateRssItemWithDtoAndStoreInDraftCache(RssItem rssItem)
         {
-            RssItemDto rssItemDto = this.draftRssItemDtoFactoryOrchestrator.CreateRssItemDtoWithSaveImage(rssItem);
-            RssItemWithDto rssItemWithDto = new RssItemWithDto(rssItem, rssItemDto);
+            /// isUnsaved: true — چون این آیتم تازه دانلود شده و هنوز در دیتابیس ذخیره نشده.
+            /// این مقدار قبل از TryMarkAsAddedIfDraftEntryUnchanged هم درست است:
+            ///   - اگر خودمان در cache بنویسیم → یعنی ذخیره‌نشده (در DB نیست).
+            ///   - اگر نخ دیگری نوشته باشد → باز هم یعنی ذخیره‌نشده (در DB نیست).
+            /// پس در هر دو حالت، true درست است.
+            RssItemDto rssItemDto = this.draftRssItemDtoFactoryOrchestrator
+                .CreateRssItemDtoWithSaveImage(rssItem, isUnsaved: true);
 
-            /// اکر مقدار originalDraftEntry را nullارسال کنیم ، یعنی «انتظار داریم اگر rssItemWithDto در cache نبود.» در این صورت ، اضافه کند .
-            /// هر چند در متد CreateRssItemAsync در کلاس RssItemBuilder ، قبلا چک کرده بودیم که در کش موقت و دیتابیس وجود نداشته باشد ، -
-            /// اما ممکن هست نخ دیگری در این فاصله ، این آیتم را زودتر دانلود کنه و در کش موقت ذخیره کنه . 
-            /// هر چند ، کامند در VM جلوی این اجرا را میگیره ولی کار از محکم کاری عیب نمیکنه ...
-            /// پس متد TryMarkAsAddedIfDraftEntryUnchanged ، اگر آیتم از قبل موجود باشه و فرضا اگر نخ دیگری در این فاصله اضافه کرده باشد، false برمیگرداند و به کش موقت ، اضافه نمیکنه .
-            bool isAddedToDraftCache = this.rssItemDraftCacheWriter.TryMarkAsAddedIfDraftEntryUnchanged(
-                rssItem.Id, rssItemWithDto, originalDraftEntry: null);
-            return (isAddedToDraftCache == true)? rssItemWithDto : null;
+            RssItemWithDto rssItemWithDto = new(rssItem, rssItemDto);
+
+            /// originalDraftEntry: null یعنی «انتظار داریم این کلید در cache نباشد».
+            /// در RssItemBuilder.CreateRssItemAsync قبلاً IsRssItemValid(id) چک شده بود،
+            /// پس انتظار داریم آیتم جدید باشد. ولی «کار از محکم‌کاری عیب نمی‌کند»:
+            /// ممکن است نخ دیگری در این فاصله همان آیتم را دانلود و در cache ذخیره کرده باشد.
+            ///
+            /// TryMarkAsAddedIfDraftEntryUnchanged این انتظار را با واقعیت مقایسه می‌کند:
+            ///   - اگر کلید در cache نبود (انتظار ما درست بود) → اضافه می‌کند و true برمی‌گرداند.
+            ///   - اگر کلید در cache بود (یکی دیگر اضافه کرده) → اضافه نمی‌کند و false برمی‌گرداند.
+            ///
+            /// ⚠️ نکته‌ی مهم: false به معنی «در cache نیست» نیست، بلکه به معنی
+            /// «یکی دیگر زودتر اضافه کرده» است. یعنی در هر دو حالت (true و false)،
+            /// آیتم در cache موجود است. تفاوت فقط در این است که چه کسی آن را نوشته.
+            bool isAddedToDraftCache = this.rssItemDraftCacheWriter
+                .TryMarkAsAddedIfDraftEntryUnchanged(rssItem.Id, rssItemWithDto, originalDraftEntry: null);
+
+            /// حالت true: خودمان اضافه کردیم. نسخه‌ی خودمان همان نسخه‌ی موجود در cache است.
+            if (isAddedToDraftCache == true)
+                return rssItemWithDto;
+
+            /// حالت false: نخ دیگری زودتر اضافه کرده. نسخه‌ی ما ممکن است دیگر
+            /// «منبع حقیقت» نباشد (مثلاً آن نخ، نسخه‌ی متفاوتی نوشته باشد یا بعداً
+            /// ویرایش شده باشد). پس نسخه‌ی موجود در cache را می‌خوانیم و برمی‌گردانیم،
+            /// تا همیشه آنچه به VM می‌رسد، با آنچه در cache است یکی باشد.
+            ///
+            /// ⚠️ پنجره‌ی بین TryMarkAsAddedIfDraftEntryUnchanged و TryGetRssItemWithDto:
+            ///   در این فاصله قفل نداریم. اگر نخ دیگری بین این دو خط، آیتم را حذف یا تغییر
+            ///   دهد، ممکن است نسخه‌ی ناسازگاری برگردانیم.
+            ///   ولی این پنجره بسیار کوتاه است (چند دستورالعمل) و احتمال این‌که نخ دیگری
+            ///   دقیقاً در همین فاصله دخالت کند، عملاً صفر است (مخصوصاً که AsyncRelayCommand
+            ///   در VM از اجرای هم‌زمان همان کامند جلوگیری می‌کند).
+            ///   اگر روزی این ریسک واقعاً مهم شد، می‌توان این دو خط را در یک write lock
+            ///   یا یک متد ترکیبی در RssItemDraftCacheManager (مثلاً TryGetOrAdd) قرار داد.
+            this.rssItemDraftCacheReader.TryGetRssItemWithDto(rssItem.Id, out rssItemWithDto);
+            return rssItemWithDto;
         }
 
     }
