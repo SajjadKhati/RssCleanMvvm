@@ -48,8 +48,7 @@ namespace Application.UseCases.Entry.SaveRssItemDataToDraftCache.Class
         private RssItemWithDto BuildRssItemWithUpdatedDescription(
             RssItemDataEditableInput rssItemDataEditableInput, RssItemWithDto currentRssItemWithDto)
         {
-            if (currentRssItemWithDto == null || currentRssItemWithDto.RssItem == null || currentRssItemWithDto.RssItemDto == null)
-                throw new ArgumentNullException($"مقدار {nameof(currentRssItemWithDto)} یا اعضاهایش نباید خالی باشد .");
+            this.ValidateRssItemWithDto(currentRssItemWithDto);
 
             RssItem updatedRssItem = new RssItem(currentRssItemWithDto.RssItem);
             updatedRssItem.Description = rssItemDataEditableInput.Description;
@@ -58,6 +57,13 @@ namespace Application.UseCases.Entry.SaveRssItemDataToDraftCache.Class
             updatedRssItemDto.Description = rssItemDataEditableInput.Description;
 
             return new RssItemWithDto(updatedRssItem, updatedRssItemDto);
+        }
+
+
+        private void ValidateRssItemWithDto(RssItemWithDto currentRssItemWithDto)
+        {
+            if (currentRssItemWithDto == null || currentRssItemWithDto.RssItem == null || currentRssItemWithDto.RssItemDto == null)
+                throw new ArgumentNullException($"مقدار {nameof(currentRssItemWithDto)} یا اعضاهایش نباید خالی باشد .");
         }
 
     }

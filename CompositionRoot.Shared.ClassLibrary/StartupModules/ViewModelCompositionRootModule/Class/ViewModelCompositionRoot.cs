@@ -36,6 +36,8 @@ using Application.Services.RssItemCreationServices.RssItemBuilderService.Class;
 using Application.Services.RssItemCreationServices.RssItemBuilderService.Interface;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Class;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Interface;
+using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Class;
+using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Interface;
 using Application.UseCases.Entry.DownLoadRssItems.Class;
 using Application.UseCases.Entry.DownLoadRssItems.Interface;
 using Application.UseCases.Entry.LoadRssSite.Class;
@@ -55,6 +57,8 @@ using Application.UseCases.Shared.SaveRssItemToDraftCache.Interface;
 using CompositionRoot.Shared.ClassLibrary.Services.RssFeedViewModelFactoryService.Class;
 using CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactoryService.Class;
 using CompositionRoot.Shared.ClassLibrary.StartupModules.AppPathsModule.Class;
+using Core.ImageServices.ImageFilteringService.Class;
+using Core.ImageServices.ImageFilteringService.Interface;
 using Domain.ApplicationServiceContracts.RssItemAllSourcesOrchestrator.Interface;
 using Domain.DomainService.RssItemDomainService.Class;
 using Domain.DomainService.RssItemDomainService.Interface;
@@ -134,6 +138,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private RssItemDtosResultMapper rssItemDtosResultMapper;
 
+        private IImageFilter imageFilter;
+
         // ====== Factoryهای Stateless ======
         private IRssItemRepositoryFactory rssItemRepositoryFactory;
 
@@ -164,7 +170,9 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IRssItemEfEntityFactory rssItemEfEntityFactory;
 
-        private IDraftRssItemDtoFactoryOrchestrator rssItemDtoFactoryOrchestrator;
+        private IDraftRssItemDtoFactoryOrchestrator draftRssItemDtoFactoryOrchestrator;
+
+        private ISaveRssItemToDraftCacheOrchestrator saveRssItemToDraftCacheOrchestrator;
 
 
         ///////////////////////////////////////////////////////////////////////
@@ -204,6 +212,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             this.rssItemReconstructor = this.CreateRssItemReconstructor();
             this.rssItemDtoEfEntityMapper = this.CreateRssItemDtoEfEntityMapper();
             this.rssItemDtosResultMapper = this.CreateRssItemDtosResultMapper();
+            this.imageFilter = this.CreateImageFilter();
         }
 
         // ۲. Factoryهای Stateless
@@ -227,7 +236,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             this.rssItemDtoFactory = this.CreateRssItemDtoFactory();
             this.rssItemEfEntityFactory = (IRssItemEfEntityFactory)this.rssItemDtoFactory;
 
-            this.rssItemDtoFactoryOrchestrator = this.CreateRssItemDtoFactoryOrchestrator();
+            this.draftRssItemDtoFactoryOrchestrator = this.CreateDraftRssItemDtoFactoryOrchestrator();
+            this.saveRssItemToDraftCacheOrchestrator = this.CreateSaveRssItemToDraftCacheOrchestrator();
         }
 
         // ۴. Factoryهای ViewModel (به UseCaseها نیاز دارند)
@@ -289,7 +299,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         {
             IRssItemsDownLoaderOrchestrator rssItemsDownLoaderOrchestrator = this.CreateRssItemsDownLoaderOrchestrator();
             return new RssItemDownloaderIntoDraftCacheOrchestrator(
-                rssItemsDownLoaderOrchestrator, this.rssItemDtoFactoryOrchestrator, this.rssItemDraftCacheManager, this.rssItemDraftCacheManager);
+                rssItemsDownLoaderOrchestrator, this.draftRssItemDtoFactoryOrchestrator, this.rssItemDraftCacheManager, this.rssItemDraftCacheManager);
         }
 
         private IRssItemsDownLoaderOrchestrator CreateRssItemsDownLoaderOrchestrator()
@@ -392,6 +402,11 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             return new RssItemDtosResultMapper();
         }
 
+        private IImageFilter CreateImageFilter()
+        {
+            return new ImageFilter();
+        }
+
         private IImageInfoToImageSettingsConverter CreateImageInfoToImageSettingsConverter()
         {
             return new ImageInfoToImageSettingsConverter();
@@ -448,13 +463,19 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private IRssItemViewModelFactory CreateRssItemViewModelFactory()
         {
             ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase = this.CreateSaveRssItemDataToDraftCacheUseCase();
-            return new RssItemViewModelFactory(saveRssItemDataToDraftCacheUseCase);
+            IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase = this.CreateConvertRssItemImageToGrayscaleUseCase();
+            return new RssItemViewModelFactory(saveRssItemDataToDraftCacheUseCase, convertRssItemImageToGrayscaleUseCase);
         }
 
         private ISaveRssItemDataToDraftCacheUseCase CreateSaveRssItemDataToDraftCacheUseCase()
         {
-            ISaveRssItemToDraftCacheOrchestrator saveRssItemToDraftCacheOrchestrator = this.CreateSaveRssItemToDraftCacheOrchestrator();
-            return new SaveRssItemDataToDraftCacheUseCase(saveRssItemToDraftCacheOrchestrator);
+            return new SaveRssItemDataToDraftCacheUseCase(this.saveRssItemToDraftCacheOrchestrator);
+        }
+
+        private IConvertRssItemImageToGrayscaleUseCase CreateConvertRssItemImageToGrayscaleUseCase()
+        {
+            return new ConvertRssItemImageToGrayscaleUseCase(
+                this.imageFilter, this.saveRssItemToDraftCacheOrchestrator, this.draftRssItemDtoFactoryOrchestrator);
         }
 
         private ISaveRssItemToDraftCacheOrchestrator CreateSaveRssItemToDraftCacheOrchestrator()
@@ -549,7 +570,7 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             return new RssItemEfEntityMapper();
         }
 
-        private IDraftRssItemDtoFactoryOrchestrator CreateRssItemDtoFactoryOrchestrator()
+        private IDraftRssItemDtoFactoryOrchestrator CreateDraftRssItemDtoFactoryOrchestrator()
         {
             return new DraftRssItemDtoFactoryOrchestrator(this.rssItemDtoFactory, this.imageSettingsReader, this.appPaths);
         }

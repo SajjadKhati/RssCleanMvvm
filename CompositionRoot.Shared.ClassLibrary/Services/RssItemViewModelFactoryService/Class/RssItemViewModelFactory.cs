@@ -1,4 +1,5 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Interface;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
 using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
@@ -10,13 +11,17 @@ namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactorySe
 
         private ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase;
 
+        private IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase;
+
 
         /////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemViewModelFactory(ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase)
+        public RssItemViewModelFactory(ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase,
+            IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase)
         {
             this.saveRssItemDataToDraftCacheUseCase = saveRssItemDataToDraftCacheUseCase;
+            this.convertRssItemImageToGrayscaleUseCase = convertRssItemImageToGrayscaleUseCase;
         }
 
 
@@ -34,7 +39,8 @@ namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactorySe
                 rssItemDto.PersianPublishDate,
                 rssItemDto.ImageFullFilePath,
                 rssItemDto.IsUnsaved,
-                this.saveRssItemDataToDraftCacheUseCase);
+                this.saveRssItemDataToDraftCacheUseCase,
+                this.convertRssItemImageToGrayscaleUseCase);
         }
 
     }

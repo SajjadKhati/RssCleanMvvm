@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Interface;
 using ViewModel.Services.SharedMessengerKeyService.Class;
 
 namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
@@ -17,6 +18,8 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
     {
 
         private ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase;
+
+        private IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase;
 
 
         /////////////////////////////////////////////////////////////////////////
@@ -66,7 +69,11 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         public bool IsUnsaved
         {
             get => this._isUnsaved;
-            set => this.SetProperty(ref this._isUnsaved, value);
+            set
+            {
+                if (this.SetProperty(ref _isUnsaved, value) == true && this.CommitRssItemCommand != null)
+                    this.CommitRssItemCommand.NotifyCanExecuteChanged();
+            }
         }
 
 
@@ -86,7 +93,56 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         /////////////////////////////////////////////////////////////////////////
 
 
+        /// <summary>
+        /// ذخیره‌ی داده‌های ویرایش‌شده (متن) در کش موقت.
+        ///
+        /// Trigger: Binding.SourceUpdated روی TextBox متن خبر.
+        /// یعنی وقتی کاربر متن Description را ویرایش می‌کند و از TextBox خارج می‌شود
+        /// (LostFocus)، این کامند به‌طور خودکار اجرا می‌شود.
+        ///
+        /// چرا ذخیره در DraftCache و نه دیتابیس؟
+        /// چون تغییرات هنوز نهایی نشده‌اند. کاربر ممکن است چند خبر را ویرایش کند
+        /// و در نهایت با دکمه‌ی «ذخیره همه» همه را به دیتابیس منتقل کند.
+        /// DraftCache، محل نگهداری موقت تغییرات ذخیره‌نشده است.
+        /// </summary>
         public IAsyncRelayCommand SaveRssItemDataToDraftCacheCommand { get; }
+
+        /// <summary>
+        /// تبدیل تصویر خبر به سیاه و سفید، و ذخیره‌ی نتیجه در کش موقت.
+        ///
+        /// Trigger: کلیک کاربر روی دکمه‌ی «تبدیل به سیاه و سفید».
+        /// برخلاف ویرایش متن (که trigger آن نامرئی است)، این یک اقدام صریح
+        /// از طرف کاربر است.
+        ///
+        /// جریان:
+        ///   ۱. تصویر فعلی خبر از DraftCache یا دیتابیس خوانده می‌شود.
+        ///   ۲. تبدیل به grayscale روی آرایه‌ی پیکسل‌ها انجام می‌شود.
+        ///   ۳. فایل تصویر (با همان مسیر hash-based، چون شناسه تغییر نمی‌کند) بازنویسی می‌شود.
+        ///   ۴. RssItem و RssItemDto به‌روزشده در DraftCache ذخیره می‌شوند
+        ///      (با وضعیت Modified یا Added).
+        ///
+        /// ⚠️ چرا CanExecute ندارد؟
+        ///
+        /// تشخیص «آیا این تصویر قبلاً سیاه‌و‌سفید شده؟» از دو راه ممکن است و هر دو
+        /// در این نسخه انجام نمی‌شوند:
+        ///
+        ///   ۱. یک ستون جداگانه در دیتابیس (مثلاً IsGrayscaled) که فقط با
+        ///      بارگذاری از DB قابل بررسی است. در این نسخه چنین ستونی اضافه نشده.
+        ///
+        ///   ۲. مقایسه‌ی تمام کانال‌های R/G/B هر پیکسل برای برابری. این کار برای
+        ///      هر بار hover یا بررسی، هزینه‌ی سنگین O(width × height) دارد و
+        ///      در این نسخه انجام نمی‌شود.
+        ///
+        /// بنابراین CanExecute همیشه true است و کاربر (حتی روی تصویر رنگی) می‌تواند
+        /// دکمه را بزند. اگر تصویر از قبل grayscale باشد، تبدیل یک no-op است (همه‌ی
+        /// مقادیر R=G=B می‌مانند) و صرفاً فایل با همان محتوا بازنویسی می‌شود —
+        /// که هزینه‌ی ناچیزی است.
+        ///
+        /// چرا ذخیره در DraftCache و نه دیتابیس؟
+        /// چون مثل ویرایش متن، این تغییر هم هنوز نهایی نشده. کاربر ممکن است
+        /// چند تصویر را تبدیل کند و بعد با «ذخیره همه» به دیتابیس منتقل کند.
+        /// </summary>
+        public IAsyncRelayCommand ConvertRssItemImageToGrayscaleCommand { get; }
 
         public IAsyncRelayCommand CommitRssItemCommand {  get; }
 
@@ -94,8 +150,9 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         /////////////////////////////////////////////////////////////////////////
 
 
-        public RssItemViewModel(string id, string link, string category, string title, string description, string persianPublishDate, string imageFullFilePath,
-            bool isUnsaved , ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase)
+        public RssItemViewModel(string id, string link, string category, string title, string description, string persianPublishDate, string imageFullFilePath, 
+            bool isUnsaved , ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase,
+            IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase)
         {
             this.Id = id;
             this.Link = link;
@@ -108,8 +165,10 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
 
             this.IsInEditMode = false;
             this.saveRssItemDataToDraftCacheUseCase = saveRssItemDataToDraftCacheUseCase;
+            this.convertRssItemImageToGrayscaleUseCase = convertRssItemImageToGrayscaleUseCase;
 
             this.SaveRssItemDataToDraftCacheCommand = new AsyncRelayCommand(this.SaveRssItemDataToDraftCache);
+            this.ConvertRssItemImageToGrayscaleCommand = new AsyncRelayCommand(this.ConvertRssItemImageToGrayscale);
             this.CommitRssItemCommand = new AsyncRelayCommand(this.CommitRssItem, this.CanExecuteCommitRssItem);
         }
 
@@ -124,10 +183,26 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
                 RssItemDto draftCacheRssItemDto = await this.saveRssItemDataToDraftCacheUseCase.ExecuteAsync(
                     new RssItemDataEditableInput(new Uri(this.Id), this.Description));
                 if (draftCacheRssItemDto == null)
-                    throw new InvalidOperationException("آیتم مورد نظر ، در کش موقت ذخیره نشد.");
+                    throw new InvalidOperationException($"آیتم در کش موقت پیدا نشد — احتمالاً همزمان، تغییر دیگری روی آن انجام شده است. لطفاً دوباره تلاش کنید.");
 
                 this.UpdateDataFromDto(draftCacheRssItemDto);
-                this.CommitRssItemCommand.NotifyCanExecuteChanged();
+            }
+            catch (Exception exception)
+            {
+                WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
+            }
+        }
+
+
+        private async Task ConvertRssItemImageToGrayscale()
+        {
+            try
+            {
+                RssItemDto draftCacheRssItemDto = await this.convertRssItemImageToGrayscaleUseCase.ExecuteAsync(new Uri(this.Id));
+                if (draftCacheRssItemDto == null)
+                    throw new InvalidOperationException($"آیتم در کش موقت پیدا نشد — احتمالاً همزمان، تغییر دیگری روی آن انجام شده است. لطفاً دوباره تلاش کنید.");
+
+                this.UpdateImageFromDto(draftCacheRssItemDto);
             }
             catch (Exception exception)
             {
@@ -175,6 +250,13 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
             /// 
             /// SetProperty خودش no-op می‌کنه اگه یکسان باشه
             this.Description = rssItemDto.Description;
+            this.IsUnsaved = rssItemDto.IsUnsaved;
+        }
+
+
+        public void UpdateImageFromDto(RssItemDto rssItemDto)
+        {
+            this.ImageFullFilePath = rssItemDto.ImageFullFilePath;
             this.IsUnsaved = rssItemDto.IsUnsaved;
         }
 

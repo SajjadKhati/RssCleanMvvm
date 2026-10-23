@@ -267,7 +267,8 @@
                                             Style="{StaticResource RssBorderedToggleButtonStyleKey}"/>
 
                                     <Button Margin="0, 13" Content="{DynamicResource ConvertToGrayScaleKey}" 
-                                            Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
+                                            Style="{StaticResource RssBorderedButtonBaseStyleKey}"
+                                            Command="{Binding Path=ConvertRssItemImageToGrayscaleCommand}"/>
 
                                     <Button Content="{DynamicResource SaveKey}" Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
                                 </StackPanel>
