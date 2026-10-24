@@ -119,6 +119,24 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
         /////////////////////////////////////////////////////////////////////////////
 
 
+        /// <summary>
+        /// با تغییر وضعیت کامندهای عملیاتی (Load / Download)، کامند لغو را
+        /// وادار به ارزیابی مجدد CanExecute می‌کند.
+        ///
+        /// چرا لازم است؟
+        /// CanExecute کامند لغو به سه property از کامندهای دیگر وابسته است
+        /// (IsRunning, IsCancellationRequested, CanBeCanceled). این‌ها property
+        /// ساده‌ی CLR هستند، نه DependencyProperty — بنابراین WPF به تغییرشان
+        /// به‌طور خودکار واکنش نشان نمی‌دهد. بدون این متد، دکمه‌ی «لغو» پس از
+        /// شروع یا پایان یک عملیات، در وضعیت قبلی (فعال/غیرفعال) باقی می‌ماند.
+        ///
+        /// این متد به رویداد PropertyChanged هر دو کامند عملیاتی subscribe شده
+        /// (در Constructor). فقط سه property مرتبط را فیلتر می‌کند تا از
+        /// NotifyCanExecuteChangedهای بی‌مورد (مثلاً هنگام تغییر ExecutionTask)
+        /// جلوگیری شود.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnOperationCommandPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IAsyncRelayCommand.IsRunning) ||

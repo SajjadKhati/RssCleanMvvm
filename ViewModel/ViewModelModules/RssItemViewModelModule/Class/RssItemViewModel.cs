@@ -1,15 +1,11 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using Application.UseCases.Entry.CommitRssItem.Interface;
+using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Interface;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.DataModels;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Interface;
 using ViewModel.Services.SharedMessengerKeyService.Class;
 
 namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
@@ -20,6 +16,8 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         private ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase;
 
         private IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase;
+
+        private ICommitRssItemUseCase commitRssItemUseCase;
 
 
         /////////////////////////////////////////////////////////////////////////
@@ -152,7 +150,8 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
 
         public RssItemViewModel(string id, string link, string category, string title, string description, string persianPublishDate, string imageFullFilePath, 
             bool isUnsaved , ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase,
-            IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase)
+            IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase,
+            ICommitRssItemUseCase commitRssItemUseCase)
         {
             this.Id = id;
             this.Link = link;
@@ -166,10 +165,11 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
             this.IsInEditMode = false;
             this.saveRssItemDataToDraftCacheUseCase = saveRssItemDataToDraftCacheUseCase;
             this.convertRssItemImageToGrayscaleUseCase = convertRssItemImageToGrayscaleUseCase;
+            this.commitRssItemUseCase = commitRssItemUseCase;
 
             this.SaveRssItemDataToDraftCacheCommand = new AsyncRelayCommand(this.SaveRssItemDataToDraftCache);
             this.ConvertRssItemImageToGrayscaleCommand = new AsyncRelayCommand(this.ConvertRssItemImageToGrayscale);
-            this.CommitRssItemCommand = new AsyncRelayCommand(this.CommitRssItem, this.CanExecuteCommitRssItem);
+            this.CommitRssItemCommand = new AsyncRelayCommand(this.CommitRssItem, this.CanCommitRssItem);
         }
 
 
@@ -202,7 +202,7 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
                 if (draftCacheRssItemDto == null)
                     throw new InvalidOperationException($"آیتم در کش موقت پیدا نشد — احتمالاً همزمان، تغییر دیگری روی آن انجام شده است. لطفاً دوباره تلاش کنید.");
 
-                this.UpdateImageFromDto(draftCacheRssItemDto);
+                this.UpdateImageFromDto(draftCacheRssItemDto, isUnsaved : true);
             }
             catch (Exception exception)
             {
@@ -211,16 +211,27 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         }
 
 
-        private bool CanExecuteCommitRssItem()
+        private bool CanCommitRssItem()
         {
-            /// یه usecase را فراخوانی کنه که ببینه آیا شناسه ی این آیتم ، درون کش موقت وجود داره یا نه؟
-            throw new NotImplementedException();
+            return this.IsUnsaved == true;
         }
 
 
-        private Task CommitRssItem()
+        private async Task CommitRssItem()
         {
-            throw new NotImplementedException();
+            try
+            {
+                RssItemDto commitedRssItemDto = await this.commitRssItemUseCase.ExecuteAsync(new Uri(this.Id));
+                if (commitedRssItemDto == null)
+                    throw new Exception("مورد خبر ذخیره نشد — احتمالاً هم‌زمان، تغییر دیگری روی آن انجام شده. لطفاً دوباره تلاش کنید.");
+
+                this.UpdateImageFromDto(commitedRssItemDto, isUnsaved : false);
+                this.SendGeneralMessage("مورد خبر ، با موفقیت ذخیره شد .");
+            }
+            catch (Exception exception)
+            {
+                WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
+            }
         }
 
 
@@ -230,7 +241,7 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         /// <summary>
         /// داده‌های ViewModel را با مقادیر DTO هم‌گام می‌کند (به‌جز تصویر، که متد جدا دارد).
         /// </summary>
-        public void UpdateDataFromDto(RssItemDto rssItemDto)
+        private void UpdateDataFromDto(RssItemDto rssItemDto)
         {
             /// چرا Description را هم دوباره set می‌کنیم، با اینکه در ۹۹.۹٪ موارد یکسان است؟
             ///
@@ -254,10 +265,16 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         }
 
 
-        public void UpdateImageFromDto(RssItemDto rssItemDto)
+        private void UpdateImageFromDto(RssItemDto rssItemDto, bool isUnsaved)
         {
             this.ImageFullFilePath = rssItemDto.ImageFullFilePath;
-            this.IsUnsaved = rssItemDto.IsUnsaved;
+            this.IsUnsaved = isUnsaved;
+        }
+
+
+        private void SendGeneralMessage(string message)
+        {
+            WeakReferenceMessenger.Default.Send(message, SharedMessengerKey.String_GeneralMessageKey);
         }
 
     }

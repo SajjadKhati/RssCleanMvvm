@@ -36,6 +36,8 @@ using Application.Services.RssItemCreationServices.RssItemBuilderService.Class;
 using Application.Services.RssItemCreationServices.RssItemBuilderService.Interface;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Class;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Interface;
+using Application.UseCases.Entry.CommitRssItem.Class;
+using Application.UseCases.Entry.CommitRssItem.Interface;
 using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Class;
 using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Interface;
 using Application.UseCases.Entry.DownLoadRssItems.Class;
@@ -464,18 +466,24 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         {
             ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase = this.CreateSaveRssItemDataToDraftCacheUseCase();
             IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase = this.CreateConvertRssItemImageToGrayscaleUseCase();
-            return new RssItemViewModelFactory(saveRssItemDataToDraftCacheUseCase, convertRssItemImageToGrayscaleUseCase);
+            ICommitRssItemUseCase commitRssItemUseCase = this.CreateCommitRssItemUseCase();
+            return new RssItemViewModelFactory(saveRssItemDataToDraftCacheUseCase, convertRssItemImageToGrayscaleUseCase, commitRssItemUseCase);
         }
 
         private ISaveRssItemDataToDraftCacheUseCase CreateSaveRssItemDataToDraftCacheUseCase()
         {
-            return new SaveRssItemDataToDraftCacheUseCase(this.saveRssItemToDraftCacheOrchestrator);
+            return new SaveRssItemDataToDraftCacheUseCase(this.saveRssItemToDraftCacheOrchestrator, this.draftRssItemDtoFactoryOrchestrator);
         }
 
         private IConvertRssItemImageToGrayscaleUseCase CreateConvertRssItemImageToGrayscaleUseCase()
         {
             return new ConvertRssItemImageToGrayscaleUseCase(
                 this.imageFilter, this.saveRssItemToDraftCacheOrchestrator, this.draftRssItemDtoFactoryOrchestrator);
+        }
+
+        private ICommitRssItemUseCase CreateCommitRssItemUseCase()
+        {
+            return new CommitRssItemUseCase(this.rssItemAllSourcesOrchestrator, this.rssItemDtoQueryFactory);
         }
 
         private ISaveRssItemToDraftCacheOrchestrator CreateSaveRssItemToDraftCacheOrchestrator()

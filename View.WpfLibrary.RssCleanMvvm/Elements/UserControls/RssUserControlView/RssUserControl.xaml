@@ -267,10 +267,11 @@
                                             Style="{StaticResource RssBorderedToggleButtonStyleKey}"/>
 
                                     <Button Margin="0, 13" Content="{DynamicResource ConvertToGrayScaleKey}" 
-                                            Style="{StaticResource RssBorderedButtonBaseStyleKey}"
-                                            Command="{Binding Path=ConvertRssItemImageToGrayscaleCommand}"/>
+                                            Command="{Binding Path=ConvertRssItemImageToGrayscaleCommand}"
+                                            Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
 
-                                    <Button Content="{DynamicResource SaveKey}" Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
+                                    <Button Content="{DynamicResource SaveKey}" Command="{Binding Path=CommitRssItemCommand}"
+                                            Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
                                 </StackPanel>
 
                             </Grid>

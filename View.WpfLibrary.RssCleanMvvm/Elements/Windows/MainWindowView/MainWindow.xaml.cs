@@ -1,7 +1,6 @@
-﻿using System.Windows;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using CommunityToolkit.Mvvm.Messaging;
 using ViewModel.Services.SharedMessengerKeyService.Class;
 
 namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
@@ -15,6 +14,10 @@ namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
         public MainWindow()
         {
             InitializeComponent();
+
+            // در MainWindow constructor (بعد از InitializeComponent، یا بعد از ساخت MenuItems):
+            this.CancelDownloadMenuItem.SetCurrentValue(MenuItem.IsEnabledProperty, false);
+            this.GetNewNewsMenuItem.SetCurrentValue(MenuItem.IsEnabledProperty, false);
 
             this.InitializeView();
         }

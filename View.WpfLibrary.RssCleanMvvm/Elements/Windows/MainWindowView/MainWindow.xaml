@@ -44,7 +44,8 @@
                     بدون FallbackValue: UnsetValue به Converter می‌رود و چون null نیست،
                     نتیجه true برمی‌گردد و MenuItem اشتباهاً فعال می‌ماند.
                 -->
-                <MenuItem Header="{DynamicResource GetNewNewsKey}" ToolTip="{DynamicResource UpdateNewNewsToolTipKey}"
+                <MenuItem x:Name="GetNewNewsMenuItem" Header="{DynamicResource GetNewNewsKey}" 
+                          ToolTip="{DynamicResource UpdateNewNewsToolTipKey}"
                           Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.DownLoadRssItemsCommand}"
                           IsEnabled="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel, 
                                 Converter={StaticResource NullableToBoolValueConverterKey}, 
@@ -58,7 +59,7 @@
                     بدون FallbackValue: UnsetValue به Converter می‌رود و چون null نیست،
                     نتیجه true برمی‌گردد و MenuItem اشتباهاً فعال می‌ماند.
                 -->
-                <MenuItem Header="{DynamicResource CancelCurrentDownloadKey}" 
+                <MenuItem x:Name="CancelDownloadMenuItem" Header="{DynamicResource CancelCurrentDownloadKey}" 
                           ToolTip="{DynamicResource CancelOperationToolTipKey}"
                           Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.CancelCurrentOperationCommand}"
                           IsEnabled="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel, 
@@ -67,7 +68,8 @@
 
                 <Separator/>
 
-                <MenuItem Header="{DynamicResource SaveAllKey}" ToolTip="{DynamicResource SaveAllToolTipKey}"/>
+                <MenuItem Header="{DynamicResource SaveAllKey}" ToolTip="{DynamicResource SaveAllToolTipKey}"
+                          Command="{Binding Path=CommitAllRssItemCommand}"/>
             </MenuItem>
 
             <MenuItem Header="{DynamicResource SettingsKey}">

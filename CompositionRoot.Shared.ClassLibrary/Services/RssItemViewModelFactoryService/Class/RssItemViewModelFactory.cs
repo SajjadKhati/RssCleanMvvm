@@ -1,4 +1,5 @@
 ﻿using Application.OverallDataModels.OverallDto.EntityDto;
+using Application.UseCases.Entry.CommitRssItem.Interface;
 using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Interface;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
@@ -13,15 +14,19 @@ namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactorySe
 
         private IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase;
 
+        private ICommitRssItemUseCase commitRssItemUseCase;
+
 
         /////////////////////////////////////////////////////////////////////////
 
 
         public RssItemViewModelFactory(ISaveRssItemDataToDraftCacheUseCase saveRssItemDataToDraftCacheUseCase,
-            IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase)
+            IConvertRssItemImageToGrayscaleUseCase convertRssItemImageToGrayscaleUseCase, 
+            ICommitRssItemUseCase commitRssItemUseCase)
         {
             this.saveRssItemDataToDraftCacheUseCase = saveRssItemDataToDraftCacheUseCase;
             this.convertRssItemImageToGrayscaleUseCase = convertRssItemImageToGrayscaleUseCase;
+            this.commitRssItemUseCase = commitRssItemUseCase;
         }
 
 
@@ -40,7 +45,8 @@ namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactorySe
                 rssItemDto.ImageFullFilePath,
                 rssItemDto.IsUnsaved,
                 this.saveRssItemDataToDraftCacheUseCase,
-                this.convertRssItemImageToGrayscaleUseCase);
+                this.convertRssItemImageToGrayscaleUseCase,
+                this.commitRssItemUseCase);
         }
 
     }

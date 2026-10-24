@@ -4,8 +4,6 @@ namespace Application.InfrastructureContracts.DataAccessProject.AppQuery.RssItem
 {
     public interface IRssItemDtoQueryFactory
     {
-
         IRssItemDtoQuery Create();
-
     }
 }

@@ -50,7 +50,7 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 
         public IAsyncRelayCommand LoadRssSiteCommand {  get; }
 
-        public IAsyncRelayCommand LoadRssItemsCommand { get; }
+        public IAsyncRelayCommand CommitAllRssItemCommand { get; }
 
 
         /////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 
             this.RssSiteViewModels = new RangeObservableCollection<RssSiteViewModel>();
             this.LoadRssSiteCommand = new AsyncRelayCommand(this.LoadRssSite);
-            this.LoadRssItemsCommand = new AsyncRelayCommand(this.LoadRssItems, this.CanExecuteLoadRssItems);
+            this.CommitAllRssItemCommand = new AsyncRelayCommand(this.CommitAllRssItem, this.CanCommitAllRssItem);
         }
 
 
@@ -84,15 +84,16 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
         }
 
 
-        private bool CanExecuteLoadRssItems()
+        private bool CanCommitAllRssItem()
         {
-            throw new NotImplementedException();
+            //
+            return false;
         }
 
 
-        private async Task LoadRssItems()
+        private async Task CommitAllRssItem()
         {
-            // LoadRssItemsUseCase
+            throw new NotImplementedException();
         }
 
 

@@ -40,10 +40,5 @@ namespace ViewModel.ViewModelModules.RssSiteViewModelModule.Class
             this.SiteName = siteName;
         }
 
-
-        /////////////////////////////////////////////////////////////////////////////
-
-
-
     }
 }
