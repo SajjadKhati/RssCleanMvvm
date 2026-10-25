@@ -9,6 +9,7 @@
         xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.MainWindowViewModelModule.Class;assembly=ViewModel"
         xmlns:appearanceSwitcherData="clr-namespace:ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.DataModel;assembly=ViewModel"
         xmlns:languageSwitcherData="clr-namespace:ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.DataModel;assembly=ViewModel"
+        xmlns:commandService="clr-namespace:ViewModel.Services.NeverExecuteCommandService.Class;assembly=ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance d:Type=viewModelModules:MainWindowViewModel, IsDesignTimeCreatable=False}"
         WindowStartupLocation="CenterScreen">
@@ -46,10 +47,8 @@
                 -->
                 <MenuItem x:Name="GetNewNewsMenuItem" Header="{DynamicResource GetNewNewsKey}" 
                           ToolTip="{DynamicResource UpdateNewNewsToolTipKey}"
-                          Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.DownLoadRssItemsCommand}"
-                          IsEnabled="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel, 
-                                Converter={StaticResource NullableToBoolValueConverterKey}, 
-                                    FallbackValue=false}"/>
+                          Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.DownLoadRssItemsCommand, 
+                                FallbackValue={x:Static commandService:NeverExecuteCommand.Instance}}"/>
 
                 <!-- FallbackValue=False برای وقتی است که مسیر Binding قابل حل نباشد.
                     مثلاً وقتی SelectedRssSiteViewModel برابر null باشد، WPF مقدار UnsetValue
@@ -61,10 +60,8 @@
                 -->
                 <MenuItem x:Name="CancelDownloadMenuItem" Header="{DynamicResource CancelCurrentDownloadKey}" 
                           ToolTip="{DynamicResource CancelOperationToolTipKey}"
-                          Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.CancelCurrentOperationCommand}"
-                          IsEnabled="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel, 
-                              Converter={StaticResource NullableToBoolValueConverterKey}, 
-                                  FallbackValue=false}"/>
+                          Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.CancelCurrentOperationCommand,
+                                FallbackValue={x:Static commandService:NeverExecuteCommand.Instance}}"/>
 
                 <Separator/>
 

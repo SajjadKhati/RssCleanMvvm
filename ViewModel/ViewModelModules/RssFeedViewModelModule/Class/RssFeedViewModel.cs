@@ -8,6 +8,7 @@ using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Inter
 using ViewModel.Services.RangeObservableCollectionService.Class;
 using ViewModel.Services.SharedMessengerKeyService.Class;
 using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
+using ViewModel.Services.CommandNotifyService.Class;
 
 namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
 {
@@ -18,6 +19,12 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
 
         private IRssItemViewModelFactory rssItemViewModelFactory;
 
+        private readonly string[] ObservedProperties =
+        {
+            nameof(IAsyncRelayCommand.IsRunning),
+            nameof(IAsyncRelayCommand.IsCancellationRequested),
+            nameof(IAsyncRelayCommand.CanBeCanceled)
+        };
 
         /////////////////////////////////////////////////////////////////////////////
 
@@ -54,10 +61,9 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
             this.rssItemViewModelFactory = rssItemViewModelFactory;
 
             this.LoadRssItemsCommand = new AsyncRelayCommand(this.LoadRssItems, this.CanLoadRssItems);
-            this.LoadRssItemsCommand.PropertyChanged += this.OnOperationCommandPropertyChanged;
-            this.DownLoadRssItemsCommand = new AsyncRelayCommand(this.DownLoadRssItems);
-            this.DownLoadRssItemsCommand.PropertyChanged += this.OnOperationCommandPropertyChanged;
+            this.DownLoadRssItemsCommand = new AsyncRelayCommand(this.DownLoadRssItems, this.CanDownLoadRssItems);
             this.CancelCurrentOperationCommand = new RelayCommand(this.CancelCurrentOperation, this.CanCancelCurrentOperation);
+            this.SetupCommandNotifyCanExecuteChanged();
         }
 
 
@@ -73,6 +79,12 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
         {
             /// ابتدا و انتهای این متد ، متد this.CancelCurrentOperationCommand.NotifyCanExecuteChanged(); را فراخوانی کن .
             throw new NotImplementedException();
+        }
+
+
+        private bool CanDownLoadRssItems()
+        {
+            return this.LoadRssItemsCommand.IsRunning == false;
         }
 
 
@@ -120,31 +132,48 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
 
 
         /// <summary>
-        /// با تغییر وضعیت کامندهای عملیاتی (Load / Download)، کامند لغو را
-        /// وادار به ارزیابی مجدد CanExecute می‌کند.
+        /// وابستگی‌های CanExecute بین کامندهای این ViewModel را برقرار می‌کند.
         ///
         /// چرا لازم است؟
-        /// CanExecute کامند لغو به سه property از کامندهای دیگر وابسته است
-        /// (IsRunning, IsCancellationRequested, CanBeCanceled). این‌ها property
-        /// ساده‌ی CLR هستند، نه DependencyProperty — بنابراین WPF به تغییرشان
-        /// به‌طور خودکار واکنش نشان نمی‌دهد. بدون این متد، دکمه‌ی «لغو» پس از
-        /// شروع یا پایان یک عملیات، در وضعیت قبلی (فعال/غیرفعال) باقی می‌ماند.
+        /// کامندهای async، propertyهای وضعیتی (IsRunning, IsCancellationRequested,
+        /// CanBeCanceled) را fire می‌کنند. اما WPF به تغییر این propertyها
+        /// به‌طور خودکار واکنش نشان نمی‌دهد — کامندهای دیگر، CanExecute خود را
+        /// دوباره ارزیابی نمی‌کنند.
         ///
-        /// این متد به رویداد PropertyChanged هر دو کامند عملیاتی subscribe شده
-        /// (در Constructor). فقط سه property مرتبط را فیلتر می‌کند تا از
-        /// NotifyCanExecuteChangedهای بی‌مورد (مثلاً هنگام تغییر ExecutionTask)
-        /// جلوگیری شود.
+        /// این متد، دو جهت وابستگی را سیم‌کشی می‌کند:
+        ///
+        ///   ۱. Load → DownLoad و Cancel:
+        ///      - DownLoad.CanExecute = !Load.IsRunning  (چون Load و DownLoad نباید همزمان اجرا شوند)
+        ///      - Cancel.CanExecute به Load.CanBeCanceled و Load.IsCancellationRequested وابسته است
+        ///
+        ///   ۲. DownLoad → Load و Cancel:
+        ///      - Load.CanExecute = !DownLoad.IsRunning  (همان دلیل بالا)
+        ///      - Cancel.CanExecute به DownLoad.CanBeCanceled و DownLoad.IsCancellationRequested وابسته است
+        ///
+        /// نتیجه: هر تغییری در وضعیت Load یا DownLoad، بلافاصله CanExecute
+        /// کامندهای وابسته را دوباره ارزیابی می‌کند و دکمه‌ها (لغو دانلود، دریافت
+        /// اخبار جدید، ...) با state واقعی هم‌گام می‌مانند.
+        ///
+        /// نکته: CancelCurrentOperationCommand فقط مقصد notify است، نه منبع
+        /// (چون IRelayCommand است، نه IAsyncRelayCommand — propertyهای وضعیتی ندارد).
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnOperationCommandPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void SetupCommandNotifyCanExecuteChanged()
         {
-            if (e.PropertyName == nameof(IAsyncRelayCommand.IsRunning) ||
-                e.PropertyName == nameof(IAsyncRelayCommand.IsCancellationRequested) ||
-                e.PropertyName == nameof(IAsyncRelayCommand.CanBeCanceled))
-            {
-                this.CancelCurrentOperationCommand.NotifyCanExecuteChanged();
-            }
+            /// ۱. Load منبع تغییرات → DownLoad و Cancel را notify می‌کند.
+            /// هر بار Load.IsRunning یا Load.IsCancellationRequested یا Load.CanBeCanceled
+            /// عوض شود، DownLoad.CanExecute و Cancel.CanExecute دوباره ارزیابی می‌شوند.
+            this.LoadRssItemsCommand.PropagateNotifyCanExecuteChangedToCommands(
+                this.ObservedProperties,
+                this.DownLoadRssItemsCommand,
+                this.CancelCurrentOperationCommand);
+
+            /// ۲. DownLoad منبع تغییرات → Load و Cancel را notify می‌کند.
+            /// (متقارن با مورد ۱. برای جلوگیری از اجرای همزمان Load و DownLoad،
+            /// و هم‌گام‌سازی Cancel با وضعیت هر دو کامند.)
+            this.DownLoadRssItemsCommand.PropagateNotifyCanExecuteChangedToCommands(
+                this.ObservedProperties,
+                this.LoadRssItemsCommand,
+                this.CancelCurrentOperationCommand);
         }
 
 

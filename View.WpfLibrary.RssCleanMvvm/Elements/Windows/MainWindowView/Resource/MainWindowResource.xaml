@@ -50,7 +50,7 @@
         <Setter Property="Height" Value="720"/>
         <Setter Property="MinWidth" Value="600"/>
         <Setter Property="MinHeight" Value="400"/>
-        <Setter Property="Title" Value="خبرخوان"/>
+        <Setter Property="Title" Value="{DynamicResource SunriseNewsFeedKey}"/>
     </Style>
 
 
@@ -99,8 +99,5 @@
             </EventTrigger>
         </Style.Triggers>
     </Style>
-
-
-
 
 </ResourceDictionary>

@@ -86,7 +86,7 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
 
         private bool CanCommitAllRssItem()
         {
-            //
+            ///
             return false;
         }
 

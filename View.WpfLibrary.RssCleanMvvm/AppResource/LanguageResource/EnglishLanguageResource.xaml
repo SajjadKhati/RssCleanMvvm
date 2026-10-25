@@ -6,6 +6,8 @@
     <FlowDirection x:Key="FlowDirectionKey">LeftToRight</FlowDirection>
 
 
+    <system:String x:Key="SunriseNewsFeedKey">Sunrise News Feed</system:String>
+
     <system:String x:Key="NewsFeedKey">News Feed</system:String>
 
     <system:String x:Key="GetNewNewsKey">Get New News</system:String>

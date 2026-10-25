@@ -6,6 +6,8 @@
     <FlowDirection x:Key="FlowDirectionKey">RightToLeft</FlowDirection>
 
 
+    <system:String x:Key="SunriseNewsFeedKey">خبر خوان طلوع</system:String>
+
     <system:String x:Key="NewsFeedKey">خبر خوان</system:String>
 
     <system:String x:Key="GetNewNewsKey">دریافت اخبار جدید</system:String>
