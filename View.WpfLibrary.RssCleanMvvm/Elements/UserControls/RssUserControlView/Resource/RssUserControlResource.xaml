@@ -1,10 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:filePathToBitmapImageConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.FilePathToBitmapImageConverterModule"
                     xmlns:system="clr-namespace:System;assembly=System.Runtime"
-                    xmlns:isInEditModeToStringConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.IsInEditModeToStringConverterModule"
                     xmlns:isInEditModeToVisibilityConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.BindingConverterModules.IsInEditModeToVisibility"
-                    xmlns:isUnsavedToBrushConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.IsUnsavedToBrushConverterModule">
+                    xmlns:isUnsavedToBrushConverterModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView.IsUnsavedToBrushConverterModule"
+                    xmlns:interaction="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:routedEventTriggerModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.UiLogicModules.RoutedEventTriggerModule.Class"
+                    xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.RssItemViewModelModule.Class;assembly=ViewModel"
+                    mc:Ignorable="d">
 
 
     <system:Double x:Key="ImageWidthKey">192</system:Double>
@@ -38,6 +43,217 @@
         </Style.Triggers>
     </Style>
 
+
+
+
+    <DataTemplate x:Key="RssItemDataTemplateKey">
+        <Border d:DataContext="{d:DesignInstance d:Type=viewModelModules:RssItemViewModel, IsDesignTimeCreatable=False}"
+                Background="Transparent" Margin="0, 2" Padding="6, 4" BorderThickness="0, 0, 0, 1"
+                BorderBrush="{Binding Path=IsUnsaved, Converter={StaticResource IsUnsavedToBrushConverterKey}}" >
+            <Grid Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Name="NewsColumn" Width="*"/>
+                    <ColumnDefinition Name="ImageColumn" Width="Auto"/>
+                    <ColumnDefinition Name="CommandButtonsColumn" Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Background="Transparent">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" FontSize="17" FontWeight="UltraBold" Text="{Binding Path=Title}"
+                                               Style="{StaticResource TextBlockStyleKey}"/>
+
+                    <TextBlock Grid.Row="1" FontSize="14" Text="{Binding Path=Category, StringFormat='در دسته بندی : {0}'}"
+                                               Style="{StaticResource TextBlockStyleKey}"/>
+
+                    <TextBlock Grid.Row="2" Margin="0, 10" TextWrapping="Wrap" Text="{Binding Mode=OneWay, Path=Description}"
+                                               Visibility="{Binding Mode=OneWay, Path=IsInEditMode, 
+                                                    Converter={StaticResource IsInEditModeToVisibilityConverterKey}}"
+                                               Style="{StaticResource TextBlockStyleKey}"/>
+
+                    <!-- Binding.TargetUpdated یک Routed Event حبابی است که هر بار مقدار از Source به Target منتقل شود، منتشر میشود.
+                                    شرط انتشار: NotifyOnTargetUpdated=True در Binding.
+
+                                    نکتهی مهم: این رویداد به ازای هر کنترل، فقط یکبار روی عنصر مینشیند.
+                                    اما به ازای هر بایندینگی که در آن کنترل NotifyOnTargetUpdated=True دارد، یکبار fire میشود.
+                                    پس اگر این TextBlock چند پراپرتی بایند شده داشته باشد (مثل Text و ToolTip)،
+                                    هندلر برای هر پراپرتی جداگانه اجرا میشود.
+                                    برای تفکیک، در هندلر از e.Property استفاده کنید.
+
+                                    چون حبابی است، به والدین هم میرسد؛ اگر والدین هندلری برای آن داشته باشند،
+                                    آن هم اجرا میشود (که ممکن است ناخواسته باشد).
+
+                                    به همین دلیل در هندلر، بعد از انجام کار، حتماً e.Handled = true بگذارید
+                                    تا رویداد به والدین حباب نکند و هندلرهای ناخواستهی والدین اجرا نشوند.
+                                -->
+                    <TextBox Grid.Row="2" Margin="0, 10" AcceptsReturn="True" TextWrapping="Wrap"
+                                             Text="{Binding Mode=TwoWay, Path=Description, NotifyOnSourceUpdated=True}"
+                                             Visibility="{Binding Mode=OneWay, Path=IsInEditMode, 
+                                                    Converter={StaticResource IsInEditModeToVisibilityConverterKey}, ConverterParameter='Invert'}">
+                        <interaction:Interaction.Triggers>
+                            <routedEventTriggerModule:RoutedEventTrigger RoutedEvent="{x:Static Binding.SourceUpdatedEvent}">
+                                <interaction:InvokeCommandAction Command="{Binding Path=SaveRssItemDataToDraftCacheCommand}"/>
+                            </routedEventTriggerModule:RoutedEventTrigger>
+                        </interaction:Interaction.Triggers>
+                    </TextBox>
+
+                    <TextBlock Grid.Row="3" Text="{Binding Path=PersianPublishDate}"
+                                               Style="{StaticResource TextBlockStyleKey}"/>
+                </Grid>
+
+                <Grid Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20, 0" Background="Transparent">
+                    <!-- توضیحات Image.Stretch  :
+                                        ═══════════════════════════════════════════════════════════════════════════
+                                         Stretch — نحوهٔ جاگیری تصویر داخل کادر کنترل Image
+                                        ═══════════════════════════════════════════════════════════════════════════
+
+                                         سناریو: کادر کنترل 100×100 است، ولی ابعاد تصاویر هر خبرگزاری متفاوت است.
+
+                                         مقادیر:
+
+                                           Fill:
+                                             - تصویر را می‌کشد تا دقیقاً اندازهٔ کادر شود.
+                                             - نسبت ابعاد به‌هم می‌ریزد (اعوجاج).
+                                             - مثال: تصویر 800×200 → کشیده می‌شود به 100×100 → مضحک و کشیده.
+
+                                           Uniform:
+                                             - تصویر را با حفظ نسبت بزرگ/کوچک می‌کند تا کامل درون کادر جا شود.
+                                             - هیچ برشی رخ نمی‌دهد، ولی ممکن است فضای خالی در بالا/پایین یا چپ/راست بماند.
+                                             - مثال: تصویر 800×200 در کادر 100×100 → می‌شود 100×25،
+                                               و بالای/پایینش فضای خالی می‌ماند.
+
+                                           UniformToFill:
+                                             - تصویر را با حفظ نسبت بزرگ می‌کند تا کل کادر را پر کند.
+                                             - بخش‌های اضافی از مرکز برش می‌خورند (نه از گوشه).
+                                             - مثال: تصویر 800×200 در کادر 100×100 → می‌شود 400×100،
+                                               و فقط 100 پیکسل وسط افقی نمایش داده می‌شود.
+                                             - ✅ برای برنامهٔ ما مناسب است، چون ظاهر یکدست ایجاد می‌کند.
+
+                                           None:
+                                             - تصویر دست‌نخورده در گوشهٔ بالا-چپ کادر رندر می‌شود.
+                                             - اگر بزرگ‌تر از کادر باشد، بقیه‌اش بریده می‌شود.
+
+                                         ✅ انتخاب ما: UniformToFill
+                                            دلیل: همیشه کل کادر 100×100 را پر می‌کند، نسبت ابعاد هم حفظ می‌شود،
+                                            و ظاهر لیست خبری یکدست می‌ماند.
+                                        -->
+                    <!-- توضیحات RenderOptions.BitmapScalingMode :
+                                    
+                                        ═══════════════════════════════════════════════════════════════════════════
+                                         RenderOptions.BitmapScalingMode — الگوریتم مقیاس‌بندی هنگام رسم
+                                        ═══════════════════════════════════════════════════════════════════════════
+
+                                         توجه: این ویژگی به «نمایش» مربوط است، نه به «دیکد».
+                                               یعنی بعد از اینکه تصویر دیکد شد (با DecodePixelWidth)،
+                                               WPF برای رساندن آن به اندازهٔ نهایی کادر، باید مقیاس‌بندی کند.
+                                               این مقیاس‌بندی نیاز به یک الگوریتم دارد.
+
+                                         مقادیر:
+
+                                           Linear (= LowQuality):
+                                             - برای هر پیکسل خروجی، میانگین 4 پیکسل مجاور ورودی را می‌گیرد.
+                                             - سریع، ولی در بزرگ‌نمایی زیاد، تصویر کمی تار می‌شود.
+                                             - ✅ مناسب اسکرول سریع و لیست بلند.
+
+                                           Fant (= HighQuality):
+                                             - الگوریتم پیچیده‌تر (polyphase)؛ لبه‌ها شارپ‌تر و جزئیات بهتر.
+                                             - کندتر، مصرف CPU بیشتر.
+                                             - مناسب تصویر ثابت و بزرگ.
+
+                                           NearestNeighbor:
+                                             - بدون درون‌یابی؛ هر پیکسل خروجی = نزدیک‌ترین پیکسل ورودی.
+                                             - نتیجه: تصویر پیکسلی (blocky).
+                                             - مناسب pixel art، نمودار، اسکرین‌شات.
+
+                                           Unspecified:
+                                             - تصمیم با WPF (معمولاً Linear).
+
+                                         ✅ انتخاب ما: LowQuality (Linear)
+                                            دلیل: ListBox با Virtualization و اسکرول سریع داریم؛ سرعت مهم‌تر از
+                                            شارپ بودن نهایی است. در اندازهٔ کوچک (100×100) تفاوت Fant و Linear
+                                            تقریباً نامحسوس است.
+
+                                        ═══════════════════════════════════════════════════════════════════════════
+                                         خلاصهٔ مسیر یک تصویر از دیسک تا صفحه
+                                        ═══════════════════════════════════════════════════════════════════════════
+
+                                           1) Decode (در Converter):
+                                              فایل با DecodePixelWidth (مثلاً 200 یا 400) از دیسک خوانده و دیکد می‌شود.
+                                              → این مرحله «حافظهٔ مصرفی» را تعیین می‌کند.
+
+                                           2) Scaling (در WPF Render):
+                                              تصویر دیکدشده توسط الگوریتم BitmapScalingMode به اندازهٔ نهایی کادر
+                                              می‌رسد (طبق Stretch).
+                                              → این مرحله «کیفیت بصری» را تعیین می‌کند.
+                                    -->
+                    <!-- توضیحات علت استفاده از BindingConverter :
+                                        ═══════════════════════════════════════════════════════════════════════════
+                                         چرا از Converter استفاده کردیم و از BitmapImage ای که پروپرتیِ UriSource اش را مقداردهی کنیم ، استفاده نکردیم؟ :
+                                        ═══════════════════════════════════════════════════════════════════════════
+
+                                         روش معمول (بدون Converter):
+
+                                           <Image.Source>
+                                               <BitmapImage UriSource="{Binding ImageFullFilePath}" .../>
+                                           </Image.Source>
+
+                                         مشکل این روش (استفاده از UriSource) :
+
+                                           1) WPF یک Image Cache داخلی دارد که بر اساس URI کلید می‌خورد.
+                                              اگر فایل تصویر روی دیسک تغییر کند ولی مسیر (URI) همان باشد،
+                                              WPF نسخهٔ قدیمی کش‌شده را نمایش می‌دهد.
+
+                                           2) در برنامهٔ ما، دکمهٔ «تبدیل به سیاه و سفید» محتوای فایل را عوض
+                                              می‌کند ولی مسیر فایل ثابت می‌ماند → WPF تغییر را نمی‌بیند.
+
+                                           3) حتی با OnPropertyChanged هم مشکل حل نمی‌شود، چون WPF هنوز
+                                              همان URI را می‌بیند و از cache می‌خواند.
+
+                                         راه‌حل: استفاده از Converter با StreamSource
+
+                                           در Converter، فایل را با FileStream باز می‌کنیم و به BitmapImage.StreamSource
+                                           می‌دهیم. چون URI به WPF داده نمی‌شود، cache داخلی درگیر نمی‌شود و
+                                           هر بار Binding اجرا شود، فایل از دیسک تازه خوانده می‌شود.
+
+                                           + CacheOption = OnLoad  → فایل بلافاصله بعد از دیکد آزاد می‌شود
+                                                                     (برای حذف/جایگزینی فایل لازم است).
+                                           + DecodePixelWidth      → اندازهٔ دیکد را کوچک نگه می‌دارد (صرفه‌جویی حافظه).
+                                           + Freeze()              → BitmapImage غیرقابل تغییر و Thread-safe می‌شود.
+
+                                         برای اجبار به بارگذاری مجدد بعد از تغییر فایل:
+
+                                           در ViewModel متد NotifyImageChanged() صدا زده می‌شود که
+                                           OnPropertyChanged(nameof(ImageFullFilePath)) را اجرا می‌کند.
+                                           چون Binding به PropertyChanged گوش می‌دهد، Converter دوباره اجرا
+                                           می‌شود و فایل تازه از دیسک خوانده می‌شود.
+                                    -->
+                    <Image Width="{StaticResource ImageWidthKey}" Height="{StaticResource ImageHeightKey}"
+                                           Stretch="UniformToFill" RenderOptions.BitmapScalingMode="LowQuality"
+                                           Source="{Binding Mode=OneWay, Path=ImageFullFilePath, 
+                                                Converter={StaticResource FilePathToBitmapImageConverterKey},
+                                                    ConverterParameter={StaticResource ImageWidthKey}}"/>
+                </Grid>
+
+                <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent">
+                    <ToggleButton IsChecked="{Binding Mode=TwoWay, Path=IsInEditMode}"
+                                            Style="{StaticResource RssBorderedToggleButtonStyleKey}"/>
+
+                    <Button Margin="0, 13" Content="{DynamicResource ConvertToGrayScaleKey}" 
+                                            Command="{Binding Path=ConvertRssItemImageToGrayscaleCommand}"
+                                            Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
+
+                    <Button Content="{DynamicResource SaveKey}" Command="{Binding Path=CommitRssItemCommand}"
+                                            Style="{StaticResource RssBorderedButtonBaseStyleKey}"/>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+    </DataTemplate>
 
 
 </ResourceDictionary>
