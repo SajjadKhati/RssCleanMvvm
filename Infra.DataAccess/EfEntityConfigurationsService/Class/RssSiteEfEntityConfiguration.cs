@@ -31,12 +31,6 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
                     Id = new Uri("https://www.yjc.ir/").AbsoluteUri,
                     SiteName = "باشگاه خبرنگاران جوان"
                 },
-                /// خبرگزاری صدا و سیما
-                new RssSiteEfEntity
-                {
-                    Id = new Uri("https://www.irib-news.ir/").AbsoluteUri,
-                    SiteName = "خبرگزاری صدا و سیما"
-                },
             };
         }
 

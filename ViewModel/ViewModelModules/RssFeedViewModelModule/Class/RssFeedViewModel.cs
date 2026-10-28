@@ -3,12 +3,13 @@ using Application.UseCases.Entry.DownLoadRssItems.DataModels;
 using Application.UseCases.Entry.DownLoadRssItems.Interface;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using System.ComponentModel;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
-using ViewModel.Services.RangeObservableCollectionService.Class;
-using ViewModel.Services.SharedMessengerKeyService.Class;
-using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
+using ViewModel.DataModels.MessengerDataModels.FeedOperationStateMessage.Class;
+using ViewModel.DataModels.MessengerDataModels.FeedOperationStateMessage.Enum;
+using ViewModel.DataModels.MessengerKey.Class;
 using ViewModel.Services.CommandNotifyService.Class;
+using ViewModel.Services.RangeObservableCollectionService.Class;
+using ViewModel.ViewModelModules.RssItemViewModelModule.Class;
 
 namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
 {
@@ -77,8 +78,21 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
 
         private async Task LoadRssItems(CancellationToken cancellationToken)
         {
-            /// ابتدا و انتهای این متد ، متد this.CancelCurrentOperationCommand.NotifyCanExecuteChanged(); را فراخوانی کن .
             throw new NotImplementedException();
+
+            this.SendOperationStartedMessage();
+            try
+            {
+
+            }
+            catch (Exception exception)
+            {
+                
+            }
+            finally
+            {
+                this.SendOperationEndedMessage();
+            }
         }
 
 
@@ -90,20 +104,26 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
 
         private async Task DownLoadRssItems(CancellationToken cancellationToken)
         {
+            this.SendOperationStartedMessage();
             try
             {
+                this.SendStartingMessages(isDownloadOperation: true);
                 RssItemDtosResult rssItemDtosResult = await this.downLoadRssItemsUseCase.ExecuteAsync(new Uri(this.Id), cancellationToken);
                 if (rssItemDtosResult.CreatedRssItemDtos != null)
                 {
                     ICollection<RssItemViewModel> rssItemViewModels = this.ConvertToRssItemViewModels(rssItemDtosResult.CreatedRssItemDtos);
                     this.InsertToBeginningIndexOfRssItemViewModels(rssItemViewModels);
                 }
-                this.SendMessages(rssItemDtosResult);
+                this.SendEndingMessages(rssItemDtosResult, isDownloadOperation: true);
             }
             catch (Exception exception)
             {
                 /// خطاهای XML/شبکه (که در Orchestrator گرفته نشدن) اینجا گرفته می‌شن
-                WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
+                WeakReferenceMessenger.Default.Send(exception, MessengerKey.Exception_ErrorKey);
+            }
+            finally
+            {
+                this.SendOperationEndedMessage();
             }
         }
 
@@ -177,6 +197,20 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
         }
 
 
+        private void SendOperationStartedMessage()
+        {
+            WeakReferenceMessenger.Default.Send(new FeedOperationStateMessage(FeedOperationState.Started, this.Id), 
+                MessengerKey.FeedOperationStateMessage_RunningStateKey);
+        }
+
+
+        private void SendOperationEndedMessage()
+        {
+            WeakReferenceMessenger.Default.Send(new FeedOperationStateMessage(FeedOperationState.Ended, this.Id),
+                MessengerKey.FeedOperationStateMessage_RunningStateKey);
+        }
+
+
         private ICollection<RssItemViewModel> ConvertToRssItemViewModels(ICollection<RssItemDto> rssItemDtos)
         {
             if (rssItemDtos == null || rssItemDtos.Count == 0)
@@ -202,39 +236,58 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
         }
 
 
-        private void SendMessages(RssItemDtosResult rssItemDtosResult)
+        private void SendStartingMessages(bool isDownloadOperation)
         {
+            string operationName = isDownloadOperation ? "دریافت خبر جدید" : "بارگذاری";
+            string startingMessage = $"عملیات {operationName} برای دسته‌ی خبریِ \"{this.Title}\" شروع شد .";
+            WeakReferenceMessenger.Default.Send(startingMessage, MessengerKey.String_GeneralMessageKey);
+        }
+
+
+        private void SendEndingMessages(RssItemDtosResult result, bool isDownloadOperation)
+        {
+            string operationName = isDownloadOperation ? "دریافت خبر جدید" : "بارگذاری";
+            string operationContext = $"عملیات {operationName} برای دسته‌ی خبریِ \"{this.Title}\"";
             /// ۱. لغو کاربر — بالاترین اولویت
-            /// چون اگه کاربر لغو کرده، پیام «هیچ خبری نیست» یا «خطا» گمراه‌کننده‌ست.
-            if (rssItemDtosResult.WasUserCancelled == true)
+            if (result.WasUserCancelled)
             {
-                string cancelMessage = (rssItemDtosResult.CreatedRssItemDtos.Count > 0)
-                    ? $"عملیات لغو شد. {rssItemDtosResult.CreatedRssItemDtos.Count} خبر در کش موقت ذخیره شد ."
-                    : "عملیات لغو شد.";
-                WeakReferenceMessenger.Default.Send(cancelMessage, SharedMessengerKey.String_GeneralMessageKey);
+                string cancelMessage = (result.CreatedRssItemDtos.Count > 0)
+                    ? $"{operationContext} لغو شد.\n{result.CreatedRssItemDtos.Count} خبر در کش موقت ذخیره شد."
+                    : $"{operationContext} لغو شد.";
+                WeakReferenceMessenger.Default.Send(cancelMessage, MessengerKey.String_GeneralMessageKey);
                 return;
             }
-            /// ۲. پیام موفقیت یا خالی
-            if (rssItemDtosResult.CreatedRssItemDtos.Count > 0)
+
+            int createdCount = result.CreatedRssItemDtos.Count;
+            int errorCount = result.CreationErrors.Count;
+            /// ۲. حالت بدون خطا: پیام موفقیت/خالی
+            if (errorCount == 0)
             {
-                string message = $"تعداد {rssItemDtosResult.CreatedRssItemDtos.Count} خبر جدید دریافت شد .";
-                WeakReferenceMessenger.Default.Send(message, SharedMessengerKey.String_GeneralMessageKey);
-            }
-            else if (rssItemDtosResult.CreationErrors.Count == 0)
-            {
-                // نه آیتم جدید، نه خطا → واقعاً هیچ خبر جدیدی نیست
-                WeakReferenceMessenger.Default.Send("هیچ خبر جدیدی وجود ندارد .", SharedMessengerKey.String_GeneralMessageKey);
+                if (createdCount > 0)
+                    WeakReferenceMessenger.Default.Send($"{operationContext} با موفقیت تمام شد.\n{createdCount} خبر جدید دریافت شد.",
+                        MessengerKey.String_GeneralMessageKey);
+                else
+                    WeakReferenceMessenger.Default.Send($"{operationContext} تمام شد .\nهیچ خبر جدیدی وجود ندارد.",
+                        MessengerKey.String_GeneralMessageKey);
+                return;
             }
 
-            /// ۳. خطاها (فقط اولی برای نمایش)
-            /// InnerException پاس داده می‌شه تا stack trace اصلی حفظ بشه.
-            if (rssItemDtosResult.CreationErrors.Count > 0)
+            /// ۳. حالت با خطا: پیام واحد و کامل (نه دو پیام متناقض)
+            string errorSummary;
+            if (createdCount > 0)
             {
-                string errorMessage = $"دریافت {rssItemDtosResult.CreationErrors.Count} خبر انجام نشد . " +
-                    $"دلیل خطای اول :\n\n{rssItemDtosResult.CreationErrors[0].Message}";
-                Exception firstError = new Exception(errorMessage, rssItemDtosResult.CreationErrors[0]);
-                WeakReferenceMessenger.Default.Send(firstError, SharedMessengerKey.Exception_ErrorKey);
+                // موفقیت نسبی — خطا + موفقیت
+                errorSummary = $"{operationContext} تمام شد .\n{createdCount} خبر با موفقیت دریافت شد، ولی دریافتِ {errorCount} خبر با شکست مواجه شد.\n" +
+                    $"دلیل خطای اول:\n\n{result.CreationErrors[0].Message}";
             }
+            else
+            {
+                // هیچ خبری + خطا (منبع خالی نبود؛ خطا داد)
+                errorSummary = $"{operationContext} با شکست مواجه شد .\nهیچ خبری دریافت نشد.\n" +
+                    $"{errorCount} خطا رخ داد. دلیل خطای اول:\n\n{result.CreationErrors[0].Message}";
+            }
+            Exception firstError = new(errorSummary, result.CreationErrors[0]);
+            WeakReferenceMessenger.Default.Send(firstError, MessengerKey.Exception_ErrorKey);
         }
 
     }

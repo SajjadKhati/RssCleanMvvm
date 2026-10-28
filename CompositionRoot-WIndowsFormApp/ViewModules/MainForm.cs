@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel;
-using ViewModel.Services.SharedMessengerKeyService.Class;
+using ViewModel.DataModels.MessengerKey.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using ViewModel.ViewModelModules.RssFeedViewModelModule.Class;
 
@@ -129,7 +129,7 @@ namespace CompositionRoot.WIndowsFormApp.ViewModules
         private void RegisterMessageHandler()
         {
             /// خطاهایی که ViewModel ها با Messenger می‌فرستند ، اینجا نمایش داده می‌شوند .
-            WeakReferenceMessenger.Default.Register<Exception, string>(this, SharedMessengerKey.Exception_ErrorKey, (_, exception) =>
+            WeakReferenceMessenger.Default.Register<Exception, string>(this, MessengerKey.Exception_ErrorKey, (_, exception) =>
             {
                 this.ShowError(exception);
             });
@@ -227,7 +227,7 @@ namespace CompositionRoot.WIndowsFormApp.ViewModules
                 try
                 {
                     /// معادل EventTrigger مربوط به رویداد Closing در نسخه‌ی WPF .
-                    this.viewModel.ExitCommand.Execute(null);
+                    
                 }
                 catch (Exception)
                 {

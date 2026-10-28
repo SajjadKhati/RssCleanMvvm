@@ -118,7 +118,6 @@ namespace Infra.DataAccess.Migrations
                 values: new object[,]
                 {
                     { "http://www.tasnimnews.ir/", "خبرگزاری تسنیم" },
-                    { "https://www.irib-news.ir/", "خبرگزاری صدا و سیما" },
                     { "https://www.yjc.ir/", "باشگاه خبرنگاران جوان" }
                 });
 
@@ -127,13 +126,6 @@ namespace Infra.DataAccess.Migrations
                 columns: new[] { "Id", "RssSiteEfEntityId", "Title" },
                 values: new object[,]
                 {
-                    { "https://www.irib-news.ir/fa/rss/3", "https://www.irib-news.ir/", "فیلم" },
-                    { "https://www.irib-news.ir/fa/rss/4", "https://www.irib-news.ir/", "ورزشی" },
-                    { "https://www.irib-news.ir/fa/rss/41", "https://www.irib-news.ir/", "بین الملل" },
-                    { "https://www.irib-news.ir/fa/rss/5", "https://www.irib-news.ir/", "سیاسی" },
-                    { "https://www.irib-news.ir/fa/rss/6", "https://www.irib-news.ir/", "اقتصادی" },
-                    { "https://www.irib-news.ir/fa/rss/8", "https://www.irib-news.ir/", "علمی فرهنگی" },
-                    { "https://www.irib-news.ir/fa/rss/allnews", "https://www.irib-news.ir/", "کل اخبار" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "http://www.tasnimnews.ir/", "صفحه اصلی" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "http://www.tasnimnews.ir/", "آخرین خبرهای روز" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "http://www.tasnimnews.ir/", "پر بیننده ترین اخبار امام و رهبری" },
@@ -154,13 +146,6 @@ namespace Infra.DataAccess.Migrations
                 columns: new[] { "RssFeedEfEntityId", "AttributeNames", "ChildElementNames", "ParentElementName" },
                 values: new object[,]
                 {
-                    { "https://www.irib-news.ir/fa/rss/3", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
-                    { "https://www.irib-news.ir/fa/rss/4", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
-                    { "https://www.irib-news.ir/fa/rss/41", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
-                    { "https://www.irib-news.ir/fa/rss/5", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
-                    { "https://www.irib-news.ir/fa/rss/6", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
-                    { "https://www.irib-news.ir/fa/rss/8", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
-                    { "https://www.irib-news.ir/fa/rss/allnews", "[\"url\"]", "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]", "item" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "[\"url\"]", "[\"guid\",\"link\",\"category\",\"title\",\"description\",\"pubDate\",\"{http://search.yahoo.com/mrss/}thumbnail\"]", "item" },
@@ -181,13 +166,6 @@ namespace Infra.DataAccess.Migrations
                 columns: new[] { "RssFeedEfEntityId", "Argb8BitImageKey", "CategoryKey", "DescriptionKey", "IdKey", "LinkKey", "PublishDateKey", "TitleKey" },
                 values: new object[,]
                 {
-                    { "https://www.irib-news.ir/fa/rss/3", "url", null, "description", "link", "link", "pubDate", "title" },
-                    { "https://www.irib-news.ir/fa/rss/4", "url", null, "description", "link", "link", "pubDate", "title" },
-                    { "https://www.irib-news.ir/fa/rss/41", "url", null, "description", "link", "link", "pubDate", "title" },
-                    { "https://www.irib-news.ir/fa/rss/5", "url", null, "description", "link", "link", "pubDate", "title" },
-                    { "https://www.irib-news.ir/fa/rss/6", "url", null, "description", "link", "link", "pubDate", "title" },
-                    { "https://www.irib-news.ir/fa/rss/8", "url", null, "description", "link", "link", "pubDate", "title" },
-                    { "https://www.irib-news.ir/fa/rss/allnews", "url", null, "description", "link", "link", "pubDate", "title" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/0/AllStories", "url", "category", "description", "guid", "link", "pubDate", "title" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/0/0/8/1/TopStories", "url", "category", "description", "guid", "link", "pubDate", "title" },
                     { "https://www.tasnimnews.ir/fa/rss/feed/1127/0/7/0/MostPupolar", "url", "category", "description", "guid", "link", "pubDate", "title" },

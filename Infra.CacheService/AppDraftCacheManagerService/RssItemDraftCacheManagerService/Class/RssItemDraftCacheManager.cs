@@ -96,6 +96,13 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
         #endregion
 
 
+        #region رویدادها
+
+        public event EventHandler<int> ItemsCountChanged;
+
+        #endregion
+
+
         ////////////////////////////////////////////////////////////////
 
 
@@ -201,9 +208,18 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
         }
 
 
+        ////////////////////////////////////////////////////////////////
+
+
         public bool ContainKey(Uri key)
         {
             return this.rssItemDraftCache.ContainsKey(key);
+        }
+
+
+        public bool HasAnyItems()
+        {
+            return this.rssItemDraftCache.Count() != 0;
         }
 
 
@@ -313,6 +329,12 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
         ////////////////////////////////////////////////////////////////
 
 
+        protected void OnItemsCountChanged()
+        {
+            this.ItemsCountChanged?.Invoke(this, this.rssItemDraftCache.Count());
+        }
+
+
         protected virtual void Dispose(bool disposing)
         {
             if (disposing == false || this.isDisposed == true)
@@ -323,6 +345,7 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
             this.isDisposed = true;
             this.folderManager.DeleteFolderWithContents(this.tempImagesFolderPath.FolderPath);
             this.ClearCaches();
+            this.ItemsCountChanged = null;
         }
 
 
@@ -357,6 +380,8 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
 
             this.draftCacheWriter.AddOrUpdateToDraftCache(this.rssItemDraftCache, key, rssItemWithDto.RssItem, draftState);
             this.draftCacheWriter.AddOrUpdateToDraftCache(this.rssItemDtoDraftCache, key, rssItemWithDto.RssItemDto, draftState);
+
+            this.OnItemsCountChanged();
         }
 
 
@@ -455,6 +480,8 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
         {
             this.rssItemDraftCache.Clear();
             this.rssItemDtoDraftCache.Clear();
+
+            this.OnItemsCountChanged();
         }
 
 
@@ -462,6 +489,8 @@ namespace Infra.CacheService.AppDraftCacheManagerService.RssItemDraftCacheManage
         {
             bool isRemoved = this.rssItemDraftCache.TryRemove(key);
             this.rssItemDtoDraftCache.TryRemove(key);
+            if(isRemoved == true)
+                this.OnItemsCountChanged();
             return isRemoved;
         }
 

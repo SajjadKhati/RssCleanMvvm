@@ -19,7 +19,11 @@ namespace Application.InfrastructureContracts.CacheProject.AppDraftCacheManager.
     public interface IRssItemDraftCacheReader
     {
 
+        event EventHandler<int> ItemsCountChanged;
+
         bool ContainKey(Uri key);
+
+        bool HasAnyItems();
 
         IReadOnlyCollection<Uri> GetAllDraftCacheKeys();
 

@@ -7,14 +7,18 @@ using CompositionRoot.WpfApp.ViewModules;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView;
+using View.WpfLibrary.RssCleanMvvm.UiLogicModules.ConfirmationDialog.Class;
 using View.WpfLibrary.RssCleanMvvm.UiLogicModules.ResourceSwitcherModule.Class;
+using View.WpfLibrary.RssCleanMvvm.UiLogicModules.WaitingDialogModule.Class;
 using ViewModel.Contracts.ViewContracts.AppearanceSwitcher.DataModel;
+using ViewModel.Contracts.ViewContracts.ConfirmationDialog.Interface;
 using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.DataModel;
 using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.Interface;
 using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.DataModel;
 using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.Interface;
+using ViewModel.Contracts.ViewContracts.WaitingDialog.Interface;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
-
 
 namespace CompositionRoot.WpfApp
 {
@@ -98,7 +102,7 @@ namespace CompositionRoot.WpfApp
         {
             this.viewDisplayer.ShowErrorInMainThread(e.Exception, "خطای مدیریت نشده که در نخ اصلی منتشر شد");
 
-            // جلوی کرش شدن برنامه را توسط خطای مدیریت نشده ، میگیره :
+            /// جلوی کرش شدن برنامه را توسط خطای مدیریت نشده ، میگیره :
             e.Handled = true;
         }
 
@@ -158,13 +162,16 @@ namespace CompositionRoot.WpfApp
                 ///
                 this.appFinalizer = new AppFinalizer(new List<IDisposable> { singletonProvider.RssItemDraftCacheManager });
                 ///
+                MainWindow mainWindow = new MainWindow();
                 IAppearanceSwitcher appearanceSwitcher = this.CreateAppearanceSwitcher();
                 ILanguageSwitcher languageSwitcher = this.CreateLanguageSwitcher();
+                IWaitingDialog waitingDialog = this.CreateWaitingDialog(mainWindow);
+                IConfirmationDialog confirmationDialog = this.CreateConfirmationDialog();
                 ViewModelCompositionRoot viewModelCompositionRoot = this.GetViewModelCompositionRoot(
-                    connectionString, this.appPaths, singletonProvider, appearanceSwitcher, languageSwitcher);
+                    connectionString, this.appPaths, singletonProvider, appearanceSwitcher, languageSwitcher, waitingDialog, confirmationDialog);
                 MainWindowViewModel mainWindowViewModel = viewModelCompositionRoot.CreateMainWindowViewModel();
                 ///
-                this.viewDisplayer.ShowMainWindowAndSetupApp(mainWindowViewModel, App.Current);
+                this.viewDisplayer.ShowMainWindowAndSetup(mainWindow, mainWindowViewModel, App.Current);
             }
             catch (Exception exception)
             {
@@ -191,7 +198,8 @@ namespace CompositionRoot.WpfApp
 
 
         private ViewModelCompositionRoot GetViewModelCompositionRoot(string connectionString, AppPaths appPaths, 
-            SingletonProvider singletonProvider, IAppearanceSwitcher appearanceSwitcher, ILanguageSwitcher languageSwitcher)
+            SingletonProvider singletonProvider, IAppearanceSwitcher appearanceSwitcher, ILanguageSwitcher languageSwitcher,
+            IWaitingDialog waitingDialog, IConfirmationDialog confirmationDialog)
         {
             return new ViewModelCompositionRoot(
                 connectionString, 
@@ -201,7 +209,9 @@ namespace CompositionRoot.WpfApp
                 singletonProvider.SharedPersistenceCacheLock,
                 singletonProvider.RssFeedConfigCache,
                 appearanceSwitcher,
-                languageSwitcher);
+                languageSwitcher,
+                waitingDialog,
+                confirmationDialog);
         }
 
 
@@ -228,6 +238,18 @@ namespace CompositionRoot.WpfApp
             };
             LanguageName defaultLanguageName = LanguageName.Persian;
             return new LanguageSwitcher(App.Current.Resources.MergedDictionaries, languageResourceInfo, defaultLanguageName);
+        }
+
+
+        private IWaitingDialog CreateWaitingDialog(Window ownerWindow)
+        {
+            return new WaitingDialog(ownerWindow);
+        }
+
+
+        private IConfirmationDialog CreateConfirmationDialog()
+        {
+            return new ConfirmationDialog();
         }
 
     }

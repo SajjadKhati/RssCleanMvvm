@@ -128,7 +128,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
         {
             Uri rssItemUriKey = new Uri(rssItemId);
             return (this.persistenceCache.TryGetValue(rssItemUriKey, out RssItemEfEntity rssItemEfEntity) == true) ?
-                this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity) : null;
+                this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity, isUnsaved: false) : null;
         }
 
 
@@ -143,7 +143,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
         {
             return cacheSnapshot?.Values
                 ?.Where(this.expressionFactory.FuncByFeedId(rssFeedId))
-                ?.Select(rssItemEfEntity => this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity))
+                ?.Select(rssItemEfEntity => this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity, isUnsaved: false))
                 ?.ToList();
         }
 
@@ -153,7 +153,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
             RssItemEfEntity rssItemEfEntity = this.FindByKeyEntity<string, RssItemEfEntity>(rssItemId);
             if (rssItemEfEntity == null)
                 return null;
-            return this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity);
+            return this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity, isUnsaved: false);
         }
 
 
@@ -177,7 +177,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemDtoQueryService.Class
 
             return rssItemEfEntityQuery
                 .ToList()
-                .Select(e => this.rssItemDtoMapper.ToRssItemDto(e))
+                .Select(e => this.rssItemDtoMapper.ToRssItemDto(e, isUnsaved: false))
                 .ToList();
         }
 

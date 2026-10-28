@@ -5,7 +5,7 @@ using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.DataModel;
 using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.Interface;
 using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.DataModel;
 using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.Interface;
-using ViewModel.Services.SharedMessengerKeyService.Class;
+using ViewModel.DataModels.MessengerKey.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
 
 namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
@@ -46,8 +46,6 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
         /////////////////////////////////////////////////////////////////////////////
 
 
-        public IAsyncRelayCommand ExitCommand { get; }
-
         public IRelayCommand ChangeThemeCommand { get; }
 
         public IRelayCommand ChangeLanguageCommand { get; }
@@ -63,7 +61,6 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
             this.appearanceSwitcher = appearanceSwitcher;
             this.languageSwitcher = languageSwitcher;
 
-            this.ExitCommand = new AsyncRelayCommand(this.Exit);
             this.ChangeThemeCommand = new RelayCommand<ThemeName>(this.ChangeTheme, this.CanChangeTheme);
             this.ChangeLanguageCommand = new RelayCommand<LanguageName>(this.ChangeLanguage, this.CanChangeLanguage);
             this.RegisterMessageHandler();
@@ -75,22 +72,10 @@ namespace ViewModel.ViewModelModules.MainWindowViewModelModule.Class
 
         private void RegisterMessageHandler()
         {
-            WeakReferenceMessenger.Default.Register<string, string>(this, SharedMessengerKey.String_GeneralMessageKey, (_, message) =>
+            WeakReferenceMessenger.Default.Register<string, string>(this, MessengerKey.String_GeneralMessageKey, (_, message) =>
             {
                 this.StatusMessage = message;
             });
-        }
-
-
-        private async Task Exit()
-        {
-            // فقط بررسی بشه که آیا کش موقت ، داده و اطلاعاتی داره یا نه؟
-            // و اگه داره ، اول ، به کاربر پیام بده که آیا میخواد در دیتابیس ذخیره کنه یا نه؟
-            // اگه کاربر تایید کرد ، منتقل کنه و از کش موقت حذف کنه .
-
-            // اگه کاربر تایید نکرد ، هیچ کار نکنه چون :
-            // در اینجا ، لازم به Dispose کردن کش موقت نیست  . چون در رویداد OnExit در کلاس App ، این کار انجام میشه .
-
         }
 
 

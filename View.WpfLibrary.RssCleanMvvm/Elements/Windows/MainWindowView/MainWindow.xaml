@@ -12,7 +12,8 @@
         xmlns:commandService="clr-namespace:ViewModel.Services.NeverExecuteCommandService.Class;assembly=ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance d:Type=viewModelModules:MainWindowViewModel, IsDesignTimeCreatable=False}"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Closing="MainWindow_Closing">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -22,11 +23,11 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <interaction:Interaction.Triggers>
+    <!--<interaction:Interaction.Triggers>
         <interaction:EventTrigger EventName="Closing">
-            <interaction:InvokeCommandAction  Command="{Binding Path=ExitCommand}"/>
+            <interaction:InvokeCommandAction  Command="{Binding Path=RssUserControlViewModel.CommitAllRssItemsNoResultCommand}"/>
         </interaction:EventTrigger>
-    </interaction:Interaction.Triggers>
+    </interaction:Interaction.Triggers>-->
 
     <Grid FlowDirection="{DynamicResource FlowDirectionKey}">
         <Grid.RowDefinitions>
@@ -45,7 +46,7 @@
                     بدون FallbackValue: UnsetValue به Converter می‌رود و چون null نیست،
                     نتیجه true برمی‌گردد و MenuItem اشتباهاً فعال می‌ماند.
                 -->
-                <MenuItem x:Name="GetNewNewsMenuItem" Header="{DynamicResource GetNewNewsKey}" 
+                <MenuItem Header="{DynamicResource GetNewNewsKey}" 
                           ToolTip="{DynamicResource UpdateNewNewsToolTipKey}"
                           Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.DownLoadRssItemsCommand, 
                                 FallbackValue={x:Static commandService:NeverExecuteCommand.Instance}}"/>
@@ -58,7 +59,7 @@
                     بدون FallbackValue: UnsetValue به Converter می‌رود و چون null نیست،
                     نتیجه true برمی‌گردد و MenuItem اشتباهاً فعال می‌ماند.
                 -->
-                <MenuItem x:Name="CancelDownloadMenuItem" Header="{DynamicResource CancelCurrentDownloadKey}" 
+                <MenuItem Header="{DynamicResource CancelCurrentDownloadKey}" 
                           ToolTip="{DynamicResource CancelOperationToolTipKey}"
                           Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.CancelCurrentOperationCommand,
                                 FallbackValue={x:Static commandService:NeverExecuteCommand.Instance}}"/>
@@ -66,7 +67,7 @@
                 <Separator/>
 
                 <MenuItem Header="{DynamicResource SaveAllKey}" ToolTip="{DynamicResource SaveAllToolTipKey}"
-                          Command="{Binding Path=CommitAllRssItemCommand}"/>
+                          Command="{Binding Path=CommitAllRssItemsCommand}"/>
             </MenuItem>
 
             <MenuItem Header="{DynamicResource SettingsKey}">

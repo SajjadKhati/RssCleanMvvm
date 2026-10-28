@@ -72,7 +72,7 @@ namespace Infra.DataAccess.AppQueryService.RssItemWithDtoQueryService.Class
         private RssItemWithDto MapToRssItemWithDto(RssItemEfEntity rssItemEfEntity)
         {
             RssItem rssItem = this.rssItemReconstructor.Reconstruct(rssItemEfEntity);
-            RssItemDto rssItemDto = this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity);
+            RssItemDto rssItemDto = this.rssItemDtoMapper.ToRssItemDto(rssItemEfEntity, isUnsaved : false);
             return new RssItemWithDto(rssItem, rssItemDto);
         }
 

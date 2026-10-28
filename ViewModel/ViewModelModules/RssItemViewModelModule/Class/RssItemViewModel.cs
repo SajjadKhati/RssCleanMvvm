@@ -6,7 +6,7 @@ using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Interface;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using ViewModel.Services.SharedMessengerKeyService.Class;
+using ViewModel.DataModels.MessengerKey.Class;
 
 namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
 {
@@ -189,7 +189,7 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
             }
             catch (Exception exception)
             {
-                WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
+                WeakReferenceMessenger.Default.Send(exception, MessengerKey.Exception_ErrorKey);
             }
         }
 
@@ -202,11 +202,11 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
                 if (draftCacheRssItemDto == null)
                     throw new InvalidOperationException($"آیتم در کش موقت پیدا نشد — احتمالاً همزمان، تغییر دیگری روی آن انجام شده است. لطفاً دوباره تلاش کنید.");
 
-                this.UpdateImageFromDto(draftCacheRssItemDto, isUnsaved : true);
+                this.UpdateImage(draftCacheRssItemDto.ImageFullFilePath, isUnsaved : true);
             }
             catch (Exception exception)
             {
-                WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
+                WeakReferenceMessenger.Default.Send(exception, MessengerKey.Exception_ErrorKey);
             }
         }
 
@@ -225,13 +225,20 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
                 if (commitedRssItemDto == null)
                     throw new Exception("مورد خبر ذخیره نشد — احتمالاً هم‌زمان، تغییر دیگری روی آن انجام شده. لطفاً دوباره تلاش کنید.");
 
-                this.UpdateImageFromDto(commitedRssItemDto, isUnsaved : false);
+                this.UpdateImage(commitedRssItemDto.ImageFullFilePath, isUnsaved : false);
                 this.SendGeneralMessage("مورد خبر ، با موفقیت ذخیره شد .");
             }
             catch (Exception exception)
             {
-                WeakReferenceMessenger.Default.Send(exception, SharedMessengerKey.Exception_ErrorKey);
+                WeakReferenceMessenger.Default.Send(exception, MessengerKey.Exception_ErrorKey);
             }
+        }
+
+
+        public void UpdateImage(string imageFullFilePath, bool isUnsaved)
+        {
+            this.ImageFullFilePath = imageFullFilePath;
+            this.IsUnsaved = isUnsaved;
         }
 
 
@@ -265,16 +272,9 @@ namespace ViewModel.ViewModelModules.RssItemViewModelModule.Class
         }
 
 
-        private void UpdateImageFromDto(RssItemDto rssItemDto, bool isUnsaved)
-        {
-            this.ImageFullFilePath = rssItemDto.ImageFullFilePath;
-            this.IsUnsaved = isUnsaved;
-        }
-
-
         private void SendGeneralMessage(string message)
         {
-            WeakReferenceMessenger.Default.Send(message, SharedMessengerKey.String_GeneralMessageKey);
+            WeakReferenceMessenger.Default.Send(message, MessengerKey.String_GeneralMessageKey);
         }
 
     }

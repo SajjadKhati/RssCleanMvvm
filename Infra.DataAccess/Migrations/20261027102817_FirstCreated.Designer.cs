@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infra.DataAccess.Migrations
 {
     [DbContext(typeof(RssDbContext))]
-    [Migration("20260913182045_FirstCreated")]
+    [Migration("20261027102817_FirstCreated")]
     partial class FirstCreated
     {
         /// <inheritdoc />
@@ -125,48 +125,6 @@ namespace Infra.DataAccess.Migrations
                             Id = "https://www.yjc.ir/fa/rss/11",
                             RssSiteEfEntityId = "https://www.yjc.ir/",
                             Title = "فیلم و صوت"
-                        },
-                        new
-                        {
-                            Id = "https://www.irib-news.ir/fa/rss/allnews",
-                            RssSiteEfEntityId = "https://www.irib-news.ir/",
-                            Title = "کل اخبار"
-                        },
-                        new
-                        {
-                            Id = "https://www.irib-news.ir/fa/rss/5",
-                            RssSiteEfEntityId = "https://www.irib-news.ir/",
-                            Title = "سیاسی"
-                        },
-                        new
-                        {
-                            Id = "https://www.irib-news.ir/fa/rss/41",
-                            RssSiteEfEntityId = "https://www.irib-news.ir/",
-                            Title = "بین الملل"
-                        },
-                        new
-                        {
-                            Id = "https://www.irib-news.ir/fa/rss/6",
-                            RssSiteEfEntityId = "https://www.irib-news.ir/",
-                            Title = "اقتصادی"
-                        },
-                        new
-                        {
-                            Id = "https://www.irib-news.ir/fa/rss/8",
-                            RssSiteEfEntityId = "https://www.irib-news.ir/",
-                            Title = "علمی فرهنگی"
-                        },
-                        new
-                        {
-                            Id = "https://www.irib-news.ir/fa/rss/4",
-                            RssSiteEfEntityId = "https://www.irib-news.ir/",
-                            Title = "ورزشی"
-                        },
-                        new
-                        {
-                            Id = "https://www.irib-news.ir/fa/rss/3",
-                            RssSiteEfEntityId = "https://www.irib-news.ir/",
-                            Title = "فیلم"
                         });
                 });
 
@@ -280,55 +238,6 @@ namespace Infra.DataAccess.Migrations
                         new
                         {
                             RssFeedEfEntityId = "https://www.yjc.ir/fa/rss/11",
-                            AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
-                            ParentElementName = "item"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/allnews",
-                            AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
-                            ParentElementName = "item"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/5",
-                            AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
-                            ParentElementName = "item"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/41",
-                            AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
-                            ParentElementName = "item"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/6",
-                            AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
-                            ParentElementName = "item"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/8",
-                            AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
-                            ParentElementName = "item"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/4",
-                            AttributeNames = "[\"url\"]",
-                            ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
-                            ParentElementName = "item"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/3",
                             AttributeNames = "[\"url\"]",
                             ChildElementNames = "[\"title\",\"link\",\"description\",\"enclosure\",\"pubDate\"]",
                             ParentElementName = "item"
@@ -561,76 +470,6 @@ namespace Infra.DataAccess.Migrations
                             LinkKey = "link",
                             PublishDateKey = "pubDate",
                             TitleKey = "title"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/allnews",
-                            Argb8BitImageKey = "url",
-                            DescriptionKey = "description",
-                            IdKey = "link",
-                            LinkKey = "link",
-                            PublishDateKey = "pubDate",
-                            TitleKey = "title"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/5",
-                            Argb8BitImageKey = "url",
-                            DescriptionKey = "description",
-                            IdKey = "link",
-                            LinkKey = "link",
-                            PublishDateKey = "pubDate",
-                            TitleKey = "title"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/41",
-                            Argb8BitImageKey = "url",
-                            DescriptionKey = "description",
-                            IdKey = "link",
-                            LinkKey = "link",
-                            PublishDateKey = "pubDate",
-                            TitleKey = "title"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/6",
-                            Argb8BitImageKey = "url",
-                            DescriptionKey = "description",
-                            IdKey = "link",
-                            LinkKey = "link",
-                            PublishDateKey = "pubDate",
-                            TitleKey = "title"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/8",
-                            Argb8BitImageKey = "url",
-                            DescriptionKey = "description",
-                            IdKey = "link",
-                            LinkKey = "link",
-                            PublishDateKey = "pubDate",
-                            TitleKey = "title"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/4",
-                            Argb8BitImageKey = "url",
-                            DescriptionKey = "description",
-                            IdKey = "link",
-                            LinkKey = "link",
-                            PublishDateKey = "pubDate",
-                            TitleKey = "title"
-                        },
-                        new
-                        {
-                            RssFeedEfEntityId = "https://www.irib-news.ir/fa/rss/3",
-                            Argb8BitImageKey = "url",
-                            DescriptionKey = "description",
-                            IdKey = "link",
-                            LinkKey = "link",
-                            PublishDateKey = "pubDate",
-                            TitleKey = "title"
                         });
                 });
 
@@ -659,11 +498,6 @@ namespace Infra.DataAccess.Migrations
                         {
                             Id = "https://www.yjc.ir/",
                             SiteName = "باشگاه خبرنگاران جوان"
-                        },
-                        new
-                        {
-                            Id = "https://www.irib-news.ir/",
-                            SiteName = "خبرگزاری صدا و سیما"
                         });
                 });
 

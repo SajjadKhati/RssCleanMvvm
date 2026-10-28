@@ -41,9 +41,9 @@ namespace CompositionRoot.WpfApp.ViewModules
         }
 
 
-        public void ShowMainWindowAndSetupApp(MainWindowViewModel mainWindowViewModel, System.Windows.Application currentApp)
+        public void ShowMainWindowAndSetup(MainWindow mainWindow, MainWindowViewModel mainWindowViewModel, 
+            System.Windows.Application currentApp)
         {
-            MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = mainWindowViewModel;
             currentApp.MainWindow = mainWindow;
             mainWindow.Show();

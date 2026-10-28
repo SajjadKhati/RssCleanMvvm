@@ -108,51 +108,6 @@ namespace Infra.DataAccess.EfEntityConfigurationsService.Class
                 } ,
                 #endregion
 
-                #region خبرگزاری صدا و سیما
-                new RssFeedEfEntity
-                {
-                    Id = new Uri("https://www.irib-news.ir/fa/rss/allnews").AbsoluteUri,
-                    RssSiteEfEntityId = new Uri("https://www.irib-news.ir/").AbsoluteUri,
-                    Title = "کل اخبار"
-                },
-
-                new RssFeedEfEntity
-                {
-                    Id = new Uri("https://www.irib-news.ir/fa/rss/5").AbsoluteUri,
-                    RssSiteEfEntityId = new Uri("https://www.irib-news.ir/").AbsoluteUri,
-                    Title = "سیاسی"
-                } ,
-                new RssFeedEfEntity
-                {
-                    Id = new Uri("https://www.irib-news.ir/fa/rss/41").AbsoluteUri,
-                    RssSiteEfEntityId = new Uri("https://www.irib-news.ir/").AbsoluteUri,
-                    Title = "بین الملل"
-                } ,
-                new RssFeedEfEntity
-                {
-                    Id = new Uri("https://www.irib-news.ir/fa/rss/6").AbsoluteUri,
-                    RssSiteEfEntityId = new Uri("https://www.irib-news.ir/").AbsoluteUri,
-                    Title = "اقتصادی"
-                } ,
-                new RssFeedEfEntity
-                {
-                    Id = new Uri("https://www.irib-news.ir/fa/rss/8").AbsoluteUri,
-                    RssSiteEfEntityId = new Uri("https://www.irib-news.ir/").AbsoluteUri,
-                    Title = "علمی فرهنگی"
-                } ,
-                new RssFeedEfEntity
-                {
-                    Id = new Uri("https://www.irib-news.ir/fa/rss/4").AbsoluteUri,
-                    RssSiteEfEntityId = new Uri("https://www.irib-news.ir/").AbsoluteUri,
-                    Title = "ورزشی"
-                } ,
-                new RssFeedEfEntity
-                {
-                    Id = new Uri("https://www.irib-news.ir/fa/rss/3").AbsoluteUri,
-                    RssSiteEfEntityId = new Uri("https://www.irib-news.ir/").AbsoluteUri,
-                    Title = "فیلم"
-                } ,
-                #endregion
             };
         }
 

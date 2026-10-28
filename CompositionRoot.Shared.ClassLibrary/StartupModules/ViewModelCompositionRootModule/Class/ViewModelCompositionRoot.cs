@@ -36,6 +36,7 @@ using Application.Services.RssItemCreationServices.RssItemBuilderService.Class;
 using Application.Services.RssItemCreationServices.RssItemBuilderService.Interface;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Class;
 using Application.Services.RssItemCreationServices.RssItemDataExtractorService.Interface;
+using Application.UseCases.Entry.CommitAllRssItems.Class;
 using Application.UseCases.Entry.CommitRssItem.Class;
 using Application.UseCases.Entry.CommitRssItem.Interface;
 using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Class;
@@ -98,8 +99,10 @@ using Shared.ImageServices.ImageUtilityService.Class;
 using Shared.ImageServices.ImageUtilityService.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssFeedViewModelFactory.Interface;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
+using ViewModel.Contracts.ViewContracts.ConfirmationDialog.Interface;
 using ViewModel.Contracts.ViewContracts.Switchers.AppearanceSwitcher.Interface;
 using ViewModel.Contracts.ViewContracts.Switchers.LanguageSwitcher.Interface;
+using ViewModel.Contracts.ViewContracts.WaitingDialog.Interface;
 using ViewModel.Services.RssSiteViewModelMapperService.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
 using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
@@ -126,6 +129,10 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private readonly IAppearanceSwitcher appearanceSwitcher;
 
         private readonly ILanguageSwitcher languageSwitcher;
+
+        private readonly IWaitingDialog waitingDialog;
+
+        private readonly IConfirmationDialog confirmationDialog;
 
         // ====== کش و ImageSettings (داخلی) ======
         private ICache<Uri, ImageSettings<ImageInfo>> imageSettingsCache;
@@ -181,8 +188,9 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
 
         public ViewModelCompositionRoot(string connectionString, AppPaths appPaths, RssItemDraftCacheManager rssItemDraftCacheManager,
-            ICache<Uri, RssItemEfEntity> persistenceCache, ReaderWriterLockSlim sharedPersistenceCacheLock,
-            ICache<Uri, RssFeedConfig> rssFeedConfigCache, IAppearanceSwitcher appearanceSwitcher, ILanguageSwitcher languageSwitcher)
+            ICache<Uri, RssItemEfEntity> persistenceCache, ReaderWriterLockSlim sharedPersistenceCacheLock, 
+            ICache<Uri, RssFeedConfig> rssFeedConfigCache, IAppearanceSwitcher appearanceSwitcher, ILanguageSwitcher languageSwitcher,
+            IWaitingDialog waitingDialog, IConfirmationDialog confirmationDialog)
         {
             // ====== تزریق‌ها (فقط ذخیره) ======
             this.connectionString = connectionString;
@@ -193,6 +201,9 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
             this.rssFeedConfigCache = rssFeedConfigCache;
             this.appearanceSwitcher = appearanceSwitcher;
             this.languageSwitcher = languageSwitcher;
+            this.waitingDialog = waitingDialog;
+            this.confirmationDialog = confirmationDialog;
+
 
             // ====== راه‌اندازی (به ترتیب وابستگی) ======
             this.InitializeSharedServices();
@@ -267,13 +278,20 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private RssUserControlViewModel CreateRssUserControlViewModel()
         {
             ILoadRssSiteUseCase loadRssSiteUseCase = this.CreateLoadRssSiteUseCase();
+            CommitAllRssItemsUseCase commitAllRssItemsUseCase = this.CreateCommitAllRssItemsUseCase();
             RssSiteInfoMapper rssSiteInfoMapper = this.CreateRssSiteInfoMapper();
-            return new RssUserControlViewModel(loadRssSiteUseCase, rssSiteInfoMapper);
+            return new RssUserControlViewModel(loadRssSiteUseCase, commitAllRssItemsUseCase, commitAllRssItemsUseCase, 
+                this.waitingDialog, this.confirmationDialog, rssSiteInfoMapper);
         }
 
         private ILoadRssSiteUseCase CreateLoadRssSiteUseCase()
         {
             return new LoadRssSiteUseCase(this.rssSiteQueryFactory);
+        }
+
+        private CommitAllRssItemsUseCase CreateCommitAllRssItemsUseCase()
+        {
+            return new CommitAllRssItemsUseCase(this.rssItemDraftCacheManager, this.rssItemAllSourcesOrchestrator, this.rssItemDtoQueryFactory);
         }
 
         private RssSiteInfoMapper CreateRssSiteInfoMapper()
