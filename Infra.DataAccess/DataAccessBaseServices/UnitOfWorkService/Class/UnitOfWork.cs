@@ -29,6 +29,8 @@ namespace Infra.DataAccess.DataAccessBaseServices.UnitOfWorkService.Class
         /// </summary>
         private DbContext _dbContext;
 
+        private SaveChangesErrorInterpreter saveChangesErrorInterpreter;
+
         private bool isAlreadyDisposed;
 
 
@@ -57,6 +59,9 @@ namespace Infra.DataAccess.DataAccessBaseServices.UnitOfWorkService.Class
         public UnitOfWork(DbContext dbContext)
         {
             this.DbContext = dbContext;
+            /// چون  کلاس SaveChangesErrorInterpreter ، فقط توسط UnitOfWork استفاده میشه ، اون را internal گرفتیم -
+            /// و بنابراین در CompositionRoot در دسترس نیست که بشه تزریق کرد .
+            this.saveChangesErrorInterpreter = new SaveChangesErrorInterpreter();
             this.isAlreadyDisposed = false;
         }
 
@@ -66,7 +71,32 @@ namespace Infra.DataAccess.DataAccessBaseServices.UnitOfWorkService.Class
 
         public int SaveChanges()
         {
-            return this.DbContext.SaveChanges();
+            try
+            {
+                return this.DbContext.SaveChanges();
+            }
+            catch (DbUpdateException ex) when (this.saveChangesErrorInterpreter.IsIndexKeyTooLong(ex) == true)
+            {
+                IList<string> tooLongIds = this.saveChangesErrorInterpreter.ExtractTooLongRssItemIds(ex);
+
+                /// پیام خطا شامل:
+                ///   - علت (طول شناسه بیش از حد مجاز)
+                ///   - حد مجاز (۴۵۰ کاراکتر)
+                ///   - تعداد آیتم‌های مشکل‌دار
+                ///   - لیست کامل شناسه‌های مشکل‌دار همراه با طول‌شان
+                string idsList = string.Join(Environment.NewLine, tooLongIds.Select(id => $"  • {id}  ({id.Length} کاراکتر)"));
+
+                throw new InvalidOperationException(
+                    $"ذخیره‌سازی در پایگاه داده انجام نشد. " +
+                    $"علت: طول شناسه (Id) برخی از آیتم‌های خبری از حد مجاز پایگاه داده " +
+                    $"(۴۵۰ کاراکتر، به دلیل محدودیت ۹۰۰ بایتی clustered index در SQL Server) بیشتر است." +
+                    $"{Environment.NewLine}{Environment.NewLine}" +
+                    $"تعداد آیتم‌های مشکل‌دار: {tooLongIds.Count}" +
+                    $"{Environment.NewLine}{Environment.NewLine}" +
+                    $"شناسه‌های مشکل‌دار:" +
+                    $"{Environment.NewLine}{idsList}\n\n",
+                    ex);
+            }
         }
 
 
