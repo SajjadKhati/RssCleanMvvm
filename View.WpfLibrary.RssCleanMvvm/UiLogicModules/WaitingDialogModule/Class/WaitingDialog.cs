@@ -48,9 +48,9 @@ namespace View.WpfLibrary.RssCleanMvvm.UiLogicModules.WaitingDialogModule.Class
         /// ثبت نشده. این، تفاوت ظریف «قرارداد» و «اجرای واقعی» است.
         /// </summary>
         /// <param name="logicFuncAsync"></param>
-        public void RunLogicInWaitingDialog(Func<Task> logicFuncAsync)
+        public void RunLogicInWaitingDialog(Func<Task> logicFuncAsync, string waitingText)
         {
-            WaitingWindow waitingWindow = new WaitingWindow();
+            WaitingWindow waitingWindow = new WaitingWindow(waitingText);
             waitingWindow.Owner = this.ownerWindow;
 
             /// ثبت handler برای Loaded. این فقط «تعریف» است، نه اجرا.

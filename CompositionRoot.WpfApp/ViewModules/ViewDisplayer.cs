@@ -35,7 +35,7 @@ namespace CompositionRoot.WpfApp.ViewModules
 
         public WaitingWindow ShowWaitingWindow()
         {
-            WaitingWindow waitingWindow = new WaitingWindow();
+            WaitingWindow waitingWindow = new WaitingWindow("در حال بارگذاری ...");
             waitingWindow.Show();
             return waitingWindow;
         }

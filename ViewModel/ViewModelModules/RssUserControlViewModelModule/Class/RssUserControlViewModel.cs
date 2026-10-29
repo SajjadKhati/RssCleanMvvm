@@ -188,7 +188,7 @@ namespace ViewModel.ViewModelModules.RssUserControlViewModelModule.Class
         /// </summary>
         private void CommitAllRssItems()
         {
-            this.waitingDialog.RunLogicInWaitingDialog(this.ExecuteCommitAllRssItemsAsync);
+            this.waitingDialog.RunLogicInWaitingDialog(this.ExecuteCommitAllRssItemsAsync, "در حال ذخیره سازی ...");
         }
 
 

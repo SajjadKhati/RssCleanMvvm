@@ -14,6 +14,6 @@
         /// پس از اتمام (یا خطای) منطق، پنجره بسته می‌شود.
         /// </summary>
         /// <param name="logicFuncAsync"></param>
-        void RunLogicInWaitingDialog(Func<Task> logicFuncAsync);
+        void RunLogicInWaitingDialog(Func<Task> logicFuncAsync, string waitingText);
     }
 }

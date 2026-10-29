@@ -1,9 +1,10 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Threading;
 using ViewModel.DataModels.MessengerKey.Class;
 using ViewModel.ViewModelModules.MainWindowViewModelModule.Class;
-using ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;
 
 namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
 {
@@ -81,7 +82,6 @@ namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
             /// e.Cancel را ست نمی‌کنیم (پیش‌فرض false) تا پنجره واقعاً بسته شود.
             if (this.isCloseReady == true)
                 return;
-
             /// اگر commit در حال اجراست، درخواست Close جدید کاربر را رد می‌کنیم.
             /// e.Cancel=true مانع بسته شدن پنجره در طول commit می‌شود.
             if (this.isCommitting == true)
@@ -90,29 +90,19 @@ namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
                 return;
             }
 
-            /// دسترسی به ViewModel مربوط به منطق RSS (که کامند commit را دارد).
-            RssUserControlViewModel rssUserControlViewModel = (this.DataContext as MainWindowViewModel)?.RssUserControlViewModel;
-
-            /// اگر ViewModel ساخته نشده (مثلاً خطا در startup)، بگذار پنجره بسته شود
-            /// (e.Cancel=false پیش‌فرض).
-            if (rssUserControlViewModel is null)
-                return;
-
-            /// اگر آیتم ذخیره‌نشده‌ای وجود ندارد (CanExecute=false)،
-            /// نیازی به commit نیست؛ بگذار پنجره بسته شود.
-            if (rssUserControlViewModel.CommitAllRssItemsNoResultCommand.CanExecute(null) == false)
+            IAsyncRelayCommand commitAllRssItemsNoResultCommand = (this.DataContext as MainWindowViewModel)?.
+                RssUserControlViewModel?.CommitAllRssItemsNoResultCommand;
+            if (commitAllRssItemsNoResultCommand is null || commitAllRssItemsNoResultCommand.CanExecute(null) == false)
                 return;
 
             /// از این‌جا به بعد، واقعاً باید commit انجام شود.
             /// ابتدا بستن پنجره را لغو می‌کنیم (تا Application.Shutdown شروع نشود
             /// و commit نیمه‌کاره کشته نشود).
             e.Cancel = true;
-
             /// پرچم "در حال commit" را روشن می‌کنیم تا Closeهای جدید کاربر در این
             /// بازه، رد شوند (و از double-execution جلوگیری شود).
             this.isCommitting = true;
-
-            await this.CommitAndCloseAsync(rssUserControlViewModel);
+            await this.CommitAndCloseAsync(commitAllRssItemsNoResultCommand);
         }
 
 
@@ -137,13 +127,13 @@ namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
         /// </summary>
         /// <param name="rssUserControlViewModel"></param>
         /// <returns></returns>
-        private async Task CommitAndCloseAsync(RssUserControlViewModel rssUserControlViewModel)
+        private async Task CommitAndCloseAsync(IAsyncRelayCommand commitAllRssItemsNoResultCommand)
         {
             try
             {
                 /// اجرای کامند commit (که خودش، confirmation و منطق را مدیریت می‌کند).
                 /// اینجا واقعاً await می‌کنیم (برخلاف InvokeCommandAction).
-                await rssUserControlViewModel.CommitAllRssItemsNoResultCommand.ExecuteAsync(null);
+                await commitAllRssItemsNoResultCommand.ExecuteAsync(null);
             }
             finally
             {
@@ -165,14 +155,7 @@ namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.MainWindowView
             /// Task.Yield، continuation رو به dispatcher queue می‌فرسته → Closing
             /// handler برمی‌گرده، WPF e.Cancel رو پردازش می‌کنه، بعد continuation
             /// اجرا می‌شه (خارج از closing state) → Close() امن.
-            await Task.Yield();
-
-            /// چرا Close()؟
-            /// چون در ابتدای این Closing، e.Cancel=true ست شد و پنجره بسته نشد.
-            /// تنها راه بستن پنجره، trigger کردن یک Closing جدید است — که با Close()
-            /// انجام می‌شود. در آن Closing جدید، isCloseReady=true → return فوری
-            /// → e.Cancel=false (پیش‌فرض) → پنجره بسته می‌شود.
-            this.Close();
+            this.Dispatcher.BeginInvoke(() => this.Close(), DispatcherPriority.Background);
         }
 
     }

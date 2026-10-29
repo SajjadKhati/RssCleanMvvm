@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.Windows.WaitingWindowView"
         mc:Ignorable="d"
         Title="WaitingWindow" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ShowInTaskbar="False">
+        WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ShowInTaskbar="False"
+        FlowDirection="RightToLeft">
 
     <Window.Triggers>
         <EventTrigger RoutedEvent="Loaded">
@@ -31,7 +32,7 @@
                 </Ellipse.RenderTransform>
             </Ellipse>
 
-            <TextBlock Margin="0,15,0,0" HorizontalAlignment="Center" Text="در حال بارگذاری..." FontSize="18"/>
+            <TextBlock x:Name="WaitingTextBlock" Margin="0,15,0,0" HorizontalAlignment="Center" FontSize="18"/>
         </StackPanel>
     </Border>
 

@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.WaitingWindowView
 {
@@ -19,9 +7,17 @@ namespace View.WpfLibrary.RssCleanMvvm.Elements.Windows.WaitingWindowView
     /// </summary>
     public partial class WaitingWindow : Window
     {
+
         public WaitingWindow()
         {
             InitializeComponent();
         }
+
+
+        public WaitingWindow(string waitingText) : this()
+        {
+            this.WaitingTextBlock.Text = waitingText;
+        }
+
     }
 }
