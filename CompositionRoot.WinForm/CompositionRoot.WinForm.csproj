@@ -6,8 +6,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>CompositionRoot.WIndowsFormApp</RootNamespace>
-    <AssemblyName>RssCleanMvvm.WinForms</AssemblyName>
+    <RootNamespace>CompositionRoot.WinForm</RootNamespace>
+    <AssemblyName>RssCleanMvvm.WinForm</AssemblyName>
+    <AssemblyTitle></AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,14 +22,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.16">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CompositionRoot.Shared.ClassLibrary\CompositionRoot.Shared.ClassLibrary.csproj" />
     <ProjectReference Include="..\Infra.DataAccess\Infra.DataAccess.csproj" />
     <ProjectReference Include="..\Infra.JsonService\Infra.JsonService.csproj" />
-    <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
+    <ProjectReference Include="..\View.WinFormLibrary.RssCleanMvvm\View.WinFormLibrary.RssCleanMvvm.csproj" />
   </ItemGroup>
 
 </Project>

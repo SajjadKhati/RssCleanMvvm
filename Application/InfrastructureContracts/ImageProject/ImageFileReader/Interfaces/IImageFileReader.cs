@@ -3,7 +3,7 @@
     public interface IImageFileReader
     {
 
-        byte[,,] Read8BitImageFromFile(string fullFilePath);
+        byte[,,] ReadArgb8BitImageFromFile(string fullFilePath);
 
     }
 }

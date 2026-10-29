@@ -21,10 +21,10 @@ namespace Infra.ImageService.ImageFileReaderService.Class
         //////////////////////////////////////////////////////////////
 
 
-        public byte[,,] Read8BitImageFromFile(string fullFilePath)
+        public byte[,,] ReadArgb8BitImageFromFile(string fullFilePath)
         {
             byte[] rawImage =  File.ReadAllBytes(fullFilePath);
-            return this.imageDataExtractor.Get8BitImage(rawImage);
+            return this.imageDataExtractor.GetArgb8BitImage(rawImage);
         }
 
     }

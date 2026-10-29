@@ -43,8 +43,25 @@ namespace Infra.ImageService.ImageDataExtractorService.Class
 
             using var pixels = image.GetPixels();
             byte[,,] imageData = this.infraImageCreator.GetImageDataArray(width, height, channelCount, pixels);
-
             return imageData;
+        }
+
+
+        /// <summary>
+        /// خواندن تصویر از byte[] خام و برگرداندن byte[,,] با ترتیب ARGB.
+        /// برای خواندن از فایل استفاده می‌شود (نه مسیر دانلود).
+        /// </summary>
+        /// <param name="rawImage"></param>
+        /// <returns></returns>
+        public byte[,,] GetArgb8BitImage(byte[] rawImage)
+        {
+            using var image = new MagickImage(rawImage);
+            int width = (int)image.Width;
+            int height = (int)image.Height;
+            int channelCount = (int)image.ChannelCount;
+
+            using var pixels = image.GetPixels();
+            return this.infraImageCreator.GetArgb8BitImageDataArray(width, height, channelCount, pixels);
         }
 
     }

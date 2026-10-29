@@ -29,7 +29,7 @@ namespace Infra.DataAccess.RssItemReconstructorService.Class
 
         public RssItem Reconstruct(RssItemEfEntity rssItemEfEntity)
         {
-            byte[,,] imageData = this.imageFileReader.Read8BitImageFromFile(rssItemEfEntity.ImageFullFilePath);
+            byte[,,] imageData = this.imageFileReader.ReadArgb8BitImageFromFile(rssItemEfEntity.ImageFullFilePath);
             return this.efEntityMapper.ToRssItem(rssItemEfEntity, imageData);
         }
 

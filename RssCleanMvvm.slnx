@@ -1,10 +1,11 @@
 <Solution>
   <Folder Name="/0 Composition Root/">
-    <Project Path="CompositionRoot-WIndowsFormApp/CompositionRoot.WIndowsFormApp.csproj" />
     <Project Path="CompositionRoot.Shared.ClassLibrary/CompositionRoot.Shared.ClassLibrary.csproj" Id="3a539b35-bb45-4bad-b7d0-017ddc0a80c8" />
+    <Project Path="CompositionRoot.WinForm/CompositionRoot.WinForm.csproj" />
     <Project Path="CompositionRoot.WpfApp/CompositionRoot.WpfApp.csproj" Id="0f92d4af-a93a-4f11-8de3-273610de0b40" />
   </Folder>
   <Folder Name="/1 View/">
+    <Project Path="View.WinFormLibrary.RssCleanMvvm/View.WinFormLibrary.RssCleanMvvm.csproj" />
     <Project Path="View.WpfLibrary.RssCleanMvvm/View.WpfLibrary.RssCleanMvvm.csproj" Id="79d109bf-5524-43dd-8714-351ce40db9ca" />
   </Folder>
   <Folder Name="/2 ViewModel/">

@@ -26,7 +26,8 @@
 
     <Border Background="White" CornerRadius="10" Padding="30">
         <StackPanel>
-            <Ellipse Width="100" Height="100" Stroke="Blue" StrokeThickness="6" StrokeDashArray="2 2" RenderTransformOrigin="0.5,0.5">
+            <Ellipse FlowDirection="LeftToRight" Width="100" Height="100" Stroke="Blue" StrokeThickness="6" 
+                     StrokeDashArray="2 2" RenderTransformOrigin="0.5,0.5">
                 <Ellipse.RenderTransform>
                     <RotateTransform x:Name="SpinTransform"/>
                 </Ellipse.RenderTransform>
