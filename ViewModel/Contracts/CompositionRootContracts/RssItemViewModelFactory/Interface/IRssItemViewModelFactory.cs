@@ -10,6 +10,10 @@ namespace ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.I
     /// </summary>
     public interface IRssItemViewModelFactory
     {
+
+        ICollection<RssItemViewModel> CreateRange(ICollection<RssItemDto> rssItemDtos);
+
         RssItemViewModel Create(RssItemDto rssItemDto);
+
     }
 }

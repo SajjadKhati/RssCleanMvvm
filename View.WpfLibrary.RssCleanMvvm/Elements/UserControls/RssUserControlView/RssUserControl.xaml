@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:View.WpfLibrary.RssCleanMvvm.Elements.UserControls.RssUserControlView"
              xmlns:viewModelModules="clr-namespace:ViewModel.ViewModelModules.RssUserControlViewModelModule.Class;assembly=ViewModel"
              xmlns:interaction="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:routedEventTriggerModule="clr-namespace:View.WpfLibrary.RssCleanMvvm.UiLogicModules.RoutedEventTriggerModule.Class"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance d:Type=viewModelModules:RssUserControlViewModel, IsDesignTimeCreatable=False}"
@@ -54,9 +55,20 @@
                         Text="{DynamicResource SelectNewsCategoryKey}"
                       ItemsSource="{Binding  Path=RssSiteViewModels/RssFeedViewModels}"
                       DisplayMemberPath="Title"
-                      SelectedItem="{Binding Mode=OneWayToSource, Path=RssSiteViewModels/SelectedRssFeedViewModel}"
+                      SelectedItem="{Binding Mode=OneWayToSource, Path=RssSiteViewModels/SelectedRssFeedViewModel, 
+                            NotifyOnSourceUpdated=True}"
                       IsEnabled="{Binding Path=SelectedRssSiteViewModel, 
-                            Converter={StaticResource NullableToBoolValueConverterKey} }"/>
+                            Converter={StaticResource NullableToBoolValueConverterKey} }">
+
+                    <interaction:Interaction.Triggers>
+                        <routedEventTriggerModule:RoutedEventTrigger 
+                            RoutedEvent="{x:Static Binding.SourceUpdatedEvent}" MarkAsHandled="True">
+                            <interaction:InvokeCommandAction 
+                                Command="{Binding Path=SelectedRssSiteViewModel.SelectedRssFeedViewModel.LoadRssItemsCommand}"/>
+                        </routedEventTriggerModule:RoutedEventTrigger>
+                    </interaction:Interaction.Triggers>
+
+                </ComboBox>
             </Grid>
         </Grid>
 

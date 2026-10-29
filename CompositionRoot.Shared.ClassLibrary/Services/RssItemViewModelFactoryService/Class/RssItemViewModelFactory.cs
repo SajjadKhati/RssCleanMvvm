@@ -33,6 +33,21 @@ namespace CompositionRoot.Shared.ClassLibrary.Services.RssItemViewModelFactorySe
         /////////////////////////////////////////////////////////////////////////
 
 
+        public ICollection<RssItemViewModel> CreateRange(ICollection<RssItemDto> rssItemDtos)
+        {
+            if (rssItemDtos == null)
+                return null;
+
+            ICollection<RssItemViewModel> rssItemViewModels = new List<RssItemViewModel>();
+            foreach (RssItemDto rssItemDto in rssItemDtos)
+            {
+                RssItemViewModel rssItemViewModel = this.Create(rssItemDto);
+                rssItemViewModels.Add(rssItemViewModel);
+            }
+            return rssItemViewModels;
+        }
+
+
         public RssItemViewModel Create(RssItemDto rssItemDto)
         {
             return new RssItemViewModel(

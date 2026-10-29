@@ -43,6 +43,8 @@ using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Class;
 using Application.UseCases.Entry.ConvertRssItemImageToGrayscale.Interface;
 using Application.UseCases.Entry.DownLoadRssItems.Class;
 using Application.UseCases.Entry.DownLoadRssItems.Interface;
+using Application.UseCases.Entry.LoadRssItems.Class;
+using Application.UseCases.Entry.LoadRssItems.Interface;
 using Application.UseCases.Entry.LoadRssSite.Class;
 using Application.UseCases.Entry.LoadRssSite.Interface;
 using Application.UseCases.Entry.SaveRssItemDataToDraftCache.Class;
@@ -165,6 +167,8 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
         private IImageChannelCountNormalizerFactory<byte> imageChannelCountNormalizerFactory;
 
         private IImageChannelSequenceNormalizerFactory<byte> imageChannelSequenceNormalizerFactory;
+
+        private IDownLoadRssItemsUseCase downLoadRssItemsUseCase;
 
         private IRssItemViewModelFactory rssItemViewModelFactory;
 
@@ -305,14 +309,20 @@ namespace CompositionRoot.Shared.ClassLibrary.StartupModules.ViewModelCompositio
 
         private IRssFeedViewModelFactory CreateRssFeedViewModelFactory()
         {
-            IDownLoadRssItemsUseCase downLoadRssItemsUseCase = this.CreateDownLoadRssItemsUseCase();
-            return new RssFeedViewModelFactory(downLoadRssItemsUseCase, this.rssItemViewModelFactory);
+            this.downLoadRssItemsUseCase = this.CreateDownLoadRssItemsUseCase();
+            ILoadRssItemsUseCase loadRssItemsUseCase = this.CreateLoadRssItemsUseCase();
+            return new RssFeedViewModelFactory(loadRssItemsUseCase, this.downLoadRssItemsUseCase, this.rssItemViewModelFactory);
         }
 
         private IDownLoadRssItemsUseCase CreateDownLoadRssItemsUseCase()
         {
             IRssItemDownloaderIntoDraftCacheOrchestrator rssItemDownloaderIntoDraftCacheOrchestrator = this.CreateRssItemDownloaderIntoDraftCacheOrchestrator();
             return new DownLoadRssItemsUseCase(rssItemDownloaderIntoDraftCacheOrchestrator, this.rssItemDtosResultMapper, this.rssFeedConfigCache);
+        }
+
+        private ILoadRssItemsUseCase CreateLoadRssItemsUseCase()
+        {
+            return new LoadRssItemsUseCase(this.rssItemDtoQueryFactory, this.downLoadRssItemsUseCase);
         }
 
         private IRssItemDownloaderIntoDraftCacheOrchestrator CreateRssItemDownloaderIntoDraftCacheOrchestrator()

@@ -1,6 +1,7 @@
-﻿using Application.OverallDataModels.OverallDto.EntityDto;
-using Application.UseCases.Entry.DownLoadRssItems.DataModels;
+﻿using Application.UseCases.Entry.DownLoadRssItems.DataModels;
 using Application.UseCases.Entry.DownLoadRssItems.Interface;
+using Application.UseCases.Entry.LoadRssItems.DataModels;
+using Application.UseCases.Entry.LoadRssItems.Interface;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using ViewModel.Contracts.CompositionRootContracts.RssItemViewModelFactory.Interface;
@@ -16,9 +17,17 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
     public class RssFeedViewModel
     {
 
+        private ILoadRssItemsUseCase loadRssItemsUseCase;
+
         private IDownLoadRssItemsUseCase downLoadRssItemsUseCase;
 
         private IRssItemViewModelFactory rssItemViewModelFactory;
+
+        /// <summary>
+        /// آیا این فید قبلاً یک‌بار Load شده؟ (برای جلوگیری از Load دوباره
+        /// وقتی کاربر بین فیدها سوئیچ می‌کند)
+        /// </summary>
+        private bool hasBeenLoaded;
 
         private readonly string[] ObservedProperties =
         {
@@ -50,16 +59,18 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
         /////////////////////////////////////////////////////////////////////////////
 
 
-        public RssFeedViewModel(string id, string title, IDownLoadRssItemsUseCase downLoadRssItemsUseCase, 
-            IRssItemViewModelFactory rssItemViewModelFactory)
+        public RssFeedViewModel(string id, string title, ILoadRssItemsUseCase loadRssItemsUseCase, 
+            IDownLoadRssItemsUseCase downLoadRssItemsUseCase, IRssItemViewModelFactory rssItemViewModelFactory)
         {
             this.Id = id;
             this.Title = title;
             /// اطلاعات آیتم های RssItemViewModels چون بعدا باید یا دانلود شوند و یا از دیتابیس گرفته شوند ، پس در سازنده نیاز به این اطلاعات نیست . 
             /// در اینجا فقط کالکشن خالی میسازیم .
             this.RssItemViewModels = new RangeObservableCollection<RssItemViewModel>();
+            this.loadRssItemsUseCase = loadRssItemsUseCase;
             this.downLoadRssItemsUseCase = downLoadRssItemsUseCase;
             this.rssItemViewModelFactory = rssItemViewModelFactory;
+            this.hasBeenLoaded = false;
 
             this.LoadRssItemsCommand = new AsyncRelayCommand(this.LoadRssItems, this.CanLoadRssItems);
             this.DownLoadRssItemsCommand = new AsyncRelayCommand(this.DownLoadRssItems, this.CanDownLoadRssItems);
@@ -70,24 +81,32 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
 
         /////////////////////////////////////////////////////////////////////////////
 
+
         private bool CanLoadRssItems()
         {
-            throw new NotImplementedException();
+            return this.DownLoadRssItemsCommand.IsRunning == false && this.hasBeenLoaded == false;
         }
 
 
         private async Task LoadRssItems(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-
+            this.hasBeenLoaded = true;
             this.SendOperationStartedMessage();
             try
             {
-
+                this.SendStartingMessages(isDownloadOperation: false);
+                LoadRssItemsResult loadRssItemsResult = await this.loadRssItemsUseCase.ExecuteAsync(new Uri(this.Id), cancellationToken);
+                if (loadRssItemsResult.AllRssItemDtos != null)
+                {
+                    ICollection<RssItemViewModel> rssItemViewModels = this.rssItemViewModelFactory.CreateRange(loadRssItemsResult.AllRssItemDtos);
+                    this.InsertToBeginningIndexOfRssItemViewModels(rssItemViewModels);
+                }
+                this.SendEndingMessages(loadRssItemsResult.DownloadedResult, isDownloadOperation: false);
             }
             catch (Exception exception)
             {
-                
+                /// خطاهای XML/شبکه (که در Orchestrator گرفته نشدن) اینجا گرفته می‌شن
+                WeakReferenceMessenger.Default.Send(exception, MessengerKey.Exception_ErrorKey);
             }
             finally
             {
@@ -111,7 +130,7 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
                 RssItemDtosResult rssItemDtosResult = await this.downLoadRssItemsUseCase.ExecuteAsync(new Uri(this.Id), cancellationToken);
                 if (rssItemDtosResult.CreatedRssItemDtos != null)
                 {
-                    ICollection<RssItemViewModel> rssItemViewModels = this.ConvertToRssItemViewModels(rssItemDtosResult.CreatedRssItemDtos);
+                    ICollection<RssItemViewModel> rssItemViewModels = this.rssItemViewModelFactory.CreateRange(rssItemDtosResult.CreatedRssItemDtos);
                     this.InsertToBeginningIndexOfRssItemViewModels(rssItemViewModels);
                 }
                 this.SendEndingMessages(rssItemDtosResult, isDownloadOperation: true);
@@ -208,21 +227,6 @@ namespace ViewModel.ViewModelModules.RssFeedViewModelModule.Class
         {
             WeakReferenceMessenger.Default.Send(new FeedOperationStateMessage(FeedOperationState.Ended, this.Id),
                 MessengerKey.FeedOperationStateMessage_RunningStateKey);
-        }
-
-
-        private ICollection<RssItemViewModel> ConvertToRssItemViewModels(ICollection<RssItemDto> rssItemDtos)
-        {
-            if (rssItemDtos == null || rssItemDtos.Count == 0)
-                return null;
-
-            ICollection<RssItemViewModel> rssItemViewModels = new List<RssItemViewModel>();
-            foreach (RssItemDto rssItemDto in rssItemDtos)
-            {
-                RssItemViewModel rssItemViewModel = this.rssItemViewModelFactory.Create(rssItemDto);
-                rssItemViewModels.Add(rssItemViewModel);
-            }
-            return rssItemViewModels;
         }
 
 
